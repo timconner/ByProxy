@@ -1,0 +1,25 @@
+.home-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.getting-started {
+    text-align: center;
+    background-color: var(--light-bg-color);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-color) 0px 2px 4px, var(--darker-bg-color) 0px 7px 13px -3px, var(--shadow-color) 0px -3px 0px inset;
+}
+
+.steps {
+    text-align: left;
+}
+
+ol {
+    padding-right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}

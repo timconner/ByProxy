@@ -1,0 +1,58 @@
+﻿@inject IStringLocalizer<Language> _strings
+@inject NavigationManager _nav
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="/" />
+    <link rel="stylesheet" href="css/app.css" />
+    @{ #if DEBUG }
+    <link rel="stylesheet" href="ByProxy.styles.css" />
+    @{ #else }
+    <link href="css/components.css" rel="stylesheet" />
+    @{ #endif }    
+
+    @if (_renderMode != null) {
+        <script src="js/sortable.js"></script>
+        <script>
+            var require = { paths: { vs: `${location.origin}/monaco/vs` } };
+        </script>
+        <script src="monaco/vs/loader.js"></script>
+    }    
+    
+    <script src="js/app.js"></script>
+
+    <HeadOutlet @rendermode="_renderMode" />
+</head>
+
+<body>
+    <Routes @rendermode="_renderMode" />
+    <div id="reconnect-modal"></div>
+    <script src="_framework/blazor.web.js" autostart="false"></script>
+    <script src="js/boot.js" data-reconnect-string="@_strings["AttemptingReconnect"]"></script>
+</body>
+
+</html>
+
+@code {
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    private static string[] staticPages = ["/login", "/logout", "/reset-pw"];
+    private IComponentRenderMode? _renderMode = null;
+
+    protected override void OnInitialized() {
+        _renderMode = staticPages.Contains(HttpContext.Request.Path.Value?.TrimEnd('/')) ? null : RenderMode.InteractiveServer;
+
+        HttpContext.Response.Cookies.Append(
+            CookieNames.AdminCulture,
+            CookieRequestCultureProvider.MakeCookieValue(
+                new RequestCulture(
+                            CultureInfo.CurrentCulture,
+                            CultureInfo.CurrentUICulture)));
+
+    }
+}

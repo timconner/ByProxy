@@ -1,0 +1,20 @@
+{
+  "Acme": {
+    "Providers": [
+      {
+        "Id": "letsencrypt",
+        "Name": "Let's Encrypt",
+        "DirectoryUrl": "https://acme-v02.api.letsencrypt.org/directory",
+        "Challenges": [ "http-01", "dns-01", "tls-alpn-01" ],
+        "ContactEmailsOptional": true
+      },
+      {
+        "Id": "letsencrypt-staging",
+        "Name": "Let's Encrypt Staging (Use for Testing)",
+        "DirectoryUrl": "https://acme-staging-v02.api.letsencrypt.org/directory",
+        "Challenges": [ "http-01", "dns-01", "tls-alpn-01" ],
+        "ContactEmailsOptional": true
+      }
+    ]
+  }
+}

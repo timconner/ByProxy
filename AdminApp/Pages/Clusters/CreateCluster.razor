@@ -1,0 +1,52 @@
+﻿@page "/clusters/create"
+@attribute [Authorize(Roles = AuthRoles.Editor)]
+@inject IStringLocalizer<Language> _strings
+@inject ProxyStateService _proxyState
+@inject ConfigurationService _config
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ModalService _modal
+@inject NavigationManager _nav
+
+<PageHeader Title="@_strings["Create Cluster"]">
+    <PageHeaderButton Icon="device-floppy" Label="@_strings["Save"]" @onclick="PerformSave" />
+</PageHeader>
+
+<PageContent>
+    @if (_newCluster == null) {
+        <LoadingIndicator />
+    } else {
+        <ClusterEditor Cluster="_newCluster" />
+    }
+</PageContent>
+
+@code {
+    private ProxyCluster? _newCluster;
+
+    protected override void OnInitialized() {
+        _newCluster = new ProxyCluster {
+            Id = Guid.NewGuid(),
+            ConfigRevision = 0,
+            Destinations = new(),
+            Name = string.Empty,
+            Description = string.Empty
+        };
+    }
+
+    private async Task PerformSave() {
+        if (_newCluster == null) return;
+        
+        var errors = _newCluster.GetValidationErrors();
+        if (errors.Count > 0) {
+            await _modal.OkOnly(_strings["Error"], $"{_strings["Validation Errors"]}:\n\n{string.Join("\n- ", errors.Select(e => _strings[e]))}");
+            return;
+        }
+
+        var success = await _modal.PerformSave(async () => {
+            using var db = _dbFactory.CreateDbContext();
+            db.Clusters.Add(_newCluster.Clone(_proxyState.CandidateConfigRevision));
+            await db.SaveChangesAsync();
+        });
+        _ = _config.UpdateHasChangesPending();
+        if (success) _nav.NavigateTo("/clusters");
+    }
+}

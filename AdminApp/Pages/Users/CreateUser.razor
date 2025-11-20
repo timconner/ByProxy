@@ -1,0 +1,60 @@
+﻿@page "/users/create"
+@attribute [Authorize(Roles = AuthRoles.Admin)]
+@inject IStringLocalizer<Language> _strings
+@inject AuthService _auth
+@inject NavigationManager _nav
+
+<PageHeader Title="@_strings["Create User"]">
+    <PageHeaderButton Icon="device-floppy" Label="@_strings["Save"]" @onclick="Create" />
+</PageHeader>
+
+<PageContent>
+    <div class="info">
+        <Icon Name="info-circle" />
+        <span>
+            @_strings["INFO_CreateUser"]
+        </span>
+    </div>
+    <form @onsubmit="Create">
+        @if (_errorMessage != null) {
+            <div class="error">
+                <Icon Name="alert-triangle" />
+                @_errorMessage
+            </div>
+        }
+        <div class="fields">
+            <label>@_strings["Full Name"]: <InputText @bind-Value="_fullName" /></label>
+            <label>@_strings["Display Name"]: <InputText @bind-Value="_displayName" /></label>
+            <label>@_strings["Username"]: <InputText @bind-Value="_username" /></label>
+            <label>
+                <span>@_strings["Password"]: </span>
+                <InputText type="password" @bind-Value="_password" />
+                <div class="temp-pw-explainer">@_strings["Help_PasswordIsTemp"]</div>
+            </label>
+        </div>
+    </form>
+</PageContent>
+
+@code {
+    private string? _errorMessage;
+
+    private string _fullName = string.Empty;
+    private string _displayName = string.Empty;
+    private string _username = string.Empty;
+    private string _password = string.Empty;
+
+    public async Task Create() {
+        try {
+            var user = await _auth.CreateUser(
+                fullName: _fullName,
+                displayName: _displayName,
+                username: _username,
+                password: _password,
+                passwordResetRequired: true
+            );
+            _nav.NavigateTo($"/users/edit/{user.Id}");
+        } catch (Exception ex) {
+            _errorMessage = ex.Message.EndsWith(" is required.") ? _strings["AllFieldsRequired"] : _strings[ex.Message];
+        }
+    }
+}

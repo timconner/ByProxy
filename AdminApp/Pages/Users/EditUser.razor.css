@@ -1,0 +1,75 @@
+.fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: fit-content;
+}
+
+    .fields button {
+        margin-left: auto;
+        width: 160px;
+    }
+
+label {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 8px;
+    text-align: right;
+}
+
+fieldset {
+    margin-top: 12px;
+    position: relative;
+}
+
+.add-role {
+    position: absolute;
+    top: -21px;
+    right: 12px;
+    padding: 3px 10px;
+    font-size: 14px;
+}
+
+    .add-role.has-admin {
+        background-color: var(--bg-color);
+    }
+
+.roles {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.empty {
+    color: var(--disabled-text-color);
+}
+
+.role {
+    position: relative;
+}
+
+.role-name {
+    display: flex;
+    justify-content: space-between;
+    gap: 3px;
+}
+
+.delete-role {
+    visibility: hidden;
+    position: absolute;
+}
+
+.role:hover {
+    background-color: darkred;
+    color: white;
+    border: 1px solid black;
+}
+
+    .role:hover .delete-role {
+        visibility: visible;
+    }
+
+    .role:hover .role-name {
+        visibility: hidden;
+    }

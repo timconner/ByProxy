@@ -1,0 +1,34 @@
+﻿@inject IStringLocalizer<Language> _strings
+
+<div class="page-header">
+    <div class="page-title">
+        <h1>@Title</h1>
+        @if (RenameHandler.HasDelegate) {
+        <button class="action" title="@_strings["Rename"]" @onclick="RenameHandler">
+            <Icon Name="edit" Size="18px" />
+        </button>
+        }
+    </div>
+    <div class="links">
+        @ChildContent
+    </div>
+</div>
+@if (FullWidthDivider) {
+    <hr class="full-width" />
+} else {
+    <hr />
+}
+
+@code {
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = default!;
+
+    [Parameter]
+    public bool FullWidthDivider { get; set; } = false;
+
+    [Parameter]
+    public EventCallback RenameHandler { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

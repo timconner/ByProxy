@@ -1,0 +1,36 @@
+﻿@inherits LayoutComponentBase
+
+@inject IStringLocalizer<Language> _strings
+
+<HeadContent>
+    <ThemeInjector />
+</HeadContent>
+
+<PageTitle>@_strings["AppName"] - @_strings["AppCaption"]</PageTitle>
+
+<SessionInvalidationHandler />
+<ModalComponent />
+<div class="page">
+    <AuthorizeView Roles="@AuthRoles.User">
+        <Authorized>
+            <header>
+                <nav>
+                    <NavMenu />
+                </nav>
+            </header>
+            <main>
+                @Body
+            </main>
+            <CandidateAndConfirmWatcher />
+        </Authorized>
+        <NotAuthorized>
+            @Body
+        </NotAuthorized>
+    </AuthorizeView>
+</div>
+
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>

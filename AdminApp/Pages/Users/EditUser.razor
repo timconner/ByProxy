@@ -1,0 +1,106 @@
+﻿@page "/users/edit/{UserId:guid}"
+@attribute [Authorize(Roles = AuthRoles.Admin)]
+@implements IDisposable
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject IStringLocalizer<Language> _strings
+@inject ModalService _modal
+@inject AuthService _auth
+@inject NavigationManager _nav
+
+@if (_user == null || _roles == null) {
+    <LoadingIndicator />
+    return;
+}
+
+<PageHeader Title="@_strings["Edit User"]">
+    <PageHeaderButton Icon="device-floppy" Label="@_strings["Save"]" @onclick="SaveChanges" />
+</PageHeader>
+
+<PageContent>
+    <EditForm Model="_user" OnValidSubmit="SaveChanges">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="fields">
+            <label>Display Name: <InputText @bind-Value="_user.DisplayName" /></label>
+            <label>Username: <InputText @bind-Value="_user.Username" /></label>
+            <label>Full Name: <InputText @bind-Value="_user.FullName" /></label>
+            <fieldset>
+                <legend>Roles</legend>
+                @if (_user.Id == _currentUserId) {
+                    <span>Admin (Cannot Remove From Self)</span>
+                } else {
+                    @if (_user.Roles.Any(_ => _.Name == AuthRoles.Admin)) {
+                        <div class="add-role has-admin">Admin Has All Roles</div>
+                    } else {
+                        <div class="add-role button" @onclick="AddRole">
+                            <Icon Name="square-plus" Size="16px" />Add
+                        </div>
+                    }
+                    <div class="roles">
+                        @if (_user.Roles.Count == 0) {
+                            <span class="empty">None</span>
+                        } else {
+                            @foreach (var role in _user.Roles) {
+                                <div class="role button" @onclick="() => RemoveRole(role)">
+                                    <div class="role-name">
+                                        @role.Name
+                                        <Icon Name="x" Size="12px" />
+                                    </div>
+                                    <div class="delete-role"><Icon Name="trash" Size="16px" /></div>
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+            </fieldset>
+        </div>
+    </EditForm>
+</PageContent>
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid UserId { get; set; }
+
+    private ProxyDb _db = default!;
+    private UserEntity? _user;
+    private List<AuthRole>? _roles;
+
+    private Guid? _currentUserId;
+
+    protected override async Task OnInitializedAsync() {
+        _currentUserId = _auth.GetUserId();
+        _db = _dbFactory.CreateDbContext();
+        _user = await _db.Users
+            .Include(_ => _.Roles)
+            .FirstOrDefaultAsync(_ => _.Id == UserId);
+        if (_user == null) throw new Exception("User not found.");
+
+        _roles = await _db.AuthRoles.ToListAsync();
+    }
+
+    private async Task AddRole() {
+        var result = await _modal.RoleSelect("Add Role");
+        if (result.DialogResult != DialogResult.OK || result.Value == null) return;
+        var role = _roles!.First(_ => _.Name == result.Value);
+
+        if (_user!.Roles.Any(_ => _.Name == role.Name)) return;
+        if (role.Name == AuthRoles.Admin) _user!.Roles.Clear();
+        _user!.Roles.Add(role);
+    }
+
+    private void RemoveRole(AuthRole role) {
+        _user!.Roles.Remove(role);
+    }
+
+    private async Task SaveChanges() {
+        await _modal.PerformSave(async () => {
+            await _db.SaveChangesAsync();
+            await _auth.InvalidateUsersSessions(_user!.Id);
+        });
+        _nav.NavigateTo("/users");
+    }
+
+    public void Dispose() {
+        if (_db != null) _db.Dispose();
+    }
+}

@@ -1,0 +1,10 @@
+﻿<dt>@Label</dt>
+<dd>@Value</dd>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Label { get; set; }
+
+    [Parameter, EditorRequired]
+    public string Value { get; set; }
+}

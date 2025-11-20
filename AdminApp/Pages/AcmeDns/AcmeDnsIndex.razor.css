@@ -1,0 +1,9 @@
+.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    font-size: 18px;
+    color: var(--disabled-text-color);
+}

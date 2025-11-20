@@ -1,0 +1,113 @@
+﻿@page "/system"
+@attribute [Authorize(Roles = AuthRoles.Admin)]
+@inject IStringLocalizer<Language> _strings
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ProxyStateService _proxyState
+@inject ModalService _modal
+@inject ConfigurationService _configService
+@inject IHostApplicationLifetime _lifetime
+@inject CertificateService _certService
+
+<PageHeader Title="@_strings["System Settings"]">
+    @if (_version != null) {
+        <div class="help-text">@_strings["Version"]: @_version</div>
+    }
+</PageHeader>
+
+<PageContent>
+    @if (_proxyConfig == null) {
+        <LoadingIndicator />
+        return;
+    }
+
+    <fieldset>
+        <legend>@_strings["Unmatched Traffic Handling"]</legend>
+
+
+        <div>
+            <Toggle FieldLabel="@_strings["Tarpit"]" IsOn="_proxyConfig.Tarpit" ToggleHandler="TarpitToggled" />
+            <div class="help-text">@_strings["Help_Tarpit"]</div>
+        </div>
+
+        <div>
+            <label>
+                @_strings["HTTP Status"]:
+                <select @bind="_proxyConfig.UnmatchedStatus" @bind:after="SaveChanges">
+                    @foreach (var status in Enum.GetValues<HttpStatusCode>()) {
+                        int statusCode = (int)status;
+                        <option value="@statusCode">@($"{statusCode} - {Enum.GetName<HttpStatusCode>(status)}")</option>
+                    }
+                </select>
+            </label>
+            <div class="help-text">@_strings["Help_UnmatchedStatus"]</div>
+        </div>
+
+        <div class="fallback">
+            <Toggle FieldLabel="@_strings["NoSniMatch"]" OffLabel="@_strings["Refuse Connection"]" IsOn="_proxyConfig.FallbackCert != null" OnLabel="@_strings["Use Fallback Certificate"]" ToggleHandler="FallbackCertToggled" />
+            @if (_proxyConfig.FallbackCert != null) {
+                <div class="cert-select">
+                    <span>@_strings["Fallback Certificate"]:</span>
+                    <span>@_proxyConfig.FallbackCert.Name</span>
+                    <button class="action" @onclick="ViewFallbackCertDetails">
+                        <Icon Name="zoom" />
+                    </button>
+                    <button class="change" @onclick="ChangeFallbackCert">
+                        @_strings["Change"]
+                    </button>
+                </div>
+            }
+            <div class="help-text">@_strings["Help_FallbackCert"]</div>
+        </div>
+
+    </fieldset>
+    <fieldset>
+        <legend>@_strings["Management Site Settings"]</legend>
+
+        <div>
+            <label>
+                @_strings["HTTPS Port"]:
+                <input type="number" name="port" min="1" max="65535" @bind:get="_proxyConfig.AdminPort" @bind:set="UpdateAdminPort" />
+            </label>
+            <div class="help-text">@_strings["Help_AdminPort"]</div>
+        </div>
+
+        <div>
+            <Toggle FieldLabel="@_strings["Listen On"]" OffLabel="@_strings["localhost"]" IsOn="@_proxyConfig.AdminListenAny" OnLabel="@_strings["Any IP"]" ToggleHandler="ListenOnToggled" />
+            <div class="help-text">@_strings["Help_ListenOn"]</div>
+        </div>
+
+        <div>
+            <div class="cert-select">
+                <span>@_strings["HTTPS Certificate"]:</span>
+                <span>@_proxyConfig.AdminCert.Name</span>
+                <button class="action" @onclick="ViewAdminCertDetails">
+                    <Icon Name="zoom" />
+                </button>
+                <button class="change" @onclick="ChangeAdminCert">
+                    @_strings["Change"]
+                </button>
+            </div>
+            <div class="help-text">@_strings["Help_AdminCert"]</div>
+        </div>
+    </fieldset>
+
+    <PageDivider Label="@_strings["Danger Zone"]" MarginTop="24px" />
+    <div class="danger-zone">
+        <div class="services">
+            <LabelValuePairs>
+                <LabelValuePair Label="@_strings["Startup Time"]" Value="@_proxyState.StartupTime.ToLocalTime().ToString("g")" />
+            </LabelValuePairs>
+            <button @onclick="RestartProxy">@_strings["Restart Proxy Server"]</button>
+            <button @onclick="ShutdownProxy">@_strings["Shutdown Proxy Server"]</button>
+        </div>
+        <div class="certificates">
+            <LabelValuePairs>
+                <LabelValuePair Label="@_strings["Last Commit"]" Value="@_proxyState.RunningConfig.CommittedAt.ToLocalTime().ToString("g")" />
+            </LabelValuePairs>
+            <a href="/system/configs" class="button">@_strings["ConfigurationCompareRestore"]</a>
+            <a href="/system/cert-purge" class="button">@_strings["Certificate Purge Utility"]</a>
+            <div />
+        </div>
+    </div>
+</PageContent>
+

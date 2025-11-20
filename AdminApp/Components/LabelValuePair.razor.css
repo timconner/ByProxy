@@ -1,0 +1,17 @@
+dt {
+    font-weight: bold;
+}
+
+    dt::after {
+        content: ":";
+    }
+
+dd {
+    margin: unset;
+}
+
+@media only screen and (max-width : 667px) {
+    dd {
+        overflow: auto;
+    }
+}

@@ -1,0 +1,182 @@
+﻿@implements IDisposable
+
+@inject IStringLocalizer<Language> _strings
+@inject AuthService _auth
+@inject ConfigurationService _config
+@inject ModalService _modal
+@inject ProxyStateService _proxyState
+@inject AdminAppStateService _appState
+@inject NavigationManager _nav
+
+<div class="shade @(_showMenu ? "show" : "noshow")" @onclick="CloseMenu"></div>
+<div class="menu-bar">
+    @if (_config.ChangesPending) {
+        <div class="changes-bar">
+            <AuthorizeView Roles="@AuthRoles.Editor">
+                <button class="bar-discard bar-action" @onclick="DiscardChanges">
+                    <Icon Name="cancel" Size="20px" />
+                    <span>@_strings["Discard"]</span>
+                </button>
+            </AuthorizeView>
+            <NavMenuLink href="/changes">
+                <div class="bar-compare bar-action">
+                    <Icon Name="arrows-diff" Size="20px" />
+                    <span>@_strings["Compare"]</span>
+                </div>
+            </NavMenuLink>
+        </div>
+        <AuthorizeView Roles="@AuthRoles.Editor">
+            <div class="commit-bar">
+                <button class="bar-commit bar-action" @onclick="CommitChanges">
+                    <Icon Name="alert-square-rounded-filled" Size="20px" />
+                    <span>@_strings["Commit"]</span>
+                </button>
+            </div>
+        </AuthorizeView>
+    }
+    <span>@_strings["AppName"]</span>
+    <div class="menu-button" @onclick="ToggleMenu">
+        <Icon Name="menu-2" Size="32px" />
+    </div>
+</div>
+
+<div class="nav-menu @(_showMenu ? "show" : "noshow")" @onclick="ToggleMenu">
+    <div class="menu-header">
+        <a href="/">
+            @_strings["AppName"]<br />@_strings["AppCaption"]
+        </a>
+    </div>
+    <div class="menu-section menu-home">
+        <NavMenuLink href="/">
+            <Icon Name="home" Size="22px" />
+            <span>@_strings["AppCaption"]</span>
+        </NavMenuLink>
+    </div>
+    <div class="menu-section menu-main">
+        <NavMenuHeader Title="@_strings["Proxy"]" />
+        <NavMenuLink href="/clusters">
+            <Icon Name="server" /><span>@_strings["Clusters"]</span>
+        </NavMenuLink>
+        <NavMenuLink href="/routes">
+            <Icon Name="arrow-ramp-right-2" /><span>@_strings["Routes"]</span>
+        </NavMenuLink>
+        <NavMenuLink href="/sni-maps">
+            <Icon Name="device-imac-search" /><span>@_strings["SNI Maps"]</span>
+        </NavMenuLink>
+
+        <NavMenuHeader Title="@_strings["Certificates"]" />
+        <NavMenuLink href="/acme">
+            <Icon Name="lock-share" /><span>@_strings["ACME"]</span>
+        </NavMenuLink>
+        <NavMenuLink href="/imported-certs">
+            <Icon Name="certificate" /><span>@_strings["Imported"]</span>
+        </NavMenuLink>
+        <NavMenuLink href="/cert-authorities">
+            <Icon Name="certificate-2" /><span>@_strings["Authorities"]</span>
+        </NavMenuLink>
+
+        <AuthorizeView Roles="@AuthRoles.Admin">
+            <NavMenuHeader Title="Admin" />
+            <NavMenuLink href="/acme/dns">
+                <Icon Name="satellite" /><span>@_strings["ACME DNS"]</span>
+            </NavMenuLink>
+            <NavMenuLink href="/system">
+                <Icon Name="server-cog" /><span>@_strings["System"]</span>
+            </NavMenuLink>
+            <NavMenuLink href="/users">
+                <Icon Name="user-edit" /><span>@_strings["Users"]</span>
+            </NavMenuLink>
+        </AuthorizeView>
+    </div>
+    @if (_config.ChangesPending) {
+        <div class="changes-pending">
+            <NavMenuHeader Title="Changes" />
+            <AuthorizeView Roles="@AuthRoles.Editor">
+                <button class="discard-changes" @onclick="DiscardChanges">
+                    <Icon Name="cancel" Size="20px" />
+                    <span>@_strings["Discard"]</span>
+                </button>
+            </AuthorizeView>
+            <div class="compare-changes">
+                <NavMenuLink href="/changes">
+                    <Icon Name="arrows-diff" Size="20px" />
+                    <span>@_strings["Compare"]</span>
+                </NavMenuLink>
+            </div>
+            <AuthorizeView Roles="@AuthRoles.Editor">
+                <button class="commit-changes" @onclick="CommitChanges">
+                    <Icon Name="alert-square-rounded-filled" />
+                    <span>@_strings["Commit"]</span>
+                </button>
+            </AuthorizeView>
+        </div>
+    }
+    <div class="menu-section menu-footer">
+        <NavMenuLink href="/account"><Icon Name="user" /><span>@_displayName</span></NavMenuLink>
+        <NavMenuLink href="/logout" ForceLoad><Icon Name="logout-2" /><span>@_strings["Sign Out"]</span></NavMenuLink>
+        <ThemeSwitcher />
+    </div>
+</div>
+
+@code {
+    private string? _displayName;
+    private bool _showMenu = false;
+
+    protected override void OnInitialized() {
+        _displayName = _auth.GetDisplayName();
+        _config.PendingChanged += ChangesPending;
+    }
+
+    private async void ChangesPending(object? sender, bool e) {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task DiscardChanges() {
+        var result = await _modal.YesNo(_strings["Discard Changes"], _strings["WARN_DiscardChanges"]);
+        if (result != DialogResult.Yes) return;
+
+        _appState.ConfigurationChangeInProgress = true;
+        try {
+            var success = await _modal.PerformSave(async () => {
+                await _config.RequestCandidateConfigDiscard();
+            }, true);
+            if (success) _nav.Refresh(true);
+        } finally {
+            _appState.ConfigurationChangeInProgress = false;
+        }
+    }
+
+    private async Task CommitChanges() {
+        var result = await _modal.CommitPrompt();
+        if (result.DialogResult != DialogResult.Yes) return;
+
+        _appState.ConfigurationChangeInProgress = true;
+        try {
+            _modal.StartSave(_strings["CommittingChanges"]);
+            await Task.Delay(1); // Force UI Refresh
+            try {
+                await _config.RequestCommit(result.Value);
+                await _modal.EndSave(true);
+                _nav.Refresh(true);
+            } catch (DbUpdateException ex) {
+                await _modal.EndSave(false, ex.InnerException?.Message ?? ex.Message);
+            } catch (Exception ex) {
+                await _modal.EndSave(false, ex.Message);
+            }
+        } finally {
+            _appState.ConfigurationChangeInProgress = false;
+        }
+    }
+
+    private void CloseMenu() {
+        _showMenu = false;
+    }
+
+    private void ToggleMenu() {
+        _showMenu = !_showMenu;
+    }
+
+    public void Dispose() {
+        _config.PendingChanged -= ChangesPending;
+    }
+}

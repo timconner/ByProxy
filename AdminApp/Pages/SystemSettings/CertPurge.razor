@@ -1,0 +1,100 @@
+﻿@page "/system/cert-purge"
+@attribute [Authorize(Roles = AuthRoles.Admin)]
+@inject IStringLocalizer<Language> _strings
+@inject CertificateService _certService
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ModalService _modal
+@inject NavigationManager _nav
+@inject ProxyStateService _proxyState
+@inject AcmeClientService _acmeClient
+
+<PageHeader Title="@_strings["Certificate Purge Utility"]">
+    <select @bind="@_activeScreen" @bind:after="ChangeScreen">
+        <option value="@ActiveScreen.Certs">@_strings["Certificates"]</option>
+        <option value="@ActiveScreen.CA">@_strings["Certificate Authorities"]</option>
+        <option value="@ActiveScreen.ACME">@_strings["ACME Accounts"]</option>
+    </select>
+</PageHeader>
+
+<PageContent>
+    @switch (_activeScreen) {
+        case ActiveScreen.Certs:
+            if (_certs == null) {
+                <LoadingIndicator />
+                return;
+            }
+            <h2>@_strings["Select Certificate To Purge"]</h2>
+            <CertInfoTable Certificates="_certs" OnSelect="CertToPurgeSelected" />
+            break;
+        case ActiveScreen.CA:
+            if (_certAuths == null) {
+                <LoadingIndicator />
+                return;
+            }
+            <h2>@_strings["Select Certificate Authority To Purge"]</h2>
+            <InfoBlock>@_strings["Info_CaPurge"]</InfoBlock>
+            <table>
+                <thead>
+                    <tr>
+                        <th>@_strings["Name"]</th>
+                        <th>@_strings["Created"]</th>
+                        <th>@_strings["Expires"]</th>
+                        <th>@_strings["Issued Count"]</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ca in _certAuths) {
+                        <tr>
+                            <td>@ca.Metadata.Name</td>
+                            <td>@ca.Certificate.NotBefore.ToShortDateString()</td>
+                            <td>@ca.Certificate.NotAfter.ToShortDateString()</td>
+                            <td>@ca.IssuedCertCount</td>
+                            <td>
+                                @if (ca.IssuedCertCount > 0) {
+                                    <button disabled>@_strings["Select"]</button>
+                                } else {
+                                    <button @onclick="() => PurgeCa(ca.Metadata.Id)">@_strings["Select"]</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            break;
+        case ActiveScreen.ACME:
+            if (_acmeAccounts == null) {
+                <LoadingIndicator />
+                return;
+            }
+            <h2>@_strings["Select ACME Account To Purge"]</h2>
+            <InfoBlock>@_strings["INFO_AcmeAccountPurge"]</InfoBlock>
+            <table>
+                <thead>
+                    <tr>
+                        <th>@_strings["Name"]</th>
+                        <th>@_strings["Provider"]</th>
+                        <th>@_strings["Issued Count"]</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var accountInfo in _acmeAccounts) {
+                        <tr>
+                            <td>@accountInfo.Account.Name</td>
+                            <td>@accountInfo.Provider.Name</td>
+                            <td>@accountInfo.IssuedCertCount</td>
+                            <td>
+                                @if (accountInfo.IssuedCertCount > 0) {
+                                    <button disabled>@_strings["Select"]</button>
+                                } else {
+                                    <button @onclick="() => PurgeAcmeAccount(accountInfo.Account.Id)">@_strings["Select"]</button>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            break;
+    }
+</PageContent>

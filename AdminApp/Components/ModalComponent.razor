@@ -1,0 +1,185 @@
+﻿@inject IStringLocalizer<Language> _strings
+@inject ModalService _modalService
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ProxyStateService _proxyState
+@inject CertificateService _certService
+
+<div class="shade @(_visible ? "open" : "closed")" @onmousedown="Cancel">
+    <div class="modal" @onclick:stopPropagation @onmousedown:stopPropagation @onkeydown="CheckForExit">
+        @if (_visible) {
+            <div class="title">@_title</div>
+            <hr />
+            <div class="inner">
+                @if (!string.IsNullOrWhiteSpace(_prompt)) {
+                    <div class="prompt">
+                        @_prompt
+                    </div>
+                }
+                <div class="content">
+                    @switch (_type) {
+                        case ModalType.SuccessFail:
+                            <div class="center-content">
+                                <SuccessFailLoader Status="_success" />
+                            </div>
+                            break;
+                        case ModalType.Loading:
+                            <div class="center-content">
+                                <LoadingIndicator />
+                            </div>
+                            break;
+                        case ModalType.ProgressViewer:
+                            <div class="progress-view">
+                                <div class="progress-updates">
+                                @foreach (var progress in _progress) {
+                                    <div class="progress-main">@progress.Main</div>
+                                    <div class="help-text progress-detail">@progress.Detail</div>
+                                }
+                                </div>
+                            </div>
+                            break;
+                        case ModalType.SingleLine:
+                            <form @onsubmit="OK">
+                                <input @ref="_input" class="@(_inputIsValid ? "valid" : "invalid")" type="text" placeholder="@_placeholder" @bind="_stringValue" @oninput="ValidateInput" />
+                            </form>
+                            break;
+                        case ModalType.LargeText:
+                            if (_readOnly) {
+                                <textarea class="@(_monoSpace ? "large monospace" : "large")" @ref="_input" @bind="_stringValue" readonly />
+                            } else {
+                                <textarea class="@(_monoSpace ? "large monospace" : "large")" @ref="_input" @bind="_stringValue" />
+                            }
+                            break;
+                        case ModalType.CommitPrompt:
+                            <br />
+                            <div class="confirm-seconds">
+                                <div class="confirm-seconds-prompt">
+                                    @_strings["Prompt_ConfirmSeconds"]
+                                </div>
+                                <select @bind="_confirmSeconds">
+                                    <option value="30">@_strings["Confirm_30"]</option>
+                                    <option value="60">@_strings["Confirm_60"]</option>
+                                    <option value="300">@_strings["Confirm_300"]</option>
+                                    <option value="600">@_strings["Confirm_600"]</option>
+                                </select>
+                            </div>
+                            break;
+                        case ModalType.Password:
+                            <form @onsubmit="OK">
+                                <input @ref="_input" type="password" placeholder="@_placeholder" @bind="_stringValue" />
+                            </form>
+                            break;
+                        case ModalType.RoleSelect:
+                            <div class="stacked">
+                                @foreach (var role in AuthRoles.AssignableRoles) {
+                                    <div class="@(_selectedRole == role ? "role selected" : "role")" @onclick="() => RoleSelected(role)">
+                                        @role
+                                    </div>
+                                }
+                            </div>
+                            break;
+                        case ModalType.CertificatePicker:
+                            if (_availableCerts == null) {
+                                <LoadingIndicator />
+                            } else {
+                                <input type="text" @bind="_stringValue" @bind:event="oninput" placeholder="@_strings["Search"]" />
+
+                                var certs = string.IsNullOrEmpty(_stringValue) ? _availableCerts
+                                : _availableCerts.Where(certInfo =>
+                                certInfo.Metadata.Name.Contains(_stringValue)
+                                || certInfo.SubjectNames.Any(subject => subject.Contains(_stringValue)));
+
+                                <CertInfoTable Certificates="certs" OnSelect="CertSelected" Exclude="[CertInfoTable.ExcludeColumns.Fingerprints]" />
+                            }
+                            break;
+                        case ModalType.CertificateDetails:
+                            if (_certInfo == null) {
+                                <LoadingIndicator />
+                            } else {
+                                @if (!_fingerprintsOnly) {
+                                    <LabelValuePairs>
+                                        <LabelValuePair Label="@_strings["Name"]" Value="@_certInfo.Metadata.Name" />
+                                        <LabelValuePair Label="@_strings["Issuer"]" Value="@_certInfo.Issuer" />
+                                        <LabelValuePair Label="@_strings["Issued"]" Value="@_certInfo.Cert.NotBefore.ToShortDateString()" />
+                                        <LabelValuePair Label="@_strings["Expires"]" Value="@_certInfo.Cert.NotAfter.ToShortDateString()" />
+                                    </LabelValuePairs>
+                                    <div class="subjects-hosts">
+                                        <fieldset>
+                                            <legend>@_strings["Subject Names"]</legend>
+                                            <ul class="monospace">
+                                                @foreach (var name in _certInfo.SubjectNames) {
+                                                    <li>@name</li>
+                                                }
+                                            </ul>
+                                        </fieldset>
+                                        <fieldset>
+                                            <legend>@_strings["SNI Maps"]</legend>
+                                            <ul class="monospace">
+                                                @foreach (var host in _certInfo.SniHosts) {
+                                                    <li>@host</li>
+                                                }
+                                            </ul>
+                                        </fieldset>
+                                    </div>
+                                }
+                                <PageDivider Label="@_strings["Serial Number"]" MarginTop="6px" MarginBottom="6px" />
+                                <div class="fingerprint monospace">
+                                    <textarea readonly rows="1">@_certInfo.Cert.SerialNumber</textarea>
+                                </div>
+                                <PageDivider Label="@_strings["SHA-1 Thumbprint"]" MarginBottom="6px" />
+                                <div class="fingerprint monospace">
+                                    <textarea readonly rows="2">@_certInfo.Cert.Thumbprint</textarea>
+                                </div>
+                                <PageDivider Label="@_strings["SHA-256 Fingerprint"]" MarginBottom="6px" />
+                                <div class="fingerprint monospace">
+                                    <textarea readonly rows="3">@Certificates.GetFingerprint(_certInfo.Cert)</textarea>
+                                </div>
+                            }
+                            break;
+                    }
+                </div>
+                @if (!string.IsNullOrWhiteSpace(_error)) {
+                    <div class="error">
+                        @_error
+                    </div>
+                }
+            </div>
+            <hr />
+            <div class="controls">
+                @if (_type == ModalType.ProgressViewer) {
+                    <div class="progress-indicator">
+                        <SuccessFailLoader Status="_success" />
+                    </div>
+                }
+                @if (_controls.HasFlag(ModalControls.OK)) {
+                    @if (_inputIsValid) {
+                        <div class="control button" @onclick="OK">@_strings["OK"]</div>
+                    } else {
+                        <div class="control button disabled">@_strings["OK"]</div>
+                    }
+                }
+                @if (_controls.HasFlag(ModalControls.Save)) {
+                    <div class="control button" @onclick="Save">@_strings["Save"]</div>
+                }
+                @if (_controls.HasFlag(ModalControls.Discard)) {
+                    <div class="control button" @onclick="Discard">@_strings["Discard"]</div>
+                }
+                @if (_controls.HasFlag(ModalControls.Cancel)) {
+                    <div class="control button" @onclick="Cancel">@_strings["Cancel"]</div>
+                }
+                @if (_controls.HasFlag(ModalControls.Yes)) {
+                    <div class="control button" @onclick="Yes">@_strings["Yes"]</div>
+                }
+                @if (_controls.HasFlag(ModalControls.No)) {
+                    <div class="control button" @onclick="No">@_strings["No"]</div>
+                }
+                @if (_controls.HasFlag(ModalControls.Close)) {
+                     @if (ModalOpen != null) {
+                        <div class="control button" @onclick="Cancel">@_strings["Close"]</div>
+                    } else {
+                        <div class="control button disabled">@_strings["Close"]</div>
+                    }
+                }
+            </div>
+        }
+    </div>
+</div>

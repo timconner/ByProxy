@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json.schemastore.org/launchsettings.json",
+    "iisSettings": {
+      "windowsAuthentication": false,
+      "anonymousAuthentication": true,
+      "iisExpress": {
+        "applicationUrl": "http://localhost:61465",
+        "sslPort": 44325
+      }
+    },
+    "profiles": {
+      "http": {
+        "commandName": "Project",
+        "dotnetRunMessages": true,
+        "launchBrowser": true,
+        //"applicationUrl": "http://proxy.local:8080",
+        "environmentVariables": {
+          "ASPNETCORE_ENVIRONMENT": "Development"
+          //"Proxy__Simple__Hostname": "proxy.local",
+          //"Proxy__Simple__Destination": "http://192.168.53.34:8060/"
+          //"Proxy__DataDir": "C:\\Temp\\THISPATHDOESNTEXIST45325",
+        }
+      }
+    }
+  }

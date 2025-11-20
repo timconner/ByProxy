@@ -1,0 +1,61 @@
+﻿@page "/routes/create"
+@attribute [Authorize(Roles = AuthRoles.Editor)]
+@inject IStringLocalizer<Language> _strings
+@inject ProxyStateService _proxyState
+@inject ConfigurationService _config
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ModalService _modal
+@inject NavigationManager _nav
+
+<PageHeader Title="@_strings["Create Route"]">
+    <PageHeaderButton Icon="device-floppy" Label="@_strings["Save"]" @onclick="PerformSave" />
+</PageHeader>
+
+<PageContent>
+    @if (_newRoute == null) {
+        <LoadingIndicator />
+    } else {
+        <RouteEditor Route="_newRoute" />
+    }
+</PageContent>
+
+@code {
+    private ProxyRoute? _newRoute;
+
+    protected override void OnInitialized() {
+        _newRoute = new ProxyRoute {
+            Id = Guid.NewGuid(),
+            ConfigRevision = 0,
+            ResponseType = RouteResponseType.Cluster,
+            ClusterId = Guid.Empty,
+            Name = string.Empty,
+            Description = string.Empty,
+            MatchCriteria = new(),
+            Transforms = new()
+        };
+    }
+
+    private async Task PerformSave() {
+        if (_newRoute == null) return;
+
+        using var db = _dbFactory.CreateDbContext();
+
+        List<string>? errors = null;
+        await _modal.PerformProcessing(async () => {
+            errors = await _newRoute.NormalizeAndReturnValidationErrors(db, _proxyState.CandidateConfigRevision);
+        });
+        if (errors == null) return;
+        if (errors.Count > 0) {
+            await _modal.OkOnly(_strings["Validation Errors"], $"- {string.Join("\n\n- ", errors.Select(e => _strings[e]))}");
+            return;
+        }
+
+        var success = await _modal.PerformSave(async () => {
+            _newRoute.Order = ((await db.Routes.MaxAsync(_ => (int?)_.Order)) ?? 0) + 1;
+            db.Routes.Add(_newRoute.Clone(_proxyState.CandidateConfigRevision));
+            await db.SaveChangesAsync();
+        });
+        _ = _config.UpdateHasChangesPending();
+        if (success) _nav.NavigateTo("/routes");
+    }
+}

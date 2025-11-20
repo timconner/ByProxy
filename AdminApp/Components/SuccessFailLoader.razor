@@ -1,0 +1,16 @@
+﻿<div class="@_classes">
+    <div class="status draw"></div>
+</div>
+
+@code {
+    [Parameter]
+    public bool? Status { get; set; }
+    private string _classes = "loader";
+
+    protected override void OnParametersSet() {
+        _classes = "loader";
+        if (Status != null) {
+            _classes += Status.Value ? " success" : " fail";
+        }
+    }
+}

@@ -1,0 +1,7 @@
+﻿section {
+    margin-top: 12px;
+    /* Move the scrollbar to the edge */
+    padding-right: 14px;
+    margin-right: -14px;
+    overflow: auto;
+}

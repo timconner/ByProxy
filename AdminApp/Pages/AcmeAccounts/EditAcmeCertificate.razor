@@ -1,0 +1,73 @@
+﻿@page "/acme/edit-cert/{CertId:guid}"
+@attribute [Authorize(Roles = AuthRoles.Editor)]
+@implements IDisposable
+@inject IStringLocalizer<Language> _strings
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ModalService _modal
+@inject AcmeClientService _acmeClient
+@inject NavigationManager _nav
+
+<PageHeader Title="@_strings["Edit Certificate"]">
+    <PageHeaderButton Icon="device-floppy" Label="@_strings["Save"]" @onclick="SaveCert" />
+</PageHeader>
+
+<PageContent>
+    @if (_cert == null || _hosts == null || _provider == null || _dnsProviders == null) {
+        <LoadingIndicator />
+        return;
+    }
+
+    <label>
+        @_strings["Name"]
+        <input type="text" @bind="@_cert.Name" placeholder="@_strings["Certificate Name"]" />
+    </label>
+    <div class="help-text">@_strings["Help_AcmeCertificateName"]</div>
+    <fieldset>
+        <legend>Hosts</legend>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>@_strings["Name"]</th>
+                    <th>@_strings["Challenge Type"]</th>
+                    <th>@_strings["DNS Provider"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var host in _hosts) {
+                    <tr>
+                        <td class="monospace">@host.Host</td>
+                        <td>
+                            @if (host.Host.StartsWith('*')) {
+                                <text>@host.ChallengeType</text>
+                            } else {
+                                <select @bind:get="@host.ChallengeType" @bind:set="(newType) => ChangeChallengeType(host, newType)">
+                                    @foreach (var challengeType in _provider.SupportedChallenges) {
+                                        if (challengeType == AcmeChallengeType.DNS_01 && _dnsProviders.Count == 0) continue;
+                                        <option value="@challengeType">@challengeType</option>
+                                    }
+                                </select>
+                            }
+                        </td>
+                        <td>
+                            @if (host is AcmeDnsCertHost dnsHost) {
+                                <select @bind="dnsHost.DnsProviderId">
+                                    @foreach (var provider in _dnsProviders) {
+                                        <option value="@provider.Key">@provider.Value</option>
+                                    }
+                                </select>
+                            } else {
+                                <Icon Name="line-dashed" Color="var(--disabled-text-color)" />
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </fieldset>
+</PageContent>
+
+@code {
+    [Parameter]
+    public Guid CertId { get; set; }
+}

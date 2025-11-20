@@ -1,0 +1,46 @@
+﻿<svg viewBox="0 0 24 24" style="@GetStyle()">
+    <desc>@Name</desc>
+    @_svg
+</svg>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Name { get; set; }
+
+    [Parameter]
+    public string Size { get; set; } = "24px";
+
+    [Parameter]
+    public string Color { get; set; } = "currentColor";
+
+    [Parameter]
+    public string FillColor { get; set; } = "currentColor";
+
+    [Parameter]
+    public string StrokeWidth { get; set; } = "2px";
+
+    private MarkupString _svg = (MarkupString)"<circle cx=\"12\" cy=\"12\" r=\"3\" fill=\"currentColor\"/>";
+    private bool _isFilled;
+
+    protected override void OnParametersSet() {
+        if (_icons.TryGetValue(Name, out var svg)) {
+            _isFilled = Name.EndsWith("-filled");
+            _svg = (MarkupString)svg;
+        }
+    }
+
+    protected string GetStyle() {
+        System.Text.StringBuilder style = new();
+        style.Append($"width:{Size};");
+        style.Append($"height:{Size};");
+        if (_isFilled) {
+            style.Append($"fill:{FillColor};");
+        } else {
+            style.Append($"color:{Color};");
+            style.Append($"stroke:{Color};");
+            style.Append($"stroke-width:{StrokeWidth};");
+        }
+        return style.ToString();
+    }
+}
+

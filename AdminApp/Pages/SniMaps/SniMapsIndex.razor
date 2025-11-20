@@ -1,0 +1,105 @@
+﻿@page "/sni-maps"
+
+@inject IStringLocalizer<Language> _strings
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject CertificateService _certService
+@inject ProxyStateService _proxyState
+@inject ModalService _modal
+@inject ConfigurationService _config
+
+<PageHeader Title="@_strings["SniMapsPageTitle"]">
+    <AuthorizeView Roles="@AuthRoles.Editor">
+        <PageHeaderLink href="/sni-maps/add" Icon="square-plus" Label="@_strings["Add"]" />
+    </AuthorizeView>
+</PageHeader>
+
+<PageContent>
+    @if (_sniMaps == null) {
+        <LoadingIndicator />
+        return;
+    }
+
+    <InfoBlock>
+        @_strings["INFO_SniMaps"]
+    </InfoBlock>
+
+    <table>
+        <thead>
+            <tr>
+                <th>@_strings["Host"]</th>
+                <th>@_strings["Certificate"]</th>
+                <th>@_strings["Validity"]</th>
+                <th>@_strings["Certificate Issues"]</th>
+                <AuthorizeView Roles="@AuthRoles.Editor">
+                    <th class="action"></th>
+                    <th class="action"></th>
+                </AuthorizeView>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var map in _sniMaps) {
+                <tr>
+                    <td class="monospace">@map.SniMap.Host</td>
+                    <td class="cert-cell">
+                        <span>@map.CertMetadata.Name</span>
+                        <button class="action" title="@_strings["Certificate Details"]" @onclick="() => ViewCertDetails(map.CertMetadata.Id)">
+                            <Icon Name="zoom" />
+                        </button>
+                    </td>
+                    @if (map.CertIssues.Count == 0) {
+                        <td><Icon Name="circle-check-filled" /></td>
+                        <td><Icon Name="line-dashed" Color="var(--disabled-text-color)" /></td>
+                    } else {
+                        <td><Icon Name="circle-x" /></td>
+                        <td>
+                            @foreach (var issue in map.CertIssues) {
+                                <div>@_strings[issue]</div>
+                            }
+                        </td>
+                    }
+                    <AuthorizeView Roles="@AuthRoles.Editor">
+                        <td class="action">
+                            <button class="action" title="@_strings["Change Map Certificate"]" @onclick="() => ChangeMapCert(map)">
+                                <Icon Name="file-pencil" Size="18px" />
+                            </button>
+                        </td>
+                        <td class="action">
+                            <button class="delete" title="@_strings["Delete"]" @onclick="() => DeleteMap(map)">
+                                <Icon Name="trash" Size="18px" />
+                            </button>
+                        </td>
+                    </AuthorizeView>
+                </tr>
+            }
+            @if (_fallbackCert != null) {
+                <tr>
+                    <td class="monospace">*.* (@_strings["Fallback"])</td>
+                    <td class="cert-cell">
+                        <span>@_fallbackCert.Name</span>
+                        <button class="action" title="@_strings["Certificate Details"]" @onclick="() => ViewCertDetails(_fallbackCert.Id)">
+                            <Icon Name="zoom" />
+                        </button>
+                    </td>
+                    <td>
+                        <Icon Name="line-dashed" Color="var(--disabled-text-color)" />
+                    </td>
+                    <td class="help-text">
+                        @_strings["Help_ChangeFallbackInSystem"]
+                    </td>
+                    <AuthorizeView Roles="@AuthRoles.Editor">
+                        <td></td>
+                        <td></td>
+                    </AuthorizeView>
+                </tr>
+            }
+        </tbody>
+    </table>
+    @if (_fallbackCert == null) {
+        <br />
+        <AlertBlock>
+            <div class="refuse">@_strings["SniRefuse"]</div>
+            <div class="help-text">@_strings["Help_SniRefuse"]</div>
+        </AlertBlock>
+    }
+</PageContent>
+

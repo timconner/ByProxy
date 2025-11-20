@@ -1,0 +1,102 @@
+﻿@page "/changes"
+
+@implements IAsyncDisposable
+@inject IStringLocalizer<Language> _strings;
+@inject IJSRuntime _js
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ModalService _modal
+@inject ProxyStateService _proxyState
+@inject AdminAppStateService _appState
+
+<PageHeader Title="@_strings["Changes"]" FullWidthDivider>
+    <Toggle IsOn="_sortByOrder" FieldLabel="@_strings["Sort by"]" OnLabel="Order" OffLabel="Id" ToggleHandler="SortToggled" />
+</PageHeader>
+
+<div class="editor-container">
+    <div @ref="_editorElement" class="editor"></div>
+</div>
+
+@code {
+    private ElementReference _editorElement;
+    private bool _sortByOrder;
+
+    private System.Threading.Timer? _monacoWaitTimer;
+    private void StopWaitTimer() => _monacoWaitTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+    private bool _rendered = false;
+
+    protected override void OnInitialized() {
+        _appState.OnThemeChange += OnThemeChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (!firstRender) return;
+        _rendered = true;
+        var monacoLoaded = await _js.InvokeAsync<bool>("isMonacoLoaded");
+        if (monacoLoaded) {
+            await SpawnDiff();
+        } else {
+            await _js.InvokeVoidAsync("loadMonaco");
+            _monacoWaitTimer = new(CheckMonacoLoaded, null, 250, 250);
+            _modal.StartLoad(_strings["LoadingWait"]);
+        }
+    }
+
+    private async void CheckMonacoLoaded(object? state) {
+        var monacoLoaded = await _js.InvokeAsync<bool>("isMonacoLoaded");
+        if (monacoLoaded) {
+            _monacoWaitTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+            _monacoWaitTimer?.Dispose();
+            await _modal.EndLoad(true);
+            await SpawnDiff();
+        }
+    }
+
+    private async Task SpawnDiff() {
+        await _modal.PerformProcessing(async () => {
+            using var db = _dbFactory.CreateDbContext();
+
+            var currentConfig = await db.Configurations.SelectSpecificRevision(_proxyState.RunningConfig.Revision);
+            if (currentConfig == null) throw new Exception("Failed to load current config.");
+
+            var candidateConfig = await db.Configurations.SelectSpecificRevision(_proxyState.CandidateConfigRevision);
+            if (candidateConfig == null) throw new Exception("Failed to load current config.");
+
+            await InvokeAsync(StateHasChanged);
+
+            await _js.InvokeVoidAsync(
+                "createMonacoDiff",
+                _editorElement,
+                currentConfig.GenerateComparableJson(_sortByOrder),
+                candidateConfig.GenerateComparableJson(_sortByOrder),
+                _appState.PreferredTheme?.IsDarkTheme ?? true
+            );
+        });
+    }
+
+    private async Task SortToggled(bool sortByOrder) {
+        _sortByOrder = sortByOrder;
+        await DisposeAsync();
+        await SpawnDiff();
+    }
+
+    private async void OnThemeChanged() => await ReloadDiff();
+
+    private async Task ReloadDiff() {
+        await DisposeDiff();
+        await SpawnDiff();
+    }
+
+    private async Task DisposeDiff() {
+        if (_rendered) {
+            try {
+                await _js.InvokeVoidAsync("disposeMonacoEditor");
+            } catch { }
+        }
+    }
+
+    public async ValueTask DisposeAsync() {
+        _appState.OnThemeChange -= OnThemeChanged;
+        _monacoWaitTimer?.Dispose();
+        await DisposeDiff();
+    }
+}

@@ -1,0 +1,26 @@
+﻿@inject NavigationManager _nav
+
+@if (ForceLoad) {
+    <a href="" @onclick="LoadPage">
+        @ChildContent
+    </a>
+} else {
+    <a href="@href">
+        @ChildContent
+    </a>
+}
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public string? href { get; set; }
+
+    [Parameter]
+    public bool ForceLoad { get; set; }
+
+    private void LoadPage() {
+        if (href != null) _nav.NavigateTo(href, true);
+    }
+}

@@ -1,0 +1,101 @@
+﻿@page "/acme/request/{AccountId:guid}"
+@attribute [Authorize(Roles = AuthRoles.Editor)]
+@inject IStringLocalizer<Language> _strings
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ModalService _modal
+@inject AcmeClientService _acmeClient
+@inject ProxyStateService _proxyState
+@inject NavigationManager _nav
+
+<PageHeader Title="@($"{_strings["Request Certificate"]}{(_account == null || _provider == null ? "" : $": {_account.Name}")}")">
+    <PageHeaderButton Icon="script-plus" Label="@_strings["Request"]" @onclick="IssueCert" />
+</PageHeader>
+
+<PageContent>
+    @if (_account == null || _provider == null || _dnsProviders == null) {
+        <LoadingIndicator />
+        return;
+    }
+
+    <h3>@_provider.Name</h3>
+    <br />
+    <label>
+        @_strings["Name"]
+        <input type="text" @bind="@_certName" placeholder="@_strings["Certificate Name"]" />
+    </label>
+    <div class="help-text">@_strings["Help_AcmeCertificateName"]</div>
+    <fieldset>
+        <legend>Hosts</legend>
+        <form @onsubmit="AddHost">
+            <label>
+                @_strings["Domain Name"]
+                <input type="text" @bind="@_newHost" placeholder="example.com" @bind:after="CheckWildcard" />
+            </label>
+            <div class="help-text">@_strings["Help_AcmeDomainName"]</div>
+            <label>
+                @_strings["Challenge Type"]
+                <select @bind="@_newChallengeType">
+                    @foreach (var challengeType in _provider.SupportedChallenges) {
+                        <option value="@challengeType">@challengeType</option>
+                    }
+                </select>
+            </label>
+            <div class="help-text">@_strings[$"Help_AcmeChallenge_{_newChallengeType}"]</div>
+            @if (_newChallengeType == AcmeChallengeType.DNS_01) {
+                <label>
+                    @_strings["DNS Provider"]
+                    <select @bind="@_newDnsProvider">
+                        @foreach (var dnsProvider in _dnsProviders) {
+                            <option value="@dnsProvider.Id">@dnsProvider.Name</option>
+                        }
+                    </select>
+                </label>
+                <div class="help-text">@_strings[$"Help_DnsProviderSelect"]</div>
+            }
+            @if (IsNewDomainValid()) {
+                <button type="submit">@_strings["Add"]</button>
+            } else {
+                <button disabled>@_strings["Add"]</button>
+            }
+        </form>
+        @if (_acmeHosts.Count == 0) {
+            <div class="empty">@_strings["No Domain Names"]</div>
+        } else {
+            <table>
+                <thead>
+                    <tr>
+                        <th>@_strings["Name"]</th>
+                        <th>@_strings["Challenge Type"]</th>
+                        <th>@_strings["DNS Provider"]</th>
+                        <th class="action">@_strings["Remove"]</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var host in _acmeHosts) {
+                        <tr>
+                            <td class="monospace">@host.Host</td>
+                            <td>@host.ChallengeType</td>
+                            <td>
+                                @if (host.ChallengeType == AcmeChallengeType.DNS_01) {
+                                    <text>@host.DnsProviderName</text>
+                                } else {
+                                    <Icon Name="line-dashed" Color="var(--disabled-text-color)" />
+                                }
+                            </td>
+                            <td class="action">
+                                <button class="delete" @onclick="() => RemoveHost(host)">
+                                    <Icon Name="x" Size="18px" />
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </fieldset>
+</PageContent>
+
+@code {
+    [Parameter]
+    public Guid AccountId { get; set; }
+}

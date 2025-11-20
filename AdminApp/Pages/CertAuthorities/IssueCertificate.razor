@@ -1,0 +1,63 @@
+﻿@page "/cert-authorities/{CaId:guid}/issue"
+@attribute [Authorize(Roles = AuthRoles.Editor)]
+@inject IStringLocalizer<Language> _strings
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ModalService _modal
+@inject CertificateService _certService
+@inject NavigationManager _nav
+
+<PageHeader Title="@($"{_strings["Issue Certificate"]}{(_ca == null ? "" : $": {_ca.Name}")}")">
+    <PageHeaderButton Icon="script-plus" Label="@_strings["Issue"]" @onclick="IssueCert" />
+</PageHeader>
+
+<PageContent>
+    @if (_ca == null) {
+        <LoadingIndicator />
+        return;
+    }
+
+    <CertificateRequestForm Request="_request" />
+</PageContent>
+
+@code {
+    [Parameter]
+    public Guid CaId { get; set; }
+    private CACert? _ca;
+
+    private CertRequest _request = new();
+
+    protected override async Task OnInitializedAsync() {
+        using var db = _dbFactory.CreateDbContext();
+        _ca = await db.CertificateAuthorities
+            .AsNoTracking()
+            .FirstAsync(_ => _.Id == CaId);
+    }
+
+    private async Task IssueCert() {
+        if (_ca == null) return;
+
+        if (string.IsNullOrWhiteSpace(_request.Name)) {
+            await _modal.OkOnly(_strings["Error"], _strings["ERR_NameEmpty"]);
+            return;
+        }
+
+        if (_request.Hosts.Count == 0) {
+            await _modal.OkOnly(_strings["Error"], _strings["ERR_HostsRequired"]);
+            return;
+        }
+
+        var success = await _modal.PerformSave(async () => {
+            var caCert = _certService.GetCertificate(_ca.Id);
+            using var cert = Certificates.IssueServerCertFromCA(caCert, _request.Hosts);
+            using var db = _dbFactory.CreateDbContext();
+            await using var transaction = await db.Database.BeginTransactionAsync();
+            var entry = db.IssuedCerts.Add(new IssuedCert(_ca.Id, _request.Name));
+            await db.SaveChangesAsync();
+            Certificates.ExportCertToDisk(entry.Entity.Id, cert);
+            await transaction.CommitAsync();
+            cert.Dispose();
+        }, true);
+        
+        if (success) _nav.NavigateTo("/cert-authorities");
+    }
+}

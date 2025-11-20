@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "monaco-editor": "^0.52.0",
+    "sortablejs": "^1.15.6"
+  }
+}

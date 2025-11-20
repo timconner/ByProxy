@@ -1,0 +1,37 @@
+fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.cert-select {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.fallback .cert-select {
+    margin-top: 6px;
+}
+
+.change {
+    margin-left: 12px;
+    padding: 1px 12px;
+}
+
+.danger-zone {
+    display: flex;
+    justify-content: space-around;
+}
+
+    .danger-zone .services {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .danger-zone .certificates {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }

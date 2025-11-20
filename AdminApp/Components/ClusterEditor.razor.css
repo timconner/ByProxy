@@ -1,0 +1,66 @@
+label {
+    user-select: none;
+}
+
+.disabled {
+    color: var(--disabled-text-color);
+}
+
+    .disabled :is(input, select) {
+        color: var(--disabled-text-color);
+        background-color: var(--dark-bg-color) !important;
+        cursor: default !important;
+    }
+
+.description {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-column-gap: 6px;
+    grid-row-gap: 6px;
+    align-items: center;
+}
+
+.name {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+    .name input {
+        max-width: 200px;
+    }
+
+.new-destination {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-column-gap: 6px;
+    margin-bottom: 12px;
+}
+
+.new-destination .label {
+    grid-column: 1;
+}
+
+.new-destination input {
+    grid-column: 2;
+}
+
+.new-destination .help-text {
+    grid-column: 1 / 3;
+    margin-bottom: 12px;
+}
+
+.new-destination button {
+    grid-column: 2;
+    width: fit-content;
+    margin-left: auto;
+}
+
+.empty {
+    margin: 0 auto 12px auto;
+    color: var(--disabled-text-color);
+}
+
+tr.drop-target :is(th, td) {
+    border-bottom: 1px dashed red;
+}

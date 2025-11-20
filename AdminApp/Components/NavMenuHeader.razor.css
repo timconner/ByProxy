@@ -1,0 +1,8 @@
+.nav-menu-header {
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    margin-top: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--disabled-text-color);
+}

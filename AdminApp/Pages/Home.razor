@@ -1,0 +1,42 @@
+﻿@page "/"
+
+@inject IStringLocalizer<Language> _strings
+
+<div class="home-container">
+    <div class="getting-started">
+        <h1>Getting Started</h1>
+        <PageDivider MarginTop="6px" />
+        <div class="steps">
+            <ol>
+                <li>
+                    <div>@_strings["GS_CreateClusters"]</div>
+                    <div class="help-text">@_strings["Help_GS_CreateClusters"]</div>
+                </li>
+                <li>
+                    <div>@_strings["GS_CreateRoutes"]</div>
+                    <div class="help-text">@_strings["Help_GS_CreateRoutes"]</div>
+                </li>
+                <li>
+                    <div>@_strings["GS_SetupCertificates"]</div>
+                    <div class="help-text">@_strings["Help_GS_SetupCertificates"]</div>
+                </li>
+                <li>
+                    <div>@_strings["GS_CreateSniMaps"]</div>
+                    <div class="help-text">@_strings["Help_GS_CreateSniMaps"]</div>
+                </li>
+                <li>
+                    <div>@_strings["GS_CommitConfig"]</div>
+                    <div class="help-text">@_strings["Help_GS_CommitConfig"]</div>
+                </li>
+                <li>
+                    <div>@_strings["GS_ConfirmConfig"]</div>
+                    <div class="help-text">@_strings["Help_GS_ConfirmConfig"]</div>
+                </li>
+            </ol>
+        </div>
+    </div>
+</div>
+
+@code {
+
+}

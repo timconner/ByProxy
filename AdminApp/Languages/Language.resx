@@ -1,0 +1,2147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Display Name" xml:space="preserve">
+    <value>Display Name</value>
+  </data>
+  <data name="Full Name" xml:space="preserve">
+    <value>Full Name</value>
+  </data>
+  <data name="Hello" xml:space="preserve">
+    <value>Hello</value>
+  </data>
+  <data name="Invalid Login" xml:space="preserve">
+    <value>Invalid Login</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Password</value>
+  </data>
+  <data name="CreateInitialAccount" xml:space="preserve">
+    <value>Create Initial Admin Account</value>
+    <comment>Used in Init</comment>
+  </data>
+  <data name="Change Password" xml:space="preserve">
+    <value>Change Password</value>
+  </data>
+  <data name="Confirm Password" xml:space="preserve">
+    <value>Confirm Password</value>
+  </data>
+  <data name="Current Password" xml:space="preserve">
+    <value>Current Password</value>
+  </data>
+  <data name="New Password" xml:space="preserve">
+    <value>New Password</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Username</value>
+  </data>
+  <data name="Add" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="AppName" xml:space="preserve">
+    <value>ByProxy</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="Case Sensitive Method" xml:space="preserve">
+    <value>Case Sensitive Method</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Certificates" xml:space="preserve">
+    <value>Certificates</value>
+  </data>
+  <data name="Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Clusters" xml:space="preserve">
+    <value>Clusters</value>
+  </data>
+  <data name="Connection Options" xml:space="preserve">
+    <value>Connection Options</value>
+  </data>
+  <data name="Create Cluster" xml:space="preserve">
+    <value>Create Cluster</value>
+    <comment>Used in CreateCluster</comment>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="Delete Cluster" xml:space="preserve">
+    <value>Delete Cluster</value>
+    <comment>Used in ClustersIndex</comment>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="Destination Address" xml:space="preserve">
+    <value>Destination Address</value>
+  </data>
+  <data name="Destination Name" xml:space="preserve">
+    <value>Destination Name</value>
+  </data>
+  <data name="Destinations" xml:space="preserve">
+    <value>Destinations</value>
+  </data>
+  <data name="ERR_DestinationsEmpty" xml:space="preserve">
+    <value>No Destinations Defined</value>
+    <comment>Used in ClusterEditor</comment>
+  </data>
+  <data name="Disable Destination Certificate Validation" xml:space="preserve">
+    <value>Disable Destination Certificate Validation</value>
+    <comment>Used in ClusterEditor</comment>
+  </data>
+  <data name="Discard" xml:space="preserve">
+    <value>Discard</value>
+  </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Edit Cluster" xml:space="preserve">
+    <value>Edit Cluster</value>
+    <comment>Used in EditCluster</comment>
+  </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="LBP_FirstAlphabetical" xml:space="preserve">
+    <value>Failover In Order</value>
+  </data>
+  <data name="Health Check Address" xml:space="preserve">
+    <value>Health Check Address</value>
+    <comment>Used in ClusterEditor</comment>
+  </data>
+  <data name="Help_DestinationAddress" xml:space="preserve">
+    <value>The address for handling routed requests.</value>
+    <comment>Used in ClusterEditor</comment>
+  </data>
+  <data name="Help_DisableDestinationCertificateValidation" xml:space="preserve">
+    <value>Accept any certificate from destinations using HTTPS.</value>
+    <comment>Used in ClusterEditor</comment>
+  </data>
+  <data name="Help_FirstAlphabetical" xml:space="preserve">
+    <value>Always picks the first destination in order that is available. Useful for active / passive failover.</value>
+    <comment>App uses custom ordering to ensure destination order is maintained which is why alphabetical order is not mentioned.</comment>
+  </data>
+  <data name="Help_HealthAddress" xml:space="preserve">
+    <value>Optional: Add to perform active health checks.</value>
+    <comment>Used in ClusterEditor</comment>
+  </data>
+  <data name="Help_LeastRequests" xml:space="preserve">
+    <value>Routes requests to the destination currently handling the fewest active requests.</value>
+  </data>
+  <data name="Help_DestinationName" xml:space="preserve">
+    <value>Optional short description.</value>
+    <comment>Used in ClusterEditor</comment>
+  </data>
+  <data name="Help_NameDescription" xml:space="preserve">
+    <value>Short name and and optional description.</value>
+  </data>
+  <data name="Help_PowerOfTwoChoices" xml:space="preserve">
+    <value>Picks two random destinations and sends the request to the one with fewer active requests. This avoids the overhead of Least Requests and the worst case for Random where it selects a busy destination.</value>
+  </data>
+  <data name="Help_Random" xml:space="preserve">
+    <value>Sends each request to a randomly chosen destination.</value>
+  </data>
+  <data name="Help_RoundRobin" xml:space="preserve">
+    <value>Cycles through destinations in order, giving each one a turn.</value>
+  </data>
+  <data name="Help_StickySessions" xml:space="preserve">
+    <value>Use a cookie to keep a client connected to same destination.</value>
+  </data>
+  <data name="Home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="LBP_LeastRequests" xml:space="preserve">
+    <value>Least Requests</value>
+  </data>
+  <data name="Load Balancing Policy" xml:space="preserve">
+    <value>Load Balancing Policy</value>
+  </data>
+  <data name="Multi-Destination Options" xml:space="preserve">
+    <value>Multi-Destination Options</value>
+    <comment>Used in ClusterEditor</comment>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="LBP_PowerOfTwoChoices" xml:space="preserve">
+    <value>Power of Two Choices</value>
+  </data>
+  <data name="Proxy" xml:space="preserve">
+    <value>Proxy</value>
+  </data>
+  <data name="AppCaption" xml:space="preserve">
+    <value>Management</value>
+  </data>
+  <data name="LBP_Random" xml:space="preserve">
+    <value>Random</value>
+  </data>
+  <data name="Remove" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <data name="LBP_RoundRobin" xml:space="preserve">
+    <value>Round-Robin</value>
+  </data>
+  <data name="Routes" xml:space="preserve">
+    <value>Routes</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="System Settings" xml:space="preserve">
+    <value>System Settings</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Sign Out" xml:space="preserve">
+    <value>Sign Out</value>
+  </data>
+  <data name="Users" xml:space="preserve">
+    <value>Users</value>
+  </data>
+  <data name="Warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="WARN_CaseSensitiveMethod" xml:space="preserve">
+    <value>HTTP Methods are case sensitive and most require all upper case (e.g. GET, PUT, POST, etc).
+
+Are you sure you want to add a method with lower case letters?</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="WARN_Delete" xml:space="preserve">
+    <value>Are you sure you want to continue with deletion?</value>
+  </data>
+  <data name="ERR_NameEmpty" xml:space="preserve">
+    <value>No name was provided.</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="Create" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="Create Route" xml:space="preserve">
+    <value>Create Route</value>
+    <comment>Used in CreateRoute</comment>
+  </data>
+  <data name="Delete Route" xml:space="preserve">
+    <value>Delete Route</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="Duplicate Destination" xml:space="preserve">
+    <value>Duplicate Destination</value>
+    <comment>Used in ClusterEditor</comment>
+  </data>
+  <data name="ERR_BadDestination" xml:space="preserve">
+    <value>Destination Address Rejected</value>
+    <comment>Used in ClusterEditor</comment>
+  </data>
+  <data name="ERR_BadHealthCheck" xml:space="preserve">
+    <value>Health Check Address Rejected</value>
+    <comment>Used in ClusterEditor</comment>
+  </data>
+  <data name="ERR_DeleteFailed" xml:space="preserve">
+    <value>Unable to delete</value>
+  </data>
+  <data name="ERR_DuplicateDestination" xml:space="preserve">
+    <value>Destination with the same address already exists.</value>
+    <comment>Used in ClusterEditor</comment>
+  </data>
+  <data name="ERR_RouteConstraint" xml:space="preserve">
+    <value>The following Routes point to it</value>
+    <comment>Used in ClustersIndex</comment>
+  </data>
+  <data name="ERR_SchemeMustBeHTTP" xml:space="preserve">
+    <value>Must be http:// or https://</value>
+    <comment>Used in ClusterEditor</comment>
+  </data>
+  <data name="ERR_UriParseFailed" xml:space="preserve">
+    <value>Unable to parse URI.</value>
+    <comment>Used in ClusterEditor</comment>
+  </data>
+  <data name="Failed" xml:space="preserve">
+    <value>Failed</value>
+  </data>
+  <data name="Help_ClickCreate" xml:space="preserve">
+    <value>Click Create to get started.</value>
+  </data>
+  <data name="No Clusters Defined" xml:space="preserve">
+    <value>No Clusters Defined</value>
+  </data>
+  <data name="No Routes Defined" xml:space="preserve">
+    <value>No Routes Defined</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="Processing" xml:space="preserve">
+    <value>Processing</value>
+  </data>
+  <data name="Saving" xml:space="preserve">
+    <value>Saving</value>
+  </data>
+  <data name="Success" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="Validation Errors" xml:space="preserve">
+    <value>Validation Errors</value>
+  </data>
+  <data name="AttemptingReconnect" xml:space="preserve">
+    <value>Attempting Reconnect</value>
+    <comment>Used in App</comment>
+  </data>
+  <data name="Clone" xml:space="preserve">
+    <value>Clone</value>
+  </data>
+  <data name="Clone Route" xml:space="preserve">
+    <value>Clone Route</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="CloneRoutePrompt" xml:space="preserve">
+    <value>Enter the name for the cloned route:</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="Cluster" xml:space="preserve">
+    <value>Cluster</value>
+  </data>
+  <data name="Commit Changes" xml:space="preserve">
+    <value>Commit Changes</value>
+    <comment>Used in NavMenu</comment>
+  </data>
+  <data name="Commit" xml:space="preserve">
+    <value>Commit</value>
+    <comment>Used in NavMenu</comment>
+  </data>
+  <data name="CommittingChanges" xml:space="preserve">
+    <value>Committing Changes...</value>
+    <comment>Used in NavMenu</comment>
+  </data>
+  <data name="Edit Route" xml:space="preserve">
+    <value>Edit Route</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="Help_HostsMatch" xml:space="preserve">
+    <value>The Host header of the http request. Domain names, IP addresses, hostnames, etc. Single level wildcards are allowed (e.g. *.example.com).</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HTTPMethodsMatch" xml:space="preserve">
+    <value>The HTTP request method (e.g. GET, POST, PUT). These are case sensitive!</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_PathMatch" xml:space="preserve">
+    <value>The path being requested, i.e. the portion of the URI after the host and port. If you don't want this path being forwarded to the destination cluster, use a Path transform to customize what is forwarded.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Host" xml:space="preserve">
+    <value>Host</value>
+  </data>
+  <data name="Hosts" xml:space="preserve">
+    <value>Hosts</value>
+  </data>
+  <data name="HTTP Methods" xml:space="preserve">
+    <value>HTTP Methods</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="InboundProtocolsPorts" xml:space="preserve">
+    <value>Inbound Protocols/Ports</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="ListenHTTP" xml:space="preserve">
+    <value>Listen on HTTP</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="ListenHTTPS" xml:space="preserve">
+    <value>Listen on HTTPS</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Match Criteria" xml:space="preserve">
+    <value>Match Criteria</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="MatchAllHosts" xml:space="preserve">
+    <value>Matching all hosts. Add a host to limit matching.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="MatchAllMethods" xml:space="preserve">
+    <value>Matching all HTTP methods. Add a method to limit matching.</value>
+  </data>
+  <data name="Matching" xml:space="preserve">
+    <value>Matching</value>
+  </data>
+  <data name="Matching all paths" xml:space="preserve">
+    <value>Matching all paths</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Path" xml:space="preserve">
+    <value>Path</value>
+  </data>
+  <data name="Path Mode" xml:space="preserve">
+    <value>Path Mode</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="PathMode_ExactMatch" xml:space="preserve">
+    <value>Exact Match</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="PathMode_Prefix" xml:space="preserve">
+    <value>Prefix</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Port" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="Redirect" xml:space="preserve">
+    <value>Redirect</value>
+  </data>
+  <data name="WARN_CommitChanges" xml:space="preserve">
+    <value>Are you sure you want to commit changes?
+
+If listening ports have changed, the application will be restarted.
+
+You must confirm changes after they have been applied.</value>
+  </data>
+  <data name="Click Again" xml:space="preserve">
+    <value>Click Again</value>
+    <comment>Used in ConfirmAndCandidateWatcher</comment>
+  </data>
+  <data name="Clone Cluster" xml:space="preserve">
+    <value>Clone Cluster</value>
+    <comment>Used in ClustersIndex</comment>
+  </data>
+  <data name="CloneClusterPrompt" xml:space="preserve">
+    <value>Enter the name for the cloned cluster:</value>
+    <comment>Used in ClustersIndex</comment>
+  </data>
+  <data name="Confirm" xml:space="preserve">
+    <value>Confirm</value>
+    <comment>Used in ConfirmAndCandidateWatcher</comment>
+  </data>
+  <data name="INFO_Clusters" xml:space="preserve">
+    <value>Clusters are the destinations available to route requests to. They are listed alphabetically since their order does not matter.</value>
+    <comment>Used in ClustersIndex</comment>
+  </data>
+  <data name="INFO_Routes" xml:space="preserve">
+    <value>Routes determine how requests are handled. Conflicting routes are resolved from top to bottom. Drag and drop routes to change priority/order.</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="Revert" xml:space="preserve">
+    <value>Revert</value>
+    <comment>Used in ConfirmAndCandidateWatcher</comment>
+  </data>
+  <data name="Revert?" xml:space="preserve">
+    <value>Revert?</value>
+    <comment>Used in ConfirmAndCandidateWatcher</comment>
+  </data>
+  <data name="Seconds" xml:space="preserve">
+    <value>Seconds</value>
+  </data>
+  <data name="WARN_ConfirmExpiration" xml:space="preserve">
+    <value>Configuration Automatically Reverts In</value>
+    <comment>Used in ConfirmAndCandidateWatcher</comment>
+  </data>
+  <data name="WARN_ConfirmRequired" xml:space="preserve">
+    <value>Confirm Required</value>
+    <comment>Used in ConfirmAndCandidateWatcher</comment>
+  </data>
+  <data name="Reverse Proxy" xml:space="preserve">
+    <value>Reverse Proxy</value>
+  </data>
+  <data name="AllFieldsRequired" xml:space="preserve">
+    <value>All fields are required.</value>
+  </data>
+  <data name="Create User" xml:space="preserve">
+    <value>Create User</value>
+    <comment>Used in CreateUser</comment>
+  </data>
+  <data name="Delete User" xml:space="preserve">
+    <value>Delete User</value>
+    <comment>Used in UsersIndex</comment>
+  </data>
+  <data name="Edit User" xml:space="preserve">
+    <value>Edit User</value>
+  </data>
+  <data name="Help_PasswordIsTemp" xml:space="preserve">
+    <value>The user will be required to reset their password on first logon.</value>
+  </data>
+  <data name="INFO_CreateUser" xml:space="preserve">
+    <value>Roles can be assigned on the next screen.</value>
+    <comment>Used in CreateUser</comment>
+  </data>
+  <data name="Last Set" xml:space="preserve">
+    <value>Last Set</value>
+  </data>
+  <data name="Prompt_SignOutUserSessions" xml:space="preserve">
+    <value>Sign out all sessions for</value>
+  </data>
+  <data name="Prompt_TempPassForUser" xml:space="preserve">
+    <value>Enter a temporary password for</value>
+    <comment>Used in UsersIndex</comment>
+  </data>
+  <data name="Reset Password" xml:space="preserve">
+    <value>Reset Password</value>
+  </data>
+  <data name="Roles" xml:space="preserve">
+    <value>Roles</value>
+  </data>
+  <data name="Sign Out User" xml:space="preserve">
+    <value>Sign Out User</value>
+  </data>
+  <data name="Certificate Authorities" xml:space="preserve">
+    <value>Certificate Authorities</value>
+    <comment>Used in CertAuthoritiesIndex</comment>
+  </data>
+  <data name="Changes" xml:space="preserve">
+    <value>Changes</value>
+    <comment>Used in Changes</comment>
+  </data>
+  <data name="Compare" xml:space="preserve">
+    <value>Compare</value>
+    <comment>Used in NavMenu</comment>
+  </data>
+  <data name="Confirm_30" xml:space="preserve">
+    <value>30 Seconds</value>
+    <comment>Used in ModalComponent</comment>
+  </data>
+  <data name="Confirm_300" xml:space="preserve">
+    <value>5 Minutes</value>
+    <comment>Used in ModalComponent</comment>
+  </data>
+  <data name="Confirm_60" xml:space="preserve">
+    <value>60 Seconds</value>
+    <comment>Used in ModalComponent</comment>
+  </data>
+  <data name="Confirm_600" xml:space="preserve">
+    <value>10 Minutes</value>
+    <comment>Used in ModalComponent</comment>
+  </data>
+  <data name="Discard Changes" xml:space="preserve">
+    <value>Discard Changes</value>
+  </data>
+  <data name="ERR_NewAndConfirmMismatch" xml:space="preserve">
+    <value>New and confirm passwords did not match.</value>
+  </data>
+  <data name="ERR_PasswordComplexityFailed" xml:space="preserve">
+    <value>Password must be at least 8 characters long and contain at least one of each: upper case letter, lower case letter, number.</value>
+  </data>
+  <data name="ERR_SameAsOldPassword" xml:space="preserve">
+    <value>New password must be different than current password.</value>
+    <comment>Used in ResetPW</comment>
+  </data>
+  <data name="SniMapsPageTitle" xml:space="preserve">
+    <value>Server Name Indication Maps</value>
+    <comment>Used in SniMapsIndex</comment>
+  </data>
+  <data name="LoadingWait" xml:space="preserve">
+    <value>Loading...</value>
+    <comment>Used in Changes</comment>
+  </data>
+  <data name="Log In" xml:space="preserve">
+    <value>Log In</value>
+    <comment>Used in Login</comment>
+  </data>
+  <data name="My Settings" xml:space="preserve">
+    <value>My Settings</value>
+    <comment>Used in Account</comment>
+  </data>
+  <data name="Prompt_ConfirmSeconds" xml:space="preserve">
+    <value>Unconfirmed changes will automatically revert after:</value>
+    <comment>Used in ModalComponent</comment>
+  </data>
+  <data name="Refresh Required" xml:space="preserve">
+    <value>Refresh Required</value>
+  </data>
+  <data name="Sign Out All Sessions" xml:space="preserve">
+    <value>Sign Out All Sessions</value>
+    <comment>Used in Account</comment>
+  </data>
+  <data name="Sort by" xml:space="preserve">
+    <value>Sort by</value>
+    <comment>Used in Changes</comment>
+  </data>
+  <data name="WARN_DiscardChanges" xml:space="preserve">
+    <value>Are you sure you want to discard uncommitted changes?
+
+These changes will be lost.</value>
+    <comment>Used in NavMenu</comment>
+  </data>
+  <data name="WARN_InvalidState" xml:space="preserve">
+    <value>The current configuration was committed or discarded. This page will be refreshed and unsaved changes will be lost.</value>
+  </data>
+  <data name="ACME Accounts" xml:space="preserve">
+    <value>ACME Accounts</value>
+    <comment>Used in CreateAcmeAccount</comment>
+  </data>
+  <data name="Authorities" xml:space="preserve">
+    <value>Authorities</value>
+    <comment>Used in NavMenu</comment>
+  </data>
+  <data name="SNI Maps" xml:space="preserve">
+    <value>SNI Maps</value>
+  </data>
+  <data name="Server Settings" xml:space="preserve">
+    <value>Server Settings</value>
+    <comment>Used in Server</comment>
+  </data>
+  <data name="Help_RouteSNI" xml:space="preserve">
+    <value>Certificates are configured through the SNI Maps page.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Imported" xml:space="preserve">
+    <value>Imported</value>
+    <comment>Used in NavMenu</comment>
+  </data>
+  <data name="Active" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="Add SNI Maps" xml:space="preserve">
+    <value>Add SNI Maps</value>
+    <comment>Used in AddSniMap</comment>
+  </data>
+  <data name="Certificate Details" xml:space="preserve">
+    <value>Certificate Details</value>
+  </data>
+  <data name="Certificate Issues" xml:space="preserve">
+    <value>Certificate Issues</value>
+    <comment>Used in SniMapsIndex</comment>
+  </data>
+  <data name="Certificate Name" xml:space="preserve">
+    <value>Certificate Name</value>
+    <comment>Used in SniMapsIndex</comment>
+  </data>
+  <data name="Created" xml:space="preserve">
+    <value>Created</value>
+    <comment>Created Date</comment>
+  </data>
+  <data name="ERR_HostsRequired" xml:space="preserve">
+    <value>At least one host is required.</value>
+    <comment>Used in GenerateSelfSigned</comment>
+  </data>
+  <data name="Expired" xml:space="preserve">
+    <value>Expired</value>
+    <comment>Used in SniMapsIndex</comment>
+  </data>
+  <data name="Expires" xml:space="preserve">
+    <value>Expires</value>
+    <comment>Expiry Date</comment>
+  </data>
+  <data name="Fallback" xml:space="preserve">
+    <value>Fallback</value>
+    <comment>Fallback Certificate</comment>
+  </data>
+  <data name="Generate Self-Signed" xml:space="preserve">
+    <value>Generate Self-Signed</value>
+    <comment>Used in ImportedCertsIndex</comment>
+  </data>
+  <data name="GenerateSelfSignedPageTitle" xml:space="preserve">
+    <value>Generate Self-Signed Certificate</value>
+    <comment>Used in GenerateSelfSigned</comment>
+  </data>
+  <data name="Help_MapHost" xml:space="preserve">
+    <value>The hostname, domain name, or IP to match when negotiating an HTTPS connection. Single level wildcards are supported (e.g. *.example.com).</value>
+  </data>
+  <data name="Import Certificate" xml:space="preserve">
+    <value>Import Certificate</value>
+    <comment>Used in ImportedCertsIndex</comment>
+  </data>
+  <data name="Imported Certificates" xml:space="preserve">
+    <value>Imported Certificates</value>
+    <comment>Used in ImportedCertsIndex</comment>
+  </data>
+  <data name="Hidden" xml:space="preserve">
+    <value>Hidden</value>
+  </data>
+  <data name="Issued" xml:space="preserve">
+    <value>Issued</value>
+    <comment>Issued Date</comment>
+  </data>
+  <data name="Issuer" xml:space="preserve">
+    <value>Issuer</value>
+    <comment>Cert Issuer</comment>
+  </data>
+  <data name="Maps to Add" xml:space="preserve">
+    <value>Maps to Add</value>
+    <comment>Used in AddSniMap</comment>
+  </data>
+  <data name="Matching Certificates" xml:space="preserve">
+    <value>Matching Certificates</value>
+    <comment>Used in AddSniMap</comment>
+  </data>
+  <data name="New Map" xml:space="preserve">
+    <value>New Map</value>
+    <comment>Used in AddSniMap</comment>
+  </data>
+  <data name="NoMatchingCerts" xml:space="preserve">
+    <value>No matching certificates found.</value>
+    <comment>Used in AddSniMap</comment>
+  </data>
+  <data name="Not Yet Valid" xml:space="preserve">
+    <value>Not Yet Valid</value>
+    <comment>Used in SniMapsIndex</comment>
+  </data>
+  <data name="Self-Signed" xml:space="preserve">
+    <value>Self-Signed</value>
+  </data>
+  <data name="SHA-1 Thumbprint" xml:space="preserve">
+    <value>SHA-1 Thumbprint</value>
+  </data>
+  <data name="SHA-256 Fingerprint" xml:space="preserve">
+    <value>SHA-256 Fingerprint</value>
+  </data>
+  <data name="Show" xml:space="preserve">
+    <value>Show</value>
+  </data>
+  <data name="Subject Names" xml:space="preserve">
+    <value>Subject Names</value>
+    <comment>Certificate SAN</comment>
+  </data>
+  <data name="Subject Not Present" xml:space="preserve">
+    <value>Subject Not Present</value>
+    <comment>Used in SniMapsIndex</comment>
+  </data>
+  <data name="Validity" xml:space="preserve">
+    <value>Validity</value>
+    <comment>Used in SniMapsIndex</comment>
+  </data>
+  <data name="WARN_DeleteMap" xml:space="preserve">
+    <value>Existing maps can be overwritten using Add.
+
+Are you sure you wish to delete this map instead?</value>
+    <comment>Used in SniMapsIndex</comment>
+  </data>
+  <data name="Create CA" xml:space="preserve">
+    <value>Create CA</value>
+    <comment>Used in CertAuthoritiesIndex</comment>
+  </data>
+  <data name="Fingerprints" xml:space="preserve">
+    <value>Fingerprints</value>
+  </data>
+  <data name="Hide" xml:space="preserve">
+    <value>Hide</value>
+  </data>
+  <data name="Inactive Certificate" xml:space="preserve">
+    <value>Inactive Certificate</value>
+  </data>
+  <data name="INFO_SniMaps" xml:space="preserve">
+    <value>SNI maps are used to select which certificate to use for HTTPS connections. Exact matches win over wildcards. Fallback certificate will be used when there is no match.</value>
+  </data>
+  <data name="Issue" xml:space="preserve">
+    <value>Issue</value>
+    <comment>Used in IssueCertificate</comment>
+  </data>
+  <data name="No Certificate Authorities" xml:space="preserve">
+    <value>No Certificate Authorities</value>
+    <comment>Used in CertAuthoritiesIndex</comment>
+  </data>
+  <data name="No Certificates" xml:space="preserve">
+    <value>No Certificates</value>
+  </data>
+  <data name="Prompt_HideCa" xml:space="preserve">
+    <value>This will hide the CA and all of it's issued certificates from all other configuration screens.
+
+Continue?</value>
+    <comment>Used in CertAuthoritiesIndex</comment>
+  </data>
+  <data name="Prompt_HideCert" xml:space="preserve">
+    <value>This will hide the certificate from all other configuration screens.
+
+Continue?</value>
+  </data>
+  <data name="Prompt_NameCA" xml:space="preserve">
+    <value>Enter the name for the new CA:</value>
+    <comment>Used in CertAuthoritiesIndex</comment>
+  </data>
+  <data name="Reactivate" xml:space="preserve">
+    <value>Reactivate</value>
+  </data>
+  <data name="Serial Number" xml:space="preserve">
+    <value>Serial Number</value>
+  </data>
+  <data name="WARN_CaCertInUse" xml:space="preserve">
+    <value>This CA has issued certificates which are currently in use. They will still show on the SNI Maps screen until the maps are removed or updated.</value>
+    <comment>Used in CertAuthoritiesIndex</comment>
+  </data>
+  <data name="WARN_CertInUse" xml:space="preserve">
+    <value>This certificate is currently in use. It will still show on the SNI Maps screen until the map is removed or updated.</value>
+  </data>
+  <data name="WARN_ReactivateCa" xml:space="preserve">
+    <value>This will unhide the CA, but all issued certs will need to be reactivated manually.</value>
+    <comment>Used in CertAuthoritiesIndex</comment>
+  </data>
+  <data name="Any IP" xml:space="preserve">
+    <value>Any IP</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Change" xml:space="preserve">
+    <value>Change</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="ERR_AdminPortInUse" xml:space="preserve">
+    <value>The specifed port is already in use by one or more routes. The management port can not be shared with routes.</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="ERR_HttpRoutePortUsedByHttps" xml:space="preserve">
+    <value>The HTTP port is currently being used by another route for HTTPS. Routes can share the same port as long as they are the same protocol. i.e. Both HTTP or both HTTPS.</value>
+  </data>
+  <data name="ERR_HttpsRoutePortUsedByHttp" xml:space="preserve">
+    <value>The HTTPS port is currently being used by another route for HTTP. Routes can share the same port as long as they are the same protocol. i.e. Both HTTP or both HTTPS.</value>
+  </data>
+  <data name="ERR_PortOutOfRange" xml:space="preserve">
+    <value>The specified port was outside the acceptable HTTP port range: 1 - 65535</value>
+  </data>
+  <data name="ERR_RoutePortInUseAdmin" xml:space="preserve">
+    <value>The specified port is being used for the management port. Routes can share ports, but a route can not use the same port as the management port.</value>
+  </data>
+  <data name="ERR_SamePortBothProtocols" xml:space="preserve">
+    <value>Both HTTP and HTTPS are set to the same port.</value>
+  </data>
+  <data name="Help_AdminPort" xml:space="preserve">
+    <value>The port that the management site can be accessed through via https.</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Help_ListenOn" xml:space="preserve">
+    <value>Choose if the management site will be available remotely. Pro tip: This setting can be left on localhost and have the management site be remotely accessible via the reverse proxy by adding a Cluster with 127.0.0.1 (or ::1) and the above HTTPS port as the destination and a corresponding route.</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Help_Tarpit" xml:space="preserve">
+    <value>Enables an HTTP connection tarpit that deliberately delays unmatched traffic responses by a randomized duration between 15 and 30 seconds, slowing down abusive or unwanted clients. Note that each stalled connection still consumes server resources, which may impact overall capacity under load.</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Help_UnmatchedStatus" xml:space="preserve">
+    <value>The HTTP status code to return when a requests has no matching routes.</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="HTTP Status" xml:space="preserve">
+    <value>HTTP Status</value>
+  </data>
+  <data name="HTTPS Certificate" xml:space="preserve">
+    <value>HTTPS Certificate</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="HTTPS Port" xml:space="preserve">
+    <value>HTTPS Port</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Listen On" xml:space="preserve">
+    <value>Listen On</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="localhost" xml:space="preserve">
+    <value>localhost</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Management Site Settings" xml:space="preserve">
+    <value>Management Site Settings</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Off" xml:space="preserve">
+    <value>Off</value>
+    <comment>Used in Toggle</comment>
+  </data>
+  <data name="On" xml:space="preserve">
+    <value>On</value>
+    <comment>Used in Toggle</comment>
+  </data>
+  <data name="PortInUse" xml:space="preserve">
+    <value>Port In Use</value>
+  </data>
+  <data name="PortOutOfRange" xml:space="preserve">
+    <value>Port Out of Range</value>
+  </data>
+  <data name="System" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Tarpit" xml:space="preserve">
+    <value>Tarpit</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Unmatched Traffic Handling" xml:space="preserve">
+    <value>Unmatched Traffic Handling</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Use SNI Maps" xml:space="preserve">
+    <value>Use SNI Maps</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Destinations_Empty" xml:space="preserve">
+    <value>No Destinations</value>
+  </data>
+  <data name="Fallback Certificate" xml:space="preserve">
+    <value>Fallback Certificate</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Getting Started" xml:space="preserve">
+    <value />
+    <comment>Used in Home</comment>
+  </data>
+  <data name="GS_CommitConfig" xml:space="preserve">
+    <value>Commit Configuration</value>
+    <comment>Used in Home</comment>
+  </data>
+  <data name="GS_ConfirmConfig" xml:space="preserve">
+    <value>Confirm Configuration</value>
+    <comment>Used in Home</comment>
+  </data>
+  <data name="GS_CreateClusters" xml:space="preserve">
+    <value>Create Clusters</value>
+    <comment>Used in Home</comment>
+  </data>
+  <data name="GS_CreateRoutes" xml:space="preserve">
+    <value>Create Routes</value>
+    <comment>Used in Home</comment>
+  </data>
+  <data name="GS_CreateSniMaps" xml:space="preserve">
+    <value>Create SNI Maps</value>
+    <comment>Used in Home</comment>
+  </data>
+  <data name="GS_SetupCertificates" xml:space="preserve">
+    <value>Setup Certificates</value>
+    <comment>Used in Home</comment>
+  </data>
+  <data name="Help_AdminCert" xml:space="preserve">
+    <value>For direct connections to the admin port, choose to either use a specific certificate or let the certificate selector use SNI and the configured SNI maps to pick the certificate.</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Help_ChangeFallbackInSystem" xml:space="preserve">
+    <value>Fallback certificate can be changed in System settings.</value>
+    <comment>Used in SniMapsIndex</comment>
+  </data>
+  <data name="Help_FallbackCert" xml:space="preserve">
+    <value>Choose the behavior for handling HTTPS connections that do not have a matching SNI map.</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Help_GS_CommitConfig" xml:space="preserve">
+    <value>The commit button will appear in the navigation menu after a change is made.</value>
+    <comment>Used in Home</comment>
+  </data>
+  <data name="Help_GS_ConfirmConfig" xml:space="preserve">
+    <value>After committing a configuration, you must confirm the changes via the on-screen popup.
+If changes aren't confirmed they will revert automatically. This is an anti-lockout safeguard.</value>
+    <comment>Used in Home</comment>
+  </data>
+  <data name="Help_GS_CreateClusters" xml:space="preserve">
+    <value>Clusters are the servers hosting your applications.</value>
+    <comment>Used in Home</comment>
+  </data>
+  <data name="Help_GS_CreateRoutes" xml:space="preserve">
+    <value>Routes control which requests go to which clusters.</value>
+    <comment>Used in Home</comment>
+  </data>
+  <data name="Help_GS_CreateSniMaps" xml:space="preserve">
+    <value>SNI Maps determine which certificate is used for a connection.</value>
+    <comment>Used in Home</comment>
+  </data>
+  <data name="Help_GS_SetupCertificates" xml:space="preserve">
+    <value>Certificates are used for establishing secure connections.</value>
+    <comment>Used in Home</comment>
+  </data>
+  <data name="Help_SniRefuse" xml:space="preserve">
+    <value>This behavior can be changed to present a fallback certificate in System settings.</value>
+    <comment>Used in SniMapsIndex</comment>
+  </data>
+  <data name="LanguageSelect" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="NoSniMatch" xml:space="preserve">
+    <value>HTTPS Connections Without SNI Match</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Refuse Connection" xml:space="preserve">
+    <value>Refuse Connection</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Restart Proxy Server" xml:space="preserve">
+    <value>Restart Proxy Server</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Search" xml:space="preserve">
+    <value>Search</value>
+    <comment>Used in ModalComponent</comment>
+  </data>
+  <data name="Shutdown Proxy Server" xml:space="preserve">
+    <value>Shutdown Proxy Server</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="SniRefuse" xml:space="preserve">
+    <value>HTTPS connections that do not have a matching SNI map will be refused.</value>
+    <comment>Used in SniMapsIndex</comment>
+  </data>
+  <data name="Use Fallback Certificate" xml:space="preserve">
+    <value>Use Fallback Certificate</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="WARN_EnabledTarpit" xml:space="preserve">
+    <value>To make tarpit effective for HTTPS connections, set unmatched HTTPS connections to use a fallback certificate.
+
+Recommend using a self-signed certificate that gives no indication of valid hostnames.</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="WARN_RefusingConnectionsTarpit" xml:space="preserve">
+    <value>Changing HTTPS connections to refuse will make the tarpit uneffective for most HTTPS connections.
+
+For tarpit it is recommended you use a self-signed certificate that gives no indication of valid hostnames.</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="WARN_RestartProxy" xml:space="preserve">
+    <value>This will restart the proxy server and the management site.
+
+All connections will be closed. Useful for flushing connections using old certificates.
+
+This does not restart the host OS.
+
+Continue with restart?</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="WARN_ShutdownProxy" xml:space="preserve">
+    <value>The proxy server will be shutdown and all services behind the proxy and this management site will become inaccessible until the proxy server is manually started.
+
+This does not shutdown the host OS.
+
+Are you sure you want to shutdown?</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="ERR_NoProtocols" xml:space="preserve">
+    <value>Route must be assigned an HTTP or HTTPS port (or both).</value>
+  </data>
+  <data name="Security" xml:space="preserve">
+    <value>Security</value>
+  </data>
+  <data name="Certificate" xml:space="preserve">
+    <value>Certificate</value>
+  </data>
+  <data name="Certificate Purge Utility" xml:space="preserve">
+    <value>Certificate/ACME Purge Utility</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Change SNI Map Certificate" xml:space="preserve">
+    <value>Change SNI Map Certificate</value>
+    <comment>Used in SniMapsIndex</comment>
+  </data>
+  <data name="ERR_CertDoesNotHaveServerAuthEKU" xml:space="preserve">
+    <value>Imported certificate must have the Server Authentication extended key usage extension.</value>
+    <comment>Used in ImportCertificate</comment>
+  </data>
+  <data name="ERR_InvalidIssuerCert" xml:space="preserve">
+    <value>The provided Issuer certificate is invalid.</value>
+    <comment>Used in ImportCertificate</comment>
+  </data>
+  <data name="ERR_InvalidServerCert" xml:space="preserve">
+    <value>The provided server certificate and/or private key is invalid.</value>
+    <comment>Used in ImportCertificate</comment>
+  </data>
+  <data name="ERR_PrivateKeyRequired" xml:space="preserve">
+    <value>The server certificate's private key is required.</value>
+    <comment>Used in ImportCertificate</comment>
+  </data>
+  <data name="ERR_PurgeCandidateInUse" xml:space="preserve">
+    <value>The certificate to be purged is currently in use in the candidate config. Remove it from all SNI maps and from all System settings first.</value>
+    <comment>Used in CertPurge</comment>
+  </data>
+  <data name="ERR_PurgeRunningInUse" xml:space="preserve">
+    <value>The certificate to be purged is currently in use in the running config. Commit a configuration that has removed it from all SNI maps and from all System settings first.</value>
+    <comment>Used in CertPurge</comment>
+  </data>
+  <data name="ERR_ServerCertificateRequired" xml:space="preserve">
+    <value>The server certificate is required.</value>
+    <comment>Used in ImportCertificate</comment>
+  </data>
+  <data name="Help_CertificatePurgeUtility" xml:space="preserve">
+    <value>This utility allows you to purge a certificate from the disk and the database.
+
+If the certificate is used in the current candidate configuration, remove it from use first or you will not be allowed to continue.
+
+If the certificate selected is currently in use in the running configuration, you must first commit a new configuration that does not use the certificate.
+
+If the certificate was used in any prior configuration, you will be prompted to select a new certificate to take its place so that prior configurations remain valid.</value>
+    <comment>Used in CertPurge</comment>
+  </data>
+  <data name="Help_PurgePriorUse" xml:space="preserve">
+    <value>The selected certificate was used in prior configurations. You will be asked to pick a certificate to takes its place.</value>
+    <comment>Used in CertPurge</comment>
+  </data>
+  <data name="Import" xml:space="preserve">
+    <value>Import</value>
+  </data>
+  <data name="IssuingCaCert" xml:space="preserve">
+    <value>Issuing CA Certificate</value>
+    <comment>Used in ImportCertificate</comment>
+  </data>
+  <data name="IssuingCaOptional" xml:space="preserve">
+    <value>Issuing CA (Optional)</value>
+    <comment>Used in ImportCertificate</comment>
+  </data>
+  <data name="Private Key" xml:space="preserve">
+    <value>Private Key</value>
+    <comment>Used in ImportCertificate</comment>
+  </data>
+  <data name="Purging" xml:space="preserve">
+    <value>Purging</value>
+    <comment>Used in CertPurge</comment>
+  </data>
+  <data name="Select Certificate To Purge" xml:space="preserve">
+    <value>Select Certificate To Purge</value>
+    <comment>Used in CertPurge</comment>
+  </data>
+  <data name="WARN_ConfirmPurgeNoReplacement" xml:space="preserve">
+    <value>Purge this certificate from the disk and database?</value>
+    <comment>Used in CertPurge</comment>
+  </data>
+  <data name="WARN_ConfirmPurgeWithReplacement" xml:space="preserve">
+    <value>Purge this certificate from the disk and database and replace it with the above certificate in previous configurations?</value>
+    <comment>Used in CertPurge</comment>
+  </data>
+  <data name="Candidate" xml:space="preserve">
+    <value>Candidate</value>
+  </data>
+  <data name="Compare Configurations" xml:space="preserve">
+    <value>Compare Configurations</value>
+    <comment>Used in ConfigComparer</comment>
+  </data>
+  <data name="ConfigurationCompareRestore" xml:space="preserve">
+    <value>Configuration Compare / Restore</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Current" xml:space="preserve">
+    <value>Current</value>
+  </data>
+  <data name="Current Candidate Configuration" xml:space="preserve">
+    <value>Current Candidate Configuration</value>
+    <comment>Used in ConfigComparer</comment>
+  </data>
+  <data name="Current Running Configuration" xml:space="preserve">
+    <value>Current Running Configuration</value>
+    <comment>Used in ConfigComparer</comment>
+  </data>
+  <data name="Danger Zone" xml:space="preserve">
+    <value>Danger Zone</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Help_PathTransformAdd" xml:space="preserve">
+    <value>Add a prefix to the path of the request.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_PathTransformAddValue" xml:space="preserve">
+    <value>Prefix to add. For example: /api 
+example.com =&gt; example.com/api</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_PathTransformPattern" xml:space="preserve">
+    <value>Replace the request path using a pattern template.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_PathTransformPatternValue" xml:space="preserve">
+    <value>See: https://learn.microsoft.com/en-us/aspnet/core/fundamentals/servers/yarp/transforms-request?view=aspnetcore-8.0#pathpattern</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_PathTransformRemove" xml:space="preserve">
+    <value>Remove a prefix from the path of the request.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_PathTransformRemoveValue" xml:space="preserve">
+    <value>Prefix to remove. For example: /api 
+example.com/api =&gt; example.com</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_PathTransformStatic" xml:space="preserve">
+    <value>Set the path of the request to a static path.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_PathTransformStaticValue" xml:space="preserve">
+    <value>Path for request. For example: /api/v2
+example.com/api/latest =&gt; example.com/api/v2</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Last Commit" xml:space="preserve">
+    <value>Last Commit</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Operation" xml:space="preserve">
+    <value>Operation</value>
+  </data>
+  <data name="Promote To Candidate" xml:space="preserve">
+    <value>Promote To Candidate</value>
+    <comment>Used in ConfigComparer</comment>
+  </data>
+  <data name="RestorePriorRev" xml:space="preserve">
+    <value>Restore Prior Configuration</value>
+    <comment>Used in ConfigComparer</comment>
+  </data>
+  <data name="Reverted" xml:space="preserve">
+    <value>Reverted</value>
+  </data>
+  <data name="Revision To Restore" xml:space="preserve">
+    <value>Revision To Restore</value>
+    <comment>Used in ConfigComparer</comment>
+  </data>
+  <data name="Startup Time" xml:space="preserve">
+    <value>Startup Time</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Transforms" xml:space="preserve">
+    <value>Transforms</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Transforms_Empty" xml:space="preserve">
+    <value>No transformations have been added.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Value" xml:space="preserve">
+    <value>Value</value>
+  </data>
+  <data name="Version" xml:space="preserve">
+    <value>Version</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="WARN_RestorePriorRev" xml:space="preserve">
+    <value>Discard the current candidate config and promote this prior revision to candidate?</value>
+    <comment>Used in ConfigComparer</comment>
+  </data>
+  <data name="ERR_RedirectLocationRequired" xml:space="preserve">
+    <value>Redirect location is required.</value>
+  </data>
+  <data name="ERR_InvalidRedirectStatus" xml:space="preserve">
+    <value>Redirect status must be 301, 302, 307, or 308.</value>
+  </data>
+  <data name="ERR_NoClusterSelected" xml:space="preserve">
+    <value>No cluster was selected.</value>
+  </data>
+  <data name="Route Response" xml:space="preserve">
+    <value>Route Response</value>
+  </data>
+  <data name="ERR_HttpStatusCodeRequired" xml:space="preserve">
+    <value>An HTTP status code is required for the selected route response type.</value>
+  </data>
+  <data name="Help_RedirectLocation" xml:space="preserve">
+    <value>The relative or absolute URI to redirect the client to.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_RedirectStatus" xml:space="preserve">
+    <value>HTTP redirect status code returned to the client.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_RouteCluster" xml:space="preserve">
+    <value>The server or series of servers to route requests to as defined in Clusters.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_StatusRouteCode" xml:space="preserve">
+    <value>The status code that will be returned to the client with an empty body.</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="Help_TarpitStatus" xml:space="preserve">
+    <value>Enables an HTTP connection tarpit that deliberately delays responses by a randomized duration between 15 and 30 seconds, slowing down abusive or unwanted clients. Note that each stalled connection still consumes server resources, which may impact overall capacity under load. The defined status code will be sent to the client after the tarpit duration with an empty body.</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="No Clusters" xml:space="preserve">
+    <value>No Clusters</value>
+    <comment>Used in RouteEdtor</comment>
+  </data>
+  <data name="Redirect Location" xml:space="preserve">
+    <value>Redirect Location</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Redirect_Found" xml:space="preserve">
+    <value>Found</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Redirect_MovedPermanently" xml:space="preserve">
+    <value>Moved Permanently</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Redirect_PermanentRedirect" xml:space="preserve">
+    <value>Permanent Redirect</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Redirect_TemporaryRedirect" xml:space="preserve">
+    <value>Temporary Redirect</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="RouteSummary_Cluster" xml:space="preserve">
+    <value>Forward To</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="RouteSummary_Redirect" xml:space="preserve">
+    <value>Redirect To</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="RouteSummary_Status" xml:space="preserve">
+    <value>Reply With Status</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="RouteSummary_Tarpit" xml:space="preserve">
+    <value>Tarpit With Status</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="WARN_NoClusters" xml:space="preserve">
+    <value>No clusters have been created. Only redirect routes will be allowed.</value>
+  </data>
+  <data name="INFO_CaPurge" xml:space="preserve">
+    <value>Only certificate authorities that have never issued a certificate or where all issued certificates have been purged can be purged.</value>
+    <comment>Used in CertPurge</comment>
+  </data>
+  <data name="Issued Count" xml:space="preserve">
+    <value>Issued Count</value>
+    <comment>Used in CertPurge</comment>
+  </data>
+  <data name="Select Certificate Authority To Purge" xml:space="preserve">
+    <value>Select Certificate Authority To Purge</value>
+    <comment>Used in CertPurge</comment>
+  </data>
+  <data name="ACME Provider" xml:space="preserve">
+    <value>ACME Provider</value>
+  </data>
+  <data name="Contact Emails" xml:space="preserve">
+    <value>Contact Emails</value>
+    <comment>Used in CreateAcmeAccount</comment>
+  </data>
+  <data name="Create ACME Account" xml:space="preserve">
+    <value>Create ACME Account</value>
+    <comment>Used in CreateAcmeAccount</comment>
+  </data>
+  <data name="Help_ContactEmailsOptional" xml:space="preserve">
+    <value>Contact emails are optional for this provider.</value>
+    <comment>Used in CreateAcmeAccount</comment>
+  </data>
+  <data name="Help_ContactEmailsRequired" xml:space="preserve">
+    <value>Contact emails are REQUIRED for this provider.</value>
+    <comment>Used in CreateAcmeAccount</comment>
+  </data>
+  <data name="No ACME Accounts" xml:space="preserve">
+    <value>No ACME Accounts</value>
+    <comment>Used in AcmeAccountsIndex</comment>
+  </data>
+  <data name="No Contact Emails" xml:space="preserve">
+    <value>No Contact Emails</value>
+    <comment>Used in CreateAcmeAccount</comment>
+  </data>
+  <data name="Prompt_ToS" xml:space="preserve">
+    <value>Review the terms of service at the link below and click Yes to accept them.</value>
+    <comment>Used in CreateAcmeAccount</comment>
+  </data>
+  <data name="ToS" xml:space="preserve">
+    <value>Terms of Service</value>
+    <comment>Used in CreateAcmeAccount</comment>
+  </data>
+  <data name="Account Name" xml:space="preserve">
+    <value>Account Name</value>
+  </data>
+  <data name="Account Url" xml:space="preserve">
+    <value>Account Url</value>
+    <comment>Used in AcmeAccountsIndex</comment>
+  </data>
+  <data name="Challenge Type" xml:space="preserve">
+    <value>Challenge Type</value>
+    <comment>Used in RequestAcmeCertificate</comment>
+  </data>
+  <data name="Confirm Request" xml:space="preserve">
+    <value>Confirm Request</value>
+    <comment>Used in RequestAcmeCertificate</comment>
+  </data>
+  <data name="DNS Provider" xml:space="preserve">
+    <value>DNS Provider</value>
+    <comment>Used in RequestAcmeCertificate</comment>
+  </data>
+  <data name="Domain Name" xml:space="preserve">
+    <value>Domain Name</value>
+    <comment>Used in RequestAcmeCertificate</comment>
+  </data>
+  <data name="Domains" xml:space="preserve">
+    <value>Domains</value>
+    <comment>Used in RequestAcmeCertificate</comment>
+  </data>
+  <data name="Help_AcmeCertificateName" xml:space="preserve">
+    <value>Short descriptive name for the certificate for reference in this management interface. Not used or sent to the ACME provider.</value>
+    <comment>Used in RequestAcmeCertificate</comment>
+  </data>
+  <data name="Help_AcmeChallenge_dns-01" xml:space="preserve">
+    <value>The ACME provider will check for the creation of a specially crafted DNS TXT record for the specified domain name.</value>
+    <comment>Used in RequestAcmeCertificate</comment>
+  </data>
+  <data name="Help_AcmeChallenge_http-01" xml:space="preserve">
+    <value>The ACME provider sends an HTTP request on port 80 to the domain name with a path prefix of /.well-known/acme-challenge. ByProxy will automatically intercept this request as long as the request makes it to the proxy server.</value>
+    <comment>Used in RequestAcmeCertificate</comment>
+  </data>
+  <data name="Help_AcmeDomainName" xml:space="preserve">
+    <value>Wildcards are supported (e.g. *.example.com) but are limited to only the dns-01 challenge type.</value>
+    <comment>Used in RequestAcmeCertificate</comment>
+  </data>
+  <data name="Hide Account" xml:space="preserve">
+    <value>Hide Account</value>
+    <comment>Used in AcmeAccountsIndex</comment>
+  </data>
+  <data name="INFO_AcmeAccountPurge" xml:space="preserve">
+    <value>Only ACME accounts that have never issued a certificate or where all issued certificates have been purged can be purged.</value>
+    <comment>Used in CertPurge</comment>
+  </data>
+  <data name="No Domain Names" xml:space="preserve">
+    <value>No Domain Names</value>
+    <comment>Used in RequestAcmeCertificate</comment>
+  </data>
+  <data name="Prompt_ConfirmRequest" xml:space="preserve">
+    <value>Send ACME certificate request?</value>
+    <comment>Used in RequestAcmeCertificate</comment>
+  </data>
+  <data name="Prompt_HideAcmeAccount" xml:space="preserve">
+    <value>This will hide the Acme account and all of it's issued certificates from all other configuration screens.
+
+Continue?</value>
+    <comment>Used in AcmeAccountsIndex</comment>
+  </data>
+  <data name="Provider" xml:space="preserve">
+    <value>Provider</value>
+  </data>
+  <data name="Reactivate Account" xml:space="preserve">
+    <value>Reactivate Account</value>
+    <comment>Used in AcmeAccountsIndex</comment>
+  </data>
+  <data name="Select ACME Account To Purge" xml:space="preserve">
+    <value>Select ACME Account To Purge</value>
+    <comment>Used in CertPurge</comment>
+  </data>
+  <data name="WARN_AcmeAccountCertInUse" xml:space="preserve">
+    <value>This account has issued certificates which are currently in use. They will still show on the SNI Maps screen until the maps are removed or updated.</value>
+    <comment>Used in AcmeAccountsIndex</comment>
+  </data>
+  <data name="WARN_ReactivateAcmeAccount" xml:space="preserve">
+    <value>This will unhide the account, but all issued certs will need to be reactivated manually.</value>
+    <comment>Used in AcmeAccountsIndex</comment>
+  </data>
+  <data name="ACME Request Progress" xml:space="preserve">
+    <value>ACME Request Progress</value>
+    <comment>Used in RequestAcmeCertificate</comment>
+  </data>
+  <data name="AcmeStep_AuthorizationChallengeHost" xml:space="preserve">
+    <value>Challenge type identified</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_AuthorizationComplete" xml:space="preserve">
+    <value>Challenge completed succesfully</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_AuthorizationStatus" xml:space="preserve">
+    <value>Current authorization status</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_DownloadingCertificate" xml:space="preserve">
+    <value>Downloading certificate from ACME</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_GeneratingCSR" xml:space="preserve">
+    <value>Generating certificate signing request</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_Http01Responded" xml:space="preserve">
+    <value>Responded to ACME challenge request</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_LoadAccountKey" xml:space="preserve">
+    <value>Loading account key</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_OrderComplete" xml:space="preserve">
+    <value>Certificate downloaded successfully</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_ProcessingAuthorization" xml:space="preserve">
+    <value>Processing authorization</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_ProcessingOrder" xml:space="preserve">
+    <value>Processing order</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_StartingHttp01" xml:space="preserve">
+    <value>Preparing HTTP-01 Challenge</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_SubmitOrder" xml:space="preserve">
+    <value>Submitting order to ACME</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_SubmittingCSR" xml:space="preserve">
+    <value>Submitting certificate signing request to ACME</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_SubmittingHttp01" xml:space="preserve">
+    <value>Submitting challenge readiness to ACME</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_WaitingAuthorizationUpdate" xml:space="preserve">
+    <value>Waiting for ACME challenge completion</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_WaitingHttp01" xml:space="preserve">
+    <value>Waiting for challenge request from ACME</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_WaitingOrderCompletion" xml:space="preserve">
+    <value>Waiting for order to finalize</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_WaitingOrderUpdate" xml:space="preserve">
+    <value>All challenges completed, waiting for order completion</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_OrderPending" xml:space="preserve">
+    <value>Order is in Pending status, challenges required</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="Edit Certificate" xml:space="preserve">
+    <value>Edit Certificate</value>
+    <comment>Used in EditAcmeCertificate</comment>
+  </data>
+  <data name="New Name" xml:space="preserve">
+    <value>New Name</value>
+  </data>
+  <data name="Rename" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="AcmeStep_Dns01RecordCreated" xml:space="preserve">
+    <value>DNS record for DNS-01 Challenge Created</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_Dns01RecordDeleted" xml:space="preserve">
+    <value>DNS record for DNS-01 Challenge Deleted</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_StartingDns01" xml:space="preserve">
+    <value>Preparing DNS-01 Challenge</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="AcmeStep_SubmittingDns01" xml:space="preserve">
+    <value>Submitting challenge readiness to ACME</value>
+    <comment>ACME Certificate Request Progress</comment>
+  </data>
+  <data name="Help_DnsProviderSelect" xml:space="preserve">
+    <value>Select the DNS provider that will create the necessary DNS records for responding to ACME challenges for this domain.</value>
+    <comment>Used in RequestAcmeCertificate</comment>
+  </data>
+  <data name="ACME DNS Providers" xml:space="preserve">
+    <value>ACME DNS Providers</value>
+    <comment>Used in AcmeDnsIndex</comment>
+  </data>
+  <data name="Compiling Script" xml:space="preserve">
+    <value>Compiling Script</value>
+    <comment>Used in EditDnsProvider</comment>
+  </data>
+  <data name="Delete DNS Provider" xml:space="preserve">
+    <value>Delete DNS Provider</value>
+    <comment>Used in AcmeDnsIndex</comment>
+  </data>
+  <data name="DNS Provider Name" xml:space="preserve">
+    <value>DNS Provider Name</value>
+    <comment>Used in AcmeDnsIndex</comment>
+  </data>
+  <data name="Draft Loaded" xml:space="preserve">
+    <value>Draft Loaded</value>
+    <comment>Used in EditDnsProvider</comment>
+  </data>
+  <data name="Edit DNS Provider" xml:space="preserve">
+    <value>Edit DNS Provider</value>
+    <comment>Used in EditDnsProvider</comment>
+  </data>
+  <data name="ERR_CannotDeleteProviderInUse" xml:space="preserve">
+    <value>A DNS provider cannot be deleted as long as there are certificate hosts assigned to it.</value>
+    <comment>Used in AcmeDnsIndex</comment>
+  </data>
+  <data name="Imports" xml:space="preserve">
+    <value>Imports</value>
+    <comment>Used in EditDnsProvider</comment>
+  </data>
+  <data name="No DNS Providers" xml:space="preserve">
+    <value>No DNS Providers</value>
+    <comment>Used in AcmeDnsIndex</comment>
+  </data>
+  <data name="Prompt_CheckDnsRecordCreated" xml:space="preserve">
+    <value>Has the following DNS record been created</value>
+    <comment>Used in EditDnsProvider</comment>
+  </data>
+  <data name="Prompt_CheckDnsRecordDeleted" xml:space="preserve">
+    <value>Verify that the following DNS record has been deleted</value>
+    <comment>Used in EditDnsProvider</comment>
+  </data>
+  <data name="Prompt_DeleteDnsProvider" xml:space="preserve">
+    <value>Are you sure you want to delete the following DNS provider</value>
+    <comment>Used in AcmeDnsIndex</comment>
+  </data>
+  <data name="Prompt_DeleteDraftAndRevert" xml:space="preserve">
+    <value>Delete draft and revert to previously saved script?</value>
+    <comment>Used in EditDnsProvider</comment>
+  </data>
+  <data name="Prompt_DiscardChangesAndReload" xml:space="preserve">
+    <value>Discard changes and reload the saved script?</value>
+    <comment>Used in EditDnsProvider</comment>
+  </data>
+  <data name="Prompt_DnsProviderName" xml:space="preserve">
+    <value>Short descriptive name for the DNS provider (e.g. Cloudflare)</value>
+    <comment>Used in AcmeDnsIndex</comment>
+  </data>
+  <data name="Prompt_DomainNameToTest" xml:space="preserve">
+    <value>Domain name to test (e.g example.com)</value>
+    <comment>Used in EditDnsProvider</comment>
+  </data>
+  <data name="Script Success" xml:space="preserve">
+    <value>Script Success</value>
+    <comment>Used in EditDnsProvider</comment>
+  </data>
+  <data name="Test" xml:space="preserve">
+    <value>Test</value>
+    <comment>Used in EditDnsProvider</comment>
+  </data>
+  <data name="Test DNS Provider" xml:space="preserve">
+    <value>Test DNS Provider</value>
+    <comment>Used in EditDnsProvider</comment>
+  </data>
+  <data name="WARN_DraftScriptLoaded" xml:space="preserve">
+    <value>A draft was loaded. Most likely due to something causing the page to reload while editing previously.
+
+Continue editing the draft or click Discard to restore the saved version.</value>
+    <comment>Used in EditDnsProvider</comment>
+  </data>
+  <data name="Prompt_RenameDnsProvider" xml:space="preserve">
+    <value>Enter the new name for the DNS provider</value>
+    <comment>Used in AcmeDnsIndex</comment>
+  </data>
+  <data name="Rename DNS Provider" xml:space="preserve">
+    <value>Rename DNS Provider</value>
+    <comment>Used in AcmeDnsIndex</comment>
+  </data>
+  <data name="CopyHeaders_Custom" xml:space="preserve">
+    <value>Only Keep Specified Headers</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="CopyHeaders_False" xml:space="preserve">
+    <value>Discard Headers from Client</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="CopyHeaders_True" xml:space="preserve">
+    <value>Keep Client Headers</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Headers" xml:space="preserve">
+    <value>Headers</value>
+  </data>
+  <data name="HeaderTransformOperation_Append" xml:space="preserve">
+    <value>Add/Append Header</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="HeaderTransformOperation_Remove" xml:space="preserve">
+    <value>Remove Header</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="HeaderTransformOperation_Set" xml:space="preserve">
+    <value>Set/Overwrite Header</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_CopyHeaders" xml:space="preserve">
+    <value>Choose rather to keep, discard, or only allow certain request headers to be forwarded.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_PreserveHost" xml:space="preserve">
+    <value>Provides option to preserve the Host header provided by the client.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Host Header" xml:space="preserve">
+    <value>Host Header</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Incoming Headers" xml:space="preserve">
+    <value>Incoming Headers</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="PathTransformMode_Add" xml:space="preserve">
+    <value>Add Prefix</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="PathTransformMode_Pattern" xml:space="preserve">
+    <value>Advanced Pattern</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="PathTransformMode_Remove" xml:space="preserve">
+    <value>Remove Prefix</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="PathTransformMode_Static" xml:space="preserve">
+    <value>Set Static Path</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="PreserveHost_False" xml:space="preserve">
+    <value>Use Cluster Destination Host</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="PreserveHost_True" xml:space="preserve">
+    <value>Keep Client Host Header</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Change Prefix" xml:space="preserve">
+    <value>Change Prefix</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="ForwardedTransformAction_Append" xml:space="preserve">
+    <value>Append</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="ForwardedTransformAction_Ignore" xml:space="preserve">
+    <value>Ignore</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="ForwardedTransformAction_Remove" xml:space="preserve">
+    <value>Remove</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="ForwardedTransformAction_Set" xml:space="preserve">
+    <value>Set</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="From HTTP Method" xml:space="preserve">
+    <value>From HTTP Method</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Header Name" xml:space="preserve">
+    <value>Header Name</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Header Value" xml:space="preserve">
+    <value>Header Value</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="HeaderTransformOperation_RouteAppend" xml:space="preserve">
+    <value>Add/Append Header with Path Variable</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="HeaderTransformOperation_RouteSet" xml:space="preserve">
+    <value>Set/Overwrite Header with Path Variable</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderTransformAppend" xml:space="preserve">
+    <value>Append value to the specified header or add if it does not exist.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderTransformAppendValue" xml:space="preserve">
+    <value>The value to append to the header.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderTransformHeaderName" xml:space="preserve">
+    <value>The header to modify (e.g. User-Agent)</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderTransformRemove" xml:space="preserve">
+    <value>Remove the specified header.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderTransformRouteAppend" xml:space="preserve">
+    <value>Append value learned from request path to the specified header or add if it does not exist.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderTransformRouteSet" xml:space="preserve">
+    <value>Add or overwrite the specified header with a value learned from the request path.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderTransformRouteValue" xml:space="preserve">
+    <value>The path variable to learn the header value from.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderTransforms" xml:space="preserve">
+    <value>Modify headers from the client or add headers to send to the cluster.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderTransformSet" xml:space="preserve">
+    <value>Add or overwrite the specified header.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderTransformSetValue" xml:space="preserve">
+    <value>The value to set the header to.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HttpMethodChange" xml:space="preserve">
+    <value>Change the http method used in the request (e.g. from POST to PUT)</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_PathTransforms" xml:space="preserve">
+    <value>Modify the path that is sent to the destination cluster.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryTransformAppend" xml:space="preserve">
+    <value>Append value to the specified query key or add if it does not exist.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryTransformAppendValue" xml:space="preserve">
+    <value>The value to append to the query key.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryTransformQueryName" xml:space="preserve">
+    <value>The query key to modify.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryTransformRemove" xml:space="preserve">
+    <value>Remove the specified query key.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryTransformRouteAppend" xml:space="preserve">
+    <value>Append value learned from request path to the specified query key or add if it does not exist.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryTransformRouteSet" xml:space="preserve">
+    <value>Add or overwrite the specified query key with a value learned from the request path.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryTransformRouteValue" xml:space="preserve">
+    <value>The path variable to learn the query key value from.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryTransforms" xml:space="preserve">
+    <value>Modify values in the query string (the part of the URL after a question mark) recieved from the client and that which are sent to the cluster.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryTransformSet" xml:space="preserve">
+    <value>Add or overwrite the specified query key.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryTransformSetValue" xml:space="preserve">
+    <value>The value to set the query key to.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="HTTP Method" xml:space="preserve">
+    <value>HTTP Method</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Path Variable" xml:space="preserve">
+    <value>Path Variable</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Query Key" xml:space="preserve">
+    <value>Query Key</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Query Value" xml:space="preserve">
+    <value>Query Value</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="QueryTransformOperation_Append" xml:space="preserve">
+    <value>Add/Append Key Value</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="QueryTransformOperation_Remove" xml:space="preserve">
+    <value>Remove Query Key</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="QueryTransformOperation_RouteAppend" xml:space="preserve">
+    <value>Add/Append Key Value with Path Variable</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="QueryTransformOperation_RouteSet" xml:space="preserve">
+    <value>Set/Overwrite Key Value with Path Variable</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="QueryTransformOperation_Set" xml:space="preserve">
+    <value>Set/Overwrite Key Value</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="To HTTP Method" xml:space="preserve">
+    <value>To HTTP Method</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="ERR_HeaderMatchCriteriaMissingValues" xml:space="preserve">
+    <value>Header match mode requires one or more values but has none set.</value>
+    <comment>Used in ProxyRoute</comment>
+  </data>
+  <data name="ERR_QueryMatchCriteriaMissingValues" xml:space="preserve">
+    <value>Query match mode requires one or more values but has none set.</value>
+    <comment>Used in ProxyRoute</comment>
+  </data>
+  <data name="HeaderMatchMode_Contains" xml:space="preserve">
+    <value>Value Contains</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="HeaderMatchMode_Exact" xml:space="preserve">
+    <value>Value Matches Exactly</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="HeaderMatchMode_Exists" xml:space="preserve">
+    <value>Header Exists (Any Value)</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="HeaderMatchMode_NotContains" xml:space="preserve">
+    <value>Value Does Not Contain</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="HeaderMatchMode_NotExists" xml:space="preserve">
+    <value>Header Does Not Exist</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="HeaderMatchMode_Prefix" xml:space="preserve">
+    <value>Value Begins With</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeadersMatch" xml:space="preserve">
+    <value>Rules for matching against headers provided by the requesting client. All rules must match for the request to be handled by this route.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Match Values" xml:space="preserve">
+    <value>Values To Match</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="New Value" xml:space="preserve">
+    <value>New Value</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Prompt_NewMatchValue" xml:space="preserve">
+    <value>New value to match against:</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Case Sensitive Values" xml:space="preserve">
+    <value>Case Senstive Values</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Match Mode" xml:space="preserve">
+    <value>Match Mode</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Matches_Empty" xml:space="preserve">
+    <value>No match criteria has been added.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryStringMatch" xml:space="preserve">
+    <value>Rules for matching against the query string provided by the requesting client (the part of the path after a ?). All rules must match for the request to be handled by this route.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Case Sensitive" xml:space="preserve">
+    <value>Case Sensitive</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderMatchKey" xml:space="preserve">
+    <value>The name of the header to check.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderMatchMode_Contains" xml:space="preserve">
+    <value>The header value contains any of the below values.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderMatchMode_Exact" xml:space="preserve">
+    <value>The header value matches one of the below values exactly.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderMatchMode_Exists" xml:space="preserve">
+    <value>The header exists in the request and has any value.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderMatchMode_NotContains" xml:space="preserve">
+    <value>The header value does not contain any of the below values.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderMatchMode_NotExists" xml:space="preserve">
+    <value>The header is not in the request sent from the client.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_HeaderMatchMode_Prefix" xml:space="preserve">
+    <value>The header value begins with one of the below values.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_MatchCaseSensitive" xml:space="preserve">
+    <value>Check to have below values matched against the client provided value in a case sensitive manner.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryMatchMode_Contains" xml:space="preserve">
+    <value>The query parameter value contains any of the below values.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryMatchMode_Exact" xml:space="preserve">
+    <value>The query parameter value matches one of the below values exactly.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryMatchMode_Exists" xml:space="preserve">
+    <value>The query parameter exists in the path string and has any value.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryMatchMode_NotContains" xml:space="preserve">
+    <value>The query parameter value does not contain any of the below values.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryMatchMode_Prefix" xml:space="preserve">
+    <value>The query parameter value begins with one of the below values.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryTransformQueryKey" xml:space="preserve">
+    <value>The query string parameter to modify.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Query String" xml:space="preserve">
+    <value>Query String</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="QueryMatchMode_Contains" xml:space="preserve">
+    <value>Value Contains</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="QueryMatchMode_Exact" xml:space="preserve">
+    <value>Value Matches Exactly</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="QueryMatchMode_Exists" xml:space="preserve">
+    <value>Query Key Exists (Any Value)</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="QueryMatchMode_NotContains" xml:space="preserve">
+    <value>Value Does Not Contain</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="QueryMatchMode_Prefix" xml:space="preserve">
+    <value>Value Begins With</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_QueryMatchKey" xml:space="preserve">
+    <value>The name of the query string parameter to check.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="MatchSummary_Exists" xml:space="preserve">
+    <value>exists</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="MatchSummary_Matches" xml:space="preserve">
+    <value>matches</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="MatchSummary_NotExists" xml:space="preserve">
+    <value>doesn't exist</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="MatchSummary_NotMatch" xml:space="preserve">
+    <value>doesn't match</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="Query Parameter" xml:space="preserve">
+    <value>Query Parameter</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="RouteResponseType_Cluster" xml:space="preserve">
+    <value>Forward to Cluster</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="RouteResponseType_Redirect" xml:space="preserve">
+    <value>HTTP Redirect</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="RouteResponseType_Status" xml:space="preserve">
+    <value>Return HTTP Status</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="RouteResponseType_Tarpit" xml:space="preserve">
+    <value>Tarpit</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+</root>

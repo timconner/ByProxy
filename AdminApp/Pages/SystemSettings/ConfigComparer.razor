@@ -1,0 +1,73 @@
+﻿@page "/system/configs"
+@attribute [Authorize(Roles = AuthRoles.Admin)]
+@inject IStringLocalizer<Language> _strings
+@inject IJSRuntime _js
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ModalService _modal
+@inject ProxyStateService _proxyState
+@inject AdminAppStateService _appState
+@inject ConfigurationService _config
+@inject NavigationManager _nav
+
+<PageHeader Title="@_strings["Compare Configurations"]" FullWidthDivider>
+    @if (_compareToRev == _proxyState.CandidateConfigRevision) {
+        <button disabled>@_strings["Current Candidate Configuration"]</button>
+    } else if (_compareToRev == _proxyState.RunningConfig.Revision) {
+        <button disabled>@_strings["Current Running Configuration"]</button>
+    } else {
+        <button @onclick="PromoteToCandidate">@_strings["Promote To Candidate"]: @_compareToRev</button>
+    }
+    <Toggle IsOn="_sortByOrder" FieldLabel="@_strings["Sort by"]" OnLabel="Order" OffLabel="Id" ToggleHandler="SortToggled" />
+</PageHeader>
+
+@if (_availableConfigs == null) {
+    <LoadingIndicator />
+} else {
+    <div class="config-pickers">
+        <select @bind="_compareRev" @bind:after="ReloadDiff">
+            @foreach (var config in _availableConfigs) {
+                <option value="@config.Revision">
+                    @config.Revision
+                    @if (config.Revision == _proxyState.RunningConfig.Revision) {
+                        <text> - @_strings["Current"]</text>
+                    }
+                    @if (config.Revision == _proxyState.CandidateConfigRevision) {
+                        <text> - @_strings["Candidate"]</text>
+                    }
+                    @if (config.Reverted) {
+                        <text> - @_strings["Reverted"]</text>
+                    }
+                    @if (config.CommittedAt != null) {
+                        <text> (@config.CommittedAt.Value.ToLocalTime().ToString("g"))</text>
+                    }
+                </option>
+            }
+        </select>
+        <select @bind="_compareToRev" @bind:after="ReloadDiff">
+            @foreach (var config in _availableConfigs) {
+                <option value="@config.Revision">
+                    @config.Revision
+                    @if (config.Revision == _proxyState.RunningConfig.Revision) {
+                        <text> - @_strings["Current"]</text>
+                    }
+                    @if (config.Revision == _proxyState.CandidateConfigRevision) {
+                        <text> - @_strings["Candidate"]</text>
+                    }
+                    @if (config.Reverted) {
+                        <text> - @_strings["Reverted"]</text>
+                    }
+                    @if (config.CommittedAt != null) {
+                        <text> (@config.CommittedAt.Value.ToLocalTime().ToString("g"))</text>
+                    }
+                </option>
+            }
+        </select>
+    </div>
+}
+
+<PageDivider MarginTop="0" MarginBottom="0" FullWidthDivider />
+
+<div class="editor-container">
+    <div @ref="_editorElement" class="editor"></div>
+</div>
+

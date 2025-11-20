@@ -1,0 +1,85 @@
+﻿@page "/sni-maps/add"
+@attribute [Authorize(Roles = AuthRoles.Editor)]
+@inject IStringLocalizer<Language> _strings
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject CertificateService _certService
+@inject ProxyStateService _proxyState
+@inject ModalService _modal
+@inject NavigationManager _nav
+@inject ConfigurationService _config
+
+<PageHeader Title="@_strings["Add SNI Maps"]">
+    <PageHeaderButton Icon="device-floppy" Label="@_strings["Save"]" @onclick="PerformSave" />
+</PageHeader>
+
+<PageContent>
+    @if (_availableCerts == null) {
+        <LoadingIndicator />
+        return;
+    }
+
+    @if (_newMaps.Count > 0) {
+        <fieldset>
+            <legend>@_strings["Maps to Add"]</legend>
+            <table>
+                <thead>
+                    <tr>
+                        <th>@_strings["Host"]</th>
+                        <th>@_strings["Certificate Name"]</th>
+                        <th>@_strings["Validity"]</th>
+                        <th>@_strings["Certificate Issues"]</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var map in _newMaps) {
+                        <tr>
+                            <td class="monospace">@map.Host</td>
+                            <td>@map.CertInfo.Metadata.Name</td>
+                            @if (map.CertIssues.Count == 0) {
+                                <td><Icon Name="circle-check-filled" /></td>
+                                <td><Icon Name="line-dashed" Color="var(--disabled-text-color)" /></td>
+                            } else {
+                                <td><Icon Name="circle-x" /></td>
+                                <td>
+                                    @foreach (var issue in map.CertIssues) {
+                                        <div>@_strings[issue]</div>
+                                    }
+                                </td>
+                            }
+                            <td><button @onclick="() => RemoveMap(map)">Remove</button></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </fieldset>
+        <br />
+    }
+
+    <fieldset>
+        <legend>@_strings["New Map"]</legend>
+
+        <div class="new-map">
+            <label>
+                @_strings["Host"]:
+                <input type="text" value="@_newHost" @oninput="HostInput" placeholder="example.com" />
+            </label>
+            <div class="help-text">@_strings["Help_MapHost"]</div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(_newHost)) {
+            <PageDivider Label="@_strings["Matching Certificates"]" MarginBottom="24px" />
+            @if (_matchingCerts == null) {
+                <LoadingIndicator AutoMargin />
+            } else {
+                @if (_matchingCerts.Count == 0) {
+                    <div class="no-matches">@_strings["NoMatchingCerts"]</div>
+                } else {
+                    <CertInfoTable Certificates="_matchingCerts" OnSelect="AddMap" />
+                }
+            }
+            <PageDivider Label="All Certificates" MarginTop="42px" MarginBottom="24px" />
+            <CertInfoTable Certificates="_availableCerts" OnSelect="AddMap" />
+        }
+    </fieldset>
+</PageContent>

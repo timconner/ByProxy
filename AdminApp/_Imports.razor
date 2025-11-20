@@ -1,0 +1,29 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using System.ComponentModel.DataAnnotations
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+
+@using Microsoft.AspNetCore.Localization
+@using Microsoft.Extensions.Localization
+
+@using Microsoft.JSInterop
+
+@using Yarp.ReverseProxy.Configuration
+
+@using ByProxy
+@using ByProxy.AdminApp.Pages
+@using ByProxy.AdminApp.Components
+@using ByProxy.AdminApp.Enums
+@using ByProxy.AdminApp.Languages
+@using ByProxy.AdminApp.Layouts
+@using ByProxy.AdminApp.Services
+@using ByProxy.Infrastructure.Acme
+@using ByProxy.Services
+
+@attribute [Authorize(Roles = AuthRoles.User)]

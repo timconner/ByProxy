@@ -1,0 +1,108 @@
+﻿@page "/users"
+@attribute [Authorize(Roles = AuthRoles.Admin)]
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject IStringLocalizer<Language> _strings
+@inject ModalService _modal
+@inject AuthService _auth
+
+@if (_users == null) {
+    <LoadingIndicator />
+    return;
+}
+
+<PageHeader Title="@_strings["Users"]">
+    <PageHeaderLink href="/users/create" Icon="square-plus" Label="@_strings["Create"]" />
+</PageHeader>
+
+<PageContent>
+    <table>
+        <thead>
+            <tr>
+                <th>@_strings["Name"]</th>
+                <th>@_strings["Username"]</th>
+                <th>@_strings["Full Name"]</th>
+                <th>@_strings["Roles"]</th>
+                <th>@_strings["Password"]<br />@_strings["Last Set"]</th>
+                <th class="action">@_strings["Edit User"]</th>
+                <th class="action">@_strings["Reset Password"]</th>
+                <th class="action">@_strings["Sign Out"]</th>
+                <th class="action">@_strings["Delete"]</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in _users) {
+                <tr>
+                    <td>@user.DisplayName</td>
+                    <td>@user.Username</td>
+                    <td>@user.FullName</td>
+
+                    <td>
+                        @if (user.Roles.Count == 0) {
+                            <span class="empty">--</span>
+                        } else {
+                            <div class="roles">
+                                @foreach (var role in user.Roles) {
+                                    <span>@role.Name</span>
+                                }
+                            </div>
+                        }
+                    </td>
+
+                    <td>@(Math.Floor(DateTime.UtcNow.Subtract(user.PasswordLastSet).TotalDays)) days ago</td>
+                    <td><a class="control" href="@($"/users/edit/{user.Id}")"><Icon Name="edit" Size="20px" /></a></td>
+
+                    @if (user.Id == _currentUserId) {
+                        <td colspan="3"><a class="button" href="/account">@_strings["My Settings"]</a></td>
+                    } else {
+                        <td class="action"><div class="control" @onclick="() => ResetPassword(user)"><Icon Name="forms" Size="20px" /></div></td>
+                        <td class="action"><div class="control" @onclick="() => SignOut(user)"><Icon Name="logout" Size="20px" /></div></td>
+                        <td class="action"><div class="control delete" @onclick="() => DeleteUser(user)"><Icon Name="user-x" Size="20px" /></div></td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+</PageContent>
+
+@code {
+    private List<UserEntity>? _users;
+    private Guid? _currentUserId;
+
+    protected override async Task OnInitializedAsync() {
+        _currentUserId = _auth.GetUserId();
+
+        using var db = _dbFactory.CreateDbContext();
+        _users = await db.Users
+            .AsNoTracking()
+            .Include(_ => _.Roles)
+            .ToListAsync();
+    }
+
+    public async Task ResetPassword(UserEntity user) {
+        var tempPassword = await _modal.PasswordPrompt(_strings["Reset Password"], $"{_strings["Prompt_TempPassForUser"]}: {user.DisplayName}");
+        if (tempPassword.DialogResult != DialogResult.OK) return;
+        if (string.IsNullOrWhiteSpace(tempPassword.Value)) return;
+        await _modal.PerformSave(async () => {
+            await _auth.SetTempPassword(user.Id, tempPassword.Value);
+        }, true);
+    }
+
+    public async Task DeleteUser(UserEntity user) {
+        var result = await _modal.YesNo(_strings["Delete User"], $"{_strings["Delete"]}: {user.DisplayName}\n\n{_strings["WARN_Delete"]}");
+        if (result != DialogResult.Yes) return;
+
+        await _modal.PerformSave(async () => {
+            await _auth.DeleteUser(user.Id);
+        }, true);
+    }
+
+    public async Task SignOut(UserEntity user) {
+        var result = await _modal.YesNo(_strings["Sign Out User"], $"{_strings["Prompt_SignOutUserSessions"]}: {user.DisplayName}");
+        if (result != DialogResult.Yes) return;
+
+        await _modal.PerformSave(async () => {
+            await _auth.InvalidateUsersSessions(user.Id);
+
+        });
+    }
+}

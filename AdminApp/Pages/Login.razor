@@ -1,0 +1,50 @@
+﻿@page "/login"
+@layout AuthLayout
+@attribute [AllowAnonymous]
+
+@inject AuthService _auth;
+@inject NavigationManager _nav;
+@inject IStringLocalizer<Language> _strings
+
+<EditForm Model="_input" method="post" OnSubmit="LoginUser" FormName="login">
+    <label>
+        <span>@_strings["Username"]:</span>
+        <InputText @bind-Value="_input.Username" autocomplete="username" aria-required="true" placeholder="@_strings["Username"]" />
+    </label>
+    <label>
+        <span>@_strings["Password"]:</span>
+        <InputText type="password" @bind-Value="_input.Password" autocomplete="current-password" aria-required="true" placeholder="@_strings["Password"]" />
+    </label>
+    <div class="bottom">
+        <div class="error">@_errorMessage</div>
+        <button type="submit" class="form-button">@_strings["Log In"]</button>
+    </div>
+</EditForm>
+
+@code {
+    private string? _errorMessage;
+
+    private sealed class InputModel {
+        [Required]
+        public string Username { get; set; } = string.Empty;
+
+        [Required]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = string.Empty;
+    }
+
+    [SupplyParameterFromForm]
+    private InputModel _input { get; set; } = new();
+
+    public async Task LoginUser() {
+        var result = await _auth.CookieLogin(_input.Username, _input.Password);
+        if (result == AuthService.LoginResult.Success) {
+            _nav.NavigateTo("/", true);
+        }
+        if (result == AuthService.LoginResult.PasswordResetRequired) {
+            _nav.NavigateTo("/reset-pw", true);
+        } else {
+            _errorMessage = _strings["Invalid Login"];
+        }
+    }
+}

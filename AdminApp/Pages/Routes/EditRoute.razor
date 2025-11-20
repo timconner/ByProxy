@@ -1,0 +1,60 @@
+﻿@page "/routes/{RouteId:guid}"
+@attribute [Authorize(Roles = AuthRoles.Editor)]
+@implements IDisposable
+@inject IStringLocalizer<Language> _strings
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ConfigurationService _config
+@inject ModalService _modal
+@inject NavigationManager _nav
+@inject ProxyStateService _proxyState
+
+<PageHeader Title="@_strings["Edit Route"]">
+    <PageHeaderButton Icon="device-floppy" Label="@_strings["Save"]" @onclick="PerformSave" />
+</PageHeader>
+
+<PageContent>
+    @if (_route == null) {
+        <LoadingIndicator />
+    } else {
+        <RouteEditor Route="_route" />
+    }
+</PageContent>
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid RouteId { get; set; }
+
+    private ProxyDb _db = default!;
+    private ProxyRoute? _route;
+
+    protected override async Task OnInitializedAsync() {
+        _db = _dbFactory.CreateDbContext();
+        _route = await _db.Routes.FirstAsync(_ => _.Id == RouteId);
+    }
+
+    private async Task PerformSave() {
+        if (_route == null) return;
+
+        List<string>? errors = null;
+        await _modal.PerformProcessing(async () => {
+            errors = await _route.NormalizeAndReturnValidationErrors(_db, _proxyState.CandidateConfigRevision);
+        });
+        if (errors == null) return;
+        if (errors.Count > 0) {
+            await _modal.OkOnly(_strings["Validation Errors"], $"- {string.Join("\n\n- ", errors.Select(e => _strings[e]))}");
+            return;
+        }
+
+        var success = await _modal.PerformSave(async () => {
+            await _db.SaveChangesAsync();
+        });
+        if (success) {
+            _ = _config.UpdateHasChangesPending();
+            _nav.NavigateTo("/routes");
+        }
+    }
+
+    public void Dispose() {
+        _db?.Dispose();
+    }
+}

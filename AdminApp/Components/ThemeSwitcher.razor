@@ -1,0 +1,39 @@
+﻿@inject AdminAppStateService _appState
+
+@{
+    var isDarkTheme = IsDarkTheme();
+}
+
+<div class="theme-switcher @(isDarkTheme ? "dark" : "light")"
+     role="button"
+     aria-label="Toggle theme"
+     @onclick="ChangeTheme" @onclick:stopPropagation
+>
+    <div class="slider" aria-hidden="true"></div>
+    <div class="option"><Icon Name="sun" /></div>
+    <div class="option"><Icon Name="moon" /></div>
+</div>
+
+@code {
+    protected override void OnInitialized() {
+        _appState.OnThemeChange += ThemeChanged;
+    }
+
+    private bool IsDarkTheme() {
+        var currentTheme = _appState.PreferredTheme ?? Themes.DefaultTheme;
+        return currentTheme.IsDarkTheme;
+    }
+
+    private async Task ChangeTheme() {
+        var currentTheme = _appState.PreferredTheme ?? Themes.DefaultTheme;
+        if (currentTheme.IsDarkTheme) {
+            await _appState.UpdatePreferredTheme(Themes.LightOcean);
+        } else {
+            await _appState.UpdatePreferredTheme(Themes.DarkOcean);
+        }
+    }
+
+    private async void ThemeChanged() {
+        await InvokeAsync(StateHasChanged);
+    }
+}

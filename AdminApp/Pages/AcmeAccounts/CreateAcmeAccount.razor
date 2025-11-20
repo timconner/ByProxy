@@ -1,0 +1,60 @@
+﻿@page "/acme/create-account"
+@attribute [Authorize(Roles = AuthRoles.Editor)]
+@inject IStringLocalizer<Language> _strings
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject AcmeClientService _acmeClient
+@inject ModalService _modal
+@inject ProxyStateService _proxyState
+@inject NavigationManager _nav
+
+<PageHeader Title="@_strings["Create ACME Account"]">
+    <PageHeaderButton Icon="lock-plus" Label="@_strings["Create"]" @onclick="CreateAccount" />
+</PageHeader>
+
+<PageContent>
+    <label>
+        @_strings["Name"]:
+        <input type="text" placeholder="@_strings["Name"]" @bind="_accountName" />
+    </label>
+    <br /><br />
+    <label>
+        @_strings["ACME Provider"]:
+        <select @bind="_acmeProviderId" @bind:after="UpdateProvider">
+            @foreach (var provider in _acmeClient.Providers) {
+                <option value="@provider.Id">@provider.Name</option>
+            }
+        </select>
+    </label>
+    <br /><br />
+    @if (_acmeProvider != null) {
+        <fieldset class="contact-emails">
+            <legend>@_strings["Contact Emails"]</legend>
+            @if (_acmeProvider.ContactEmailsOptional) {
+                <div class="help-text">@_strings["Help_ContactEmailsOptional"]</div>
+            } else {
+                <div class="help-text">@_strings["Help_ContactEmailsRequired"]</div>
+            }
+            <form @onsubmit="AddContactEmail">
+                <div class="new-contact-email">
+                    <InputText @bind-Value="_newEmail" placeholder="contact@example.com" />
+                    <button type="submit">@_strings["Add"]</button>
+                </div>
+            </form>
+            @if (_contactEmails.Count == 0) {
+                <div class="empty">@_strings["No Contact Emails"]</div>
+            } else {
+                <ul class="monospace">
+                    @foreach (var email in _contactEmails) {
+                        <li>
+                            @email
+                            <button @onclick="() => RemoveContactEmail(email)">
+                                <Icon Name="x" Size="18px" />
+                            </button>
+                        </li>
+                    }
+                </ul>
+            }
+        </fieldset>
+    }
+</PageContent>
+

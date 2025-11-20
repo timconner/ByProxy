@@ -1,0 +1,11 @@
+.editor-container {
+    margin: 0 -16px;
+    width: calc(100% + 32px);
+    height: 100%;
+    position: relative;
+}
+
+.editor {
+    position: absolute;
+    inset: 0;
+}

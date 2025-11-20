@@ -1,0 +1,13 @@
+﻿@attribute [AllowAnonymous]
+@inject NavigationManager _nav
+@inject ConfigurationService _config
+
+@code {
+    protected override void OnAfterRender(bool firstRender) {
+        if (_config.AdminInitialized) {
+            _nav.NavigateTo("/login", true);
+        } else {
+            _nav.NavigateTo("/init", true);
+        }
+    }
+}

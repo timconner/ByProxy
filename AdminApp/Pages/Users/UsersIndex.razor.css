@@ -1,0 +1,25 @@
+.roles {
+    display: flex;
+    flex-direction: column;
+}
+
+.empty {
+    color: var(--disabled-text-color);
+}
+
+.control {
+    display: flex;
+    justify-content: center;
+    color: var(--disabled-text-color);
+    padding: 6px;
+    margin: auto;
+}
+
+    .control:hover {
+        cursor: pointer;
+        color: var(--text-color);
+    }
+
+.delete:hover {
+    color: red;
+}

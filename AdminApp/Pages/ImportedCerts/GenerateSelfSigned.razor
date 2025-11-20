@@ -1,0 +1,43 @@
+﻿@page "/imported-certs/generate"
+@attribute [Authorize(Roles = AuthRoles.Editor)]
+@inject IStringLocalizer<Language> _strings
+@inject ModalService _modal
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject NavigationManager _nav
+
+<PageHeader Title="@_strings["GenerateSelfSignedPageTitle"]">
+    <PageHeaderButton Icon="square-plus" Label="@_strings["Create"]" @onclick="CreateCert" />
+</PageHeader>
+
+<PageContent>
+    <CertificateRequestForm Request="_request" />
+</PageContent>
+
+@code {
+    private CertRequest _request = new();
+
+    public async Task CreateCert() {
+        if (string.IsNullOrWhiteSpace(_request.Name)) {
+            await _modal.OkOnly(_strings["Error"], _strings["ERR_NameEmpty"]);
+            return;
+        }
+
+        if (_request.Hosts.Count == 0) {
+            await _modal.OkOnly(_strings["Error"], _strings["ERR_HostsRequired"]);
+            return;
+        }
+
+        var success = await _modal.PerformSave(async () => {
+            using var cert = Certificates.GenerateSelfSignedCert(_request.Hosts);
+
+            using var db = _dbFactory.CreateDbContext();
+            await using var transaction = await db.Database.BeginTransactionAsync();
+            var entry = db.ImportedCerts.Add(new ImportedCert(_request.Name));
+            await db.SaveChangesAsync();
+            Certificates.ExportCertToDisk(entry.Entity.Id, cert);
+            await transaction.CommitAsync();
+        }, true);
+        
+        if (success) _nav.NavigateTo("/imported-certs");
+    }
+}

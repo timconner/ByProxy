@@ -1,0 +1,33 @@
+ul {
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    li button {
+        background: none;
+        border: none;
+        color: var(--disabled-text-color);
+        padding: 0;
+    }
+
+        li button:hover {
+            color: red;
+            background: none;
+            border: none;
+        }
+
+.new-contact-email {
+    display: flex;
+    gap: 6px;
+}
+
+.empty {
+    margin: 0 auto 12px auto;
+    color: var(--disabled-text-color);
+}

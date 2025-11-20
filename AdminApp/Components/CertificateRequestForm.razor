@@ -1,0 +1,45 @@
+﻿@inject IStringLocalizer<Language> _strings
+
+<fieldset>
+    <legend>@_strings["Certificate Details"]</legend>
+    <div class="name">
+        <div class="label">@_strings["Name"]:</div>
+        <input type="text" name="name" @bind="Request.Name" placeholder="@_strings["Certificate Name"]" />
+    </div>
+    <PageDivider Label="Hosts" />
+    <form @onsubmit="AddHost">
+        <div class="new-host">
+            <input type="text" @bind="_newHost" placeholder="example.com" />
+            <button type="submit">@_strings["Add"]</button>
+        </div>
+    </form>
+    <ul class="monospace">
+        @foreach (var host in Request.Hosts) {
+            <li>
+                @host
+                <button @onclick="() => RemoveHost(host)">
+                    <Icon Name="x" Size="18px" />
+                </button>
+            </li>
+        }
+    </ul>
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired]
+    public CertRequest Request { get; set; }
+
+    private string _newHost = string.Empty;
+
+    private void AddHost() {
+        var newHost = _newHost.Trim();
+        if (string.IsNullOrWhiteSpace(newHost)) return;
+        if (!Request.Hosts.Contains(newHost, StringComparer.OrdinalIgnoreCase)) Request.Hosts.Add(newHost);
+        _newHost = string.Empty;
+    }
+
+    private void RemoveHost(string host) {
+        _newHost = host;
+        Request.Hosts.Remove(host);
+    }
+}

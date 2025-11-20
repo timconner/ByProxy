@@ -1,0 +1,100 @@
+﻿@page "/imported-certs"
+
+@inject IStringLocalizer<Language> _strings
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject CertificateService _certService
+@inject ProxyStateService _proxyState
+@inject ModalService _modal
+
+<PageHeader Title="@_strings["Imported Certificates"]">
+    <AuthorizeView Roles="@AuthRoles.Editor">
+        <PageHeaderLink href="/imported-certs/generate" Icon="abacus" Label="@_strings["Generate Self-Signed"]" />
+        <PageHeaderLink href="/imported-certs/import" Icon="file-download" Label="@_strings["Import Certificate"]" />
+    </AuthorizeView>
+</PageHeader>
+
+<PageContent>
+    @if (_certs == null) {
+        <LoadingIndicator />
+        return;
+    }
+    <div class="active-toggle">
+        <Toggle IsOn="_showHidden" FieldLabel="@_strings["Show"]" OffLabel="@_strings["Active"]" OnLabel="@_strings["Hidden"]" ToggleHandler="ToggleHidden" />
+    </div>
+
+    @{
+        var certs = _certs.Where(_ => _.Metadata.Hidden == _showHidden);
+    }
+
+    @if (!certs.Any()) {
+        <div class="empty">@_strings["No Certificates"]</div>
+    } else {
+        <AuthorizeView Roles="@AuthRoles.Editor">
+            <Authorized>
+                <CertInfoTable Certificates="certs" OnEdit="RenameCert" OnHiddenToggle="ChangeCertVisibility" />
+            </Authorized>
+            <NotAuthorized>
+                <CertInfoTable Certificates="certs" />
+            </NotAuthorized>
+        </AuthorizeView>
+    }
+</PageContent>
+
+@code {
+    private List<CertInfo>? _certs = null;
+    private bool _showHidden = false;
+
+    protected override async Task OnInitializedAsync() {
+        await ReloadCerts();
+    }
+
+    private async Task ReloadCerts() {
+        _certs = await _certService.CompileAvailableServerCerts<ImportedCert>(_strings);
+    }
+
+    private async void ToggleHidden(bool showHidden) {
+        _showHidden = showHidden;
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    private async Task RenameCert(CertInfo cert) {
+        var result = await _modal.SingleValue(_strings["Rename"], $"{_strings["New Name"]}:", cert.Metadata.Name);
+        if (result.DialogResult != DialogResult.OK || string.IsNullOrWhiteSpace(result.Value)) return;
+        var success = await _modal.PerformSave(async () => {
+            using var db = _dbFactory.CreateDbContext();
+            var entry = db.Attach(cert.Metadata);
+            entry.Entity.Name = result.Value;
+            await db.SaveChangesAsync();
+        });
+        if (success) await ReloadCerts();
+    }
+
+    private async Task ChangeCertVisibility(CertInfo cert) {
+        bool success = false;
+        if (cert.Metadata.Hidden) {
+            success = await _modal.PerformSave(async () => {
+                using var db = _dbFactory.CreateDbContext();
+                var entry = db.Attach(cert.Metadata);
+                entry.Entity.Hidden = false;
+                await db.SaveChangesAsync();
+            });
+        } else {
+            if (cert.SniHosts.Count > 0) {
+                await _modal.OkOnly(_strings["In Use"], _strings["ERROR_CertInUse"]);
+                return;
+            }
+
+            var result = await _modal.YesNo(_strings["Hide"], _strings["Prompt_HideCert"]);
+            if (result != DialogResult.Yes) return;
+
+            success = await _modal.PerformSave(async () => {
+                using var db = _dbFactory.CreateDbContext();
+                var entry = db.Attach(cert.Metadata);
+                entry.Entity.Hidden = true;
+                await db.SaveChangesAsync();
+            });
+        }
+
+        if (success) await ReloadCerts();
+    }
+}

@@ -1,0 +1,90 @@
+﻿@page "/cert-authorities"
+@inject IStringLocalizer<Language> _strings
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject CertificateService _certService
+@inject ProxyStateService _proxyState
+@inject ModalService _modal
+
+<PageHeader Title="@_strings["Certificate Authorities"]">
+    <Toggle IsOn="_showHiddenCAs" FieldLabel="@_strings["Show"]" OffLabel="@_strings["Active"]" OnLabel="@_strings["Hidden"]" ToggleHandler="ShowInactiveToggled" />
+    <AuthorizeView Roles="@AuthRoles.Editor">
+        <PageHeaderButton Icon="square-plus" Label="@_strings["Create CA"]" @onclick="CreateCa" />
+    </AuthorizeView>
+</PageHeader>
+
+<PageContent>
+    @if (_certAuthorities == null) {
+        <LoadingIndicator />
+        return;
+    }
+
+    @if (_certAuthorities.Count == 0) {
+        <div class="empty">@_strings["No Certificate Authorities"]</div>
+        return;
+    }
+
+    @foreach (var ca in _certAuthorities) {
+        <fieldset>
+            <legend>@ca.Metadata.Name</legend>
+            <div class="ca">
+                <div class="details">
+                    <LabelValuePairs>
+                        <LabelValuePair Label="@_strings["Created"]" Value="@ca.Certificate.NotBefore.ToShortDateString()" />
+                        <LabelValuePair Label="@_strings["Expires"]" Value="@ca.Certificate.NotAfter.ToShortDateString()" />
+                        <LabelComplexValuePair Label="@_strings["Fingerprints"]">
+                            <button class="action" @onclick="() => ViewFingerprints(ca.Metadata.Id)">
+                                <Icon Name="fingerprint" Size="20px" />
+                            </button>
+                        </LabelComplexValuePair>
+                    </LabelValuePairs>
+                </div>
+                <div class="actions">
+                    <AuthorizeView Roles="@AuthRoles.Editor">
+                        @if (_showHiddenCAs) {
+                            <button @onclick="() => ReactivateCa(ca)">
+                                <Icon Size="18px" Name="eye-check" />
+                                @_strings["Reactivate CA"]
+                            </button>
+                        } else {
+                            <a class="button" href="@($"/cert-authorities/{ca.Metadata.Id}/issue")">
+                                <Icon Size="18px" Name="script-plus" />
+                                @_strings["Issue Certificate"]
+                            </a>
+                            <button @onclick="() => HideCa(ca)">
+                                <Icon Size="18px" Name="eye-off" />
+                                @_strings["Hide CA"]
+                            </button>
+                        }
+                    </AuthorizeView>
+                </div>
+            </div>
+            <PageDivider Label="Issued Certificates" />
+            @{
+                var showHiddenCerts = _showHiddenCAs || _showInactiveCerts.Contains(ca.Metadata.Id);
+                var caCerts = _showHiddenCAs ? ca.IssuedCerts : ca.IssuedCerts.Where(_ => _.Metadata.Hidden == showHiddenCerts);
+            }
+            @if (!_showHiddenCAs) {
+                <div class="active-toggle">
+                    <Toggle IsOn="showHiddenCerts" FieldLabel="@_strings["Show"]" OffLabel="@_strings["Active"]" OnLabel="@_strings["Hidden"]" ToggleHandler="(b) => ToggleCaCerts(ca, b)" />
+                </div>
+            }
+            @if (!caCerts.Any()) {
+                <div class="empty">@_strings["No Certificates"]</div>
+            } else {
+                <AuthorizeView Roles="@AuthRoles.Editor">
+                    <Authorized>
+                        @if (_showHiddenCAs) {
+                            <CertInfoTable Certificates="caCerts" />
+                        } else {
+                            <CertInfoTable Certificates="caCerts" OnEdit="RenameCert" OnHiddenToggle="ChangeCertVisibility" />
+                        }
+                    </Authorized>
+                    <NotAuthorized>
+                        <CertInfoTable Certificates="caCerts" />
+                    </NotAuthorized>
+                </AuthorizeView>
+            }
+        </fieldset>
+    }
+</PageContent>
+

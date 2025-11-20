@@ -1,0 +1,116 @@
+﻿@implements IDisposable
+
+@inject ConfigurationService _config
+@inject ProxyStateService _proxyState
+@inject IStringLocalizer<Language> _strings
+@inject NavigationManager _nav
+@inject ModalService _modal
+@inject AdminAppStateService _appState
+
+@if (_confirmExpiration.HasValue) {
+    <div class="confirm-modal">
+        <div class="confirm-modal-body">
+            <strong>
+                @_strings["WARN_ConfirmRequired"]
+            </strong>
+            <hr />
+            @_strings["WARN_ConfirmExpiration"]<br />
+            <span class="remain">
+                @SecondsRemaining @_strings["Seconds"]
+            </span>
+            <AuthorizeView Roles="@AuthRoles.Editor">
+                <hr />
+                <div class="confirm-buttons">
+                    @if (_revertClicked) {
+                        <button class="revert confirm" @onclick="RequestRevert">@_strings["Revert?"]<br />@_strings["Click Again"]</button>
+                    } else {
+                        <button class="revert" @onclick="() => _revertClicked = true">@_strings["Revert"]</button>
+                    }
+                    <button @onclick="ConfirmCommit">@_strings["Confirm"]</button>
+                </div>
+            </AuthorizeView>
+        </div>
+    </div>
+}
+
+@code {
+    private System.Threading.Timer? _updateTimer;
+
+    private DateTime? _confirmExpiration;
+    private int SecondsRemaining => (int)Math.Ceiling(_confirmExpiration?.Subtract(DateTime.UtcNow).TotalSeconds ?? 0);
+
+    private bool _revertClicked = false;
+
+    protected override void OnInitialized() {
+        _confirmExpiration = _config.ConfigConfirmExpiration;
+        _config.AwaitingConfirm += ConfirmRequired;
+        _proxyState.CandidateChanged += CandidateChanged;
+
+        if (_confirmExpiration.HasValue) {
+            _updateTimer = new(Refresh, null, 0, 250);
+        }
+    }
+
+    private void StopUpdateTimer() => _updateTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+
+    private async void ConfirmRequired(object? sender, DateTime? confirmExpiration) {
+        if (confirmExpiration.HasValue) {
+            if (!_appState.ConfigurationChangeInProgress) _nav.Refresh(true);
+        } else {
+            _confirmExpiration = null;
+            StopUpdateTimer();
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async void CandidateChanged(object? sender, int revision) {
+        if (!_appState.ConfigurationChangeInProgress) {
+            await _modal.OkOnly(_strings["Refresh Required"], _strings["WARN_InvalidState"]);
+            _nav.Refresh(true);
+        }
+    }
+
+    private async Task RequestRevert() {
+        try {
+            await _config.RequestCancelConfirmAndRollback();
+            _nav.Refresh(true);
+        } catch (Exception ex) {
+            var errorModal = _modal.OkOnly(_strings["Error"], ex.Message);
+            await CloseModal(errorModal);
+        }
+    }
+
+    private async Task ConfirmCommit() {
+        try {
+            await _config.ConfirmCommit();
+            await CloseModal();
+        } catch (Exception ex) {
+            var errorModal = _modal.OkOnly(_strings["Error"], ex.Message);
+            await CloseModal(errorModal);
+        }
+    }
+
+    private async Task CloseModal(Task? errorModal = null) {
+        _confirmExpiration = null;
+        StopUpdateTimer();
+        await InvokeAsync(StateHasChanged);
+        if (errorModal != null) await errorModal;
+    }
+
+    private async void Refresh(object? state) {
+        if (!_confirmExpiration.HasValue) {
+            StopUpdateTimer();
+        } else if (DateTime.UtcNow > _confirmExpiration.Value) {
+            StopUpdateTimer();
+            _nav.Refresh(true);
+        } else {
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    public void Dispose() {
+        _updateTimer?.Dispose();
+        _config.AwaitingConfirm -= ConfirmRequired;
+        _proxyState.CandidateChanged -= CandidateChanged;
+    }
+}

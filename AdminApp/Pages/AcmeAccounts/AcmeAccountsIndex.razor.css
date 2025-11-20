@@ -1,0 +1,29 @@
+.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    font-size: 18px;
+    color: var(--disabled-text-color);
+}
+
+legend {
+    font-weight: bold;
+}
+
+.acme-account {
+    display: flex;
+    justify-content: space-between;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.active-toggle {
+    display: flex;
+    justify-content: flex-end;
+}

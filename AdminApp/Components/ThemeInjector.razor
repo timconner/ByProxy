@@ -1,0 +1,25 @@
+﻿@inject AdminAppStateService _appState
+@inject IJSRuntime _js
+
+@((_appState.PreferredTheme ?? Themes.DefaultTheme).ConvertToCss())
+
+@code {
+    protected override void OnInitialized() {
+        _appState.OnThemeChange += UpdateTheme;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (!firstRender) return;
+
+        if (_appState.PreferredTheme == null) {
+            bool prefersLightTheme = await _js.InvokeAsync<bool>("prefersLightTheme");
+            await _appState.UpdatePreferredTheme(prefersLightTheme ? Themes.LightOcean : Themes.DarkOcean);
+        } else {
+            await _appState.UpdateThemeCookie();
+        }
+    }
+
+    private async void UpdateTheme() {
+        await InvokeAsync(StateHasChanged);
+    }
+}

@@ -1,0 +1,13 @@
+.new-map {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.no-matches {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--disabled-text-color);
+}

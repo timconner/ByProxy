@@ -1,0 +1,154 @@
+﻿.loader {
+    border: 2px solid var(--shadow-color);
+    border-left-color: limegreen;
+    animation-name: loader-spin;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+}
+
+    .loader, .loader:after {
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+    }
+
+.success {
+    -webkit-animation: none;
+    animation: none;
+    border-color: limegreen;
+    transition: border opacity 500ms ease-out;
+}
+
+    .success .status.draw:after {
+        animation-duration: 1.2s;
+        animation-timing-function: ease;
+        animation-name: checkmark;
+        transform: scaleX(-1) rotate(135deg);
+    }
+
+    .success .status:after {
+        opacity: 1;
+        height: 20px;
+        width: 10px;
+        transform-origin: left top;
+        border-right: 2px solid limegreen;
+        border-top: 2px solid limegreen;
+        content: "";
+        left: 9px;
+        top: 20px;
+        position: absolute;
+    }
+
+.fail {
+    -webkit-animation: none;
+    animation: none;
+    border-color: red;
+    transition: border opacity 500ms ease-out;
+}
+
+    .fail .status {
+        top: 50%;
+        left: 50%;
+        position: absolute;
+    }
+
+        .fail .status.draw:before, .fail .status.draw:after {
+            animation-duration: 1.2s;
+            animation-timing-function: ease;
+            animation-name: crossmark;
+        }
+
+        .fail .status.draw:before {
+            transform: scaleX(-1) rotate(45deg);
+        }
+
+        .fail .status.draw:after {
+            transform: scaleX(-1) rotate(225deg);
+        }
+
+        .fail .status:before, .fail .status:after {
+            opacity: 1;
+            height: 10px;
+            width: 10px;
+            transform-origin: left top;
+            border-right: 2px solid red;
+            border-top: 2px solid red;
+            content: "";
+            position: absolute;
+        }
+
+        .fail .status:before {
+            left: 8px;
+            top: -9px;
+        }
+
+        .fail .status:after {
+            left: -6px;
+            top: 8px;
+        }
+
+@keyframes loader-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes checkmark {
+    0% {
+        height: 0;
+        width: 0;
+        opacity: 1;
+    }
+
+    20% {
+        height: 0;
+        width: 10px;
+        opacity: 1;
+    }
+
+    40% {
+        height: 20px;
+        width: 10px;
+        opacity: 1;
+    }
+
+    100% {
+        height: 20px;
+        width: 10px;
+        opacity: 1;
+    }
+}
+
+@keyframes crossmark {
+    0% {
+        height: 0;
+        width: 0;
+        opacity: 1;
+    }
+
+    20% {
+        height: 0;
+        width: 10px;
+        opacity: 1;
+    }
+
+    40% {
+        height: 10px;
+        width: 10px;
+        opacity: 1;
+    }
+
+    100% {
+        height: 10px;
+        width: 10px;
+        opacity: 1;
+    }
+}

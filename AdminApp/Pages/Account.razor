@@ -1,0 +1,51 @@
+﻿@page "/account"
+
+@inject IStringLocalizer<Language> _strings
+@inject AuthService _auth
+@inject NavigationManager _nav
+
+<PageHeader Title="@_auth.GetFullName()">
+    <label>
+        @_strings["LanguageSelect"]:
+        <select @bind="_culture" @bind:after="UpdateCulture">
+            @foreach (var language in Languages.SupportedLanguages) {
+                var culture = new CultureInfo(language);
+                <option value="@culture">@culture.NativeName</option>
+            }
+        </select>
+    </label>
+</PageHeader>
+
+<PageContent>
+    <InfoBlock>
+        Translations are currently unavailable. Language selector and culture system is functional, but available languages are just placeholders to streamline implementation of translations later.
+    </InfoBlock>
+    <fieldset>
+        <legend>@_strings["Security"]</legend>
+        <button @onclick="ResetPassword">@_strings["Reset Password"]</button>
+        <button @onclick="SignOutAllSessions">@_strings["Sign Out All Sessions"]</button>
+    </fieldset>
+</PageContent>
+
+@code {
+    private CultureInfo? _culture;
+
+    protected override void OnInitialized() {
+        _culture = CultureInfo.CurrentCulture;
+    }
+
+    private async Task UpdateCulture() {
+        if (_culture == null || _culture == CultureInfo.CurrentCulture) return;
+        await _auth.UpdateUserCulture(_culture);
+        _nav.Refresh(true);
+    }
+
+    private void ResetPassword() {
+        _nav.NavigateTo("/reset-pw", true);
+    }
+
+    private async Task SignOutAllSessions() {
+        await _auth.InvalidateCurrentUsersSessions();
+        _nav.NavigateTo("/login", true);
+    }
+}

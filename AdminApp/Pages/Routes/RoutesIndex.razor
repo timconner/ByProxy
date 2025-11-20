@@ -1,0 +1,107 @@
+﻿@page "/routes"
+
+@inject IStringLocalizer<Language> _strings
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ConfigurationService _config
+@inject NavigationManager _nav
+@inject ModalService _modal
+@inject IJSRuntime _js
+
+<PageHeader Title="@_strings["Routes"]">
+    <AuthorizeView Roles="@AuthRoles.Editor">
+        <PageHeaderLink href="/routes/create" Icon="square-plus" Label="@_strings["Create"]" />
+    </AuthorizeView>
+</PageHeader>
+
+<PageContent>
+    <InfoBlock>
+        @_strings["INFO_Routes"]
+    </InfoBlock>
+
+    @if (_routes == null || _clusterNames == null) {
+        <LoadingIndicator />
+    }
+
+    @if (_routes?.Count == 0) {
+        <div class="empty">
+            @_strings["No Routes Defined"]
+            <br /><br />
+            @_strings["Help_ClickCreate"] <Icon Name="arrow-up-right" />
+        </div>
+    }
+
+    <table style="@(_routes == null || _routes.Count == 0 || _clusterNames == null ? "display:none" : null)">
+        <thead>
+            <tr>
+                <AuthorizeView Roles="@AuthRoles.Editor">
+                    <th class="drag-handle"></th>
+                </AuthorizeView>
+                <th>@_strings["Name"]</th>
+                <th>@_strings["Description"]</th>
+                <th>@_strings["Matching"]</th>
+                <th>@_strings["Route Response"]</th>
+                <AuthorizeView Roles="@AuthRoles.Editor">
+                    <th class="action"></th>
+                    <th class="action"></th>
+                    <th class="action"></th>
+                </AuthorizeView>
+            </tr>
+        </thead>
+        <tbody @ref="_tbody">
+            @if (_routes != null && _clusterNames != null) {
+                @foreach (var route in _routes) {
+                    <tr>
+                        <AuthorizeView Roles="@AuthRoles.Editor">
+                            <td class="drag-handle">
+                                <Icon Name="grip-vertical" Size="16px" />
+                            </td>
+                        </AuthorizeView>
+                        <td>@route.Name</td>
+                        <td>@route.Description</td>
+                        <td class="monospace">
+                            @foreach (var simMatch in GenerateSimulatedMatches(route)) {
+                                <div>@simMatch</div>
+                            }
+                        </td>
+                        <td>
+                            @switch (route.ResponseType.Type) {
+                                case RouteResponseType.Constants.Cluster:
+                                    <text>@_strings["RouteSummary_Cluster"]: @_clusterNames[route.ClusterId!.Value]</text>
+                                    break;
+                                case RouteResponseType.Constants.Redirect:
+                                    <text>@_strings["RouteSummary_Redirect"]: @route.RedirectLocation</text>
+                                    break;
+                                case RouteResponseType.Constants.Status:
+                                    <text>@_strings["RouteSummary_Status"]: @route.HttpStatusCode</text>
+                                    break;
+                                case RouteResponseType.Constants.Tarpit:
+                                    <text>@_strings["RouteSummary_Tarpit"]: @route.HttpStatusCode</text>
+                                    break;
+                            }
+                            @if (route.ClusterId != null) {
+                            } else {
+                            }
+                        </td>
+                        <AuthorizeView Roles="@AuthRoles.Editor">
+                            <td class="action">
+                                <button class="edit" title="@_strings["Edit"]" @onclick="() => EditRoute(route)">
+                                    <Icon Name="pencil" Size="18px" />
+                                </button>
+                            </td>
+                            <td class="action">
+                                <button class="clone" title="@_strings["Clone"]" @onclick="() => CloneRoute(route)">
+                                    <Icon Name="copy" Size="18px" />
+                                </button>
+                            </td>
+                            <td class="action">
+                                <button class="delete" title="@_strings["Delete"]" @onclick="() => DeleteRoute(route)">
+                                    <Icon Name="trash" Size="18px" />
+                                </button>
+                            </td>
+                        </AuthorizeView>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</PageContent>

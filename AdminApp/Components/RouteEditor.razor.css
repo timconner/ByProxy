@@ -1,0 +1,160 @@
+label {
+    user-select: none;
+}
+
+ol {
+    margin: 0;
+}
+
+ul {
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+    li button {
+        background: none;
+        border: none;
+        color: var(--disabled-text-color);
+        padding: 0;
+    }
+
+        li button:hover {
+            color: red;
+            background: none;
+            border: none;
+        }
+
+.disabled {
+    color: var(--disabled-text-color);
+}
+
+    .disabled :is(input, select) {
+        color: var(--disabled-text-color);
+        background-color: var(--dark-bg-color) !important;
+        cursor: default !important;
+    }
+
+.description {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-column-gap: 6px;
+    grid-row-gap: 6px;
+    align-items: center;
+}
+
+.name {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.name input {
+    max-width: 200px;
+}
+
+.response-type select {
+    width: fit-content;
+}
+
+.cluster select {
+    min-width: 140px;
+}
+
+.response {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.summary {
+    margin-top: 8px;
+    padding-left: 40px;
+    margin-bottom: 2px;
+}
+
+.protocols-ports {
+    margin-bottom: 20px;
+}
+
+.new-value {
+    display: flex;
+    gap: 6px;
+}
+
+.protocols {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    align-items: center;
+    justify-content: start;
+    grid-gap: 12px 12px;
+}
+
+    .protocols .port {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+    }
+    
+    .protocols .port input {
+        width: 64px;
+    }
+
+.new-transform, .new-match {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    width: fit-content;
+}
+
+.match-values {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+    .match-values .button {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        padding: 4px 6px;
+        border-radius: 9px;
+    }
+    
+.match-button-separator {
+    color: var(--disabled-text-color);
+}
+
+.match-value {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background-color: var(--light-bg-color);
+    padding: 6px 6px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 9px;
+}
+
+.match-value:hover {
+    background-color: darkred;
+    cursor: pointer;
+}
+
+.empty {
+    margin: 0 auto 12px auto;
+    color: var(--disabled-text-color);
+}
+
+.x-forwarded {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+}

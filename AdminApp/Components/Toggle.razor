@@ -1,0 +1,41 @@
+﻿@inject IStringLocalizer<Language> _strings
+
+<div class="toggle @(IsOn ? "on" : "off")" @onclick="InvokeToggle">
+    @if (FieldLabel != null) {
+        <span>@FieldLabel:</span>
+    }
+    <div class="component">
+        <span class="label off">@OffLabel</span>
+        <Icon Name="@_iconName" Size="24px" />
+        <span class="label on">@OnLabel</span>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string? FieldLabel { get; set; } = null;
+
+    [Parameter]
+    public string? OnLabel { get; set; }
+
+    [Parameter]
+    public string? OffLabel { get; set; }
+
+    [Parameter]
+    public bool IsOn { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<bool> ToggleHandler { get; set; }
+
+    private string _iconName => IsOn ? "toggle-right" : "toggle-left";
+
+    protected override void OnParametersSet() {
+        if (OnLabel == null) OnLabel = _strings["On"];
+        if (OffLabel == null) OffLabel = _strings["Off"];
+    }
+
+    private async Task InvokeToggle() {
+        IsOn = !IsOn;
+        await ToggleHandler.InvokeAsync(IsOn);
+    }
+}

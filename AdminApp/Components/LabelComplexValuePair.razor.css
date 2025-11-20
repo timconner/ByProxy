@@ -1,0 +1,11 @@
+dt {
+    font-weight: bold;
+}
+
+    dt::after {
+        content: ":";
+    }
+
+dd {
+    margin: unset;
+}

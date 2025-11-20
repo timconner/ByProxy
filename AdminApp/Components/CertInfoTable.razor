@@ -1,0 +1,173 @@
+﻿@inject IStringLocalizer<Language> _strings
+@inject ModalService _modal
+
+<table>
+    <thead>
+        <tr>
+            <th>@_strings["Name"]</th>
+            @if (!_exclude.HasFlag(ExcludeColumns.SubjectNames)) {
+                <th>@_strings["Subject Names"]</th>
+            }
+            @if (!_exclude.HasFlag(ExcludeColumns.Issued)) {
+                <th>@_strings["Issued"]</th>
+            }
+            @if (!_exclude.HasFlag(ExcludeColumns.Expires)) {
+                <th>@_strings["Expires"]</th>
+            }
+            @if (!_exclude.HasFlag(ExcludeColumns.Issuer)) {
+                <th>@_strings["Issuer"]</th>
+            }
+            @if (!_exclude.HasFlag(ExcludeColumns.SniMaps)) {
+                <th>@_strings["SNI Maps"]</th>
+            }
+            @if (OnSelect.HasDelegate) {
+                <th></th>
+            }
+            @if (OnEdit.HasDelegate) {
+                <th></th>
+            }
+            @if (OnHiddenToggle.HasDelegate) {
+                <th></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cert in Certificates) {
+            <tr>
+                <td>
+                    <div class="name-cell">
+                        <span>@cert.Metadata.Name</span>
+                        @if (!_exclude.HasFlag(ExcludeColumns.Fingerprints)) {
+                            <button class="action" @onclick="() => ViewFingerprints(cert)"><Icon Name="fingerprint" /></button>
+                        }
+                        @if (_include.HasFlag(IncludeColumns.CertificateDetails)) {
+                            <button class="action" @onclick="() => ViewDetails(cert)"><Icon Name="zoom" /></button>
+                        }
+                    </div>
+                </td>
+                @if (!_exclude.HasFlag(ExcludeColumns.SubjectNames)) {
+                    <td class="monospace">
+                        @foreach (var name in cert.SubjectNames) {
+                            <div>@name</div>
+                        }
+                    </td>
+                }
+                @if (!_exclude.HasFlag(ExcludeColumns.Issued)) {
+                    <td>@cert.Cert.NotBefore.ToShortDateString()</td>
+                }
+                @if (!_exclude.HasFlag(ExcludeColumns.Expires)) {
+                    <td>@cert.Cert.NotAfter.ToShortDateString()</td>
+                }
+                @if (!_exclude.HasFlag(ExcludeColumns.Issuer)) {
+                    <td>@cert.Issuer</td>
+                }
+                @if (!_exclude.HasFlag(ExcludeColumns.SniMaps)) {
+                    <td class="monospace">
+                        @if (cert.SniHosts.Count == 0) {
+                            <Icon Name="line-dashed" Color="var(--disabled-text-color)" />
+                        } else {
+                            @foreach (var map in cert.SniHosts) {
+                                <div>@map</div>
+                            }
+                        }
+                    </td>
+                }
+                @if (OnSelect.HasDelegate) {
+                    <td>
+                        <button @onclick="() => OnSelect.InvokeAsync(cert)">
+                            @_strings["Select"]
+                        </button>
+                    </td>
+                }
+                @if (OnEdit.HasDelegate) {
+                    <td>
+                        <button class="action" title="@_strings["Edit"]" @onclick="() => OnEdit.InvokeAsync(cert)">
+                            <Icon Name="pencil" />
+                        </button>
+                    </td>
+                }
+                @if (OnHiddenToggle.HasDelegate) {
+                    <td>
+                        @if (cert.Metadata.Hidden) {
+                            <button class="action" title="@_strings["Reactivate"]" @onclick="() => OnHiddenToggle.InvokeAsync(cert)">
+                                <Icon Name="eye-check" />
+                            </button>
+                        } else {
+                            <button class="action" title="@_strings["Hide"]" @onclick="() => OnHiddenToggle.InvokeAsync(cert)">
+                                <Icon Name="eye-off" />
+                            </button>
+                        }
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter, EditorRequired]
+    public IEnumerable<CertInfo> Certificates { get; set; }
+
+    [Parameter]
+    public EventCallback<CertInfo> OnSelect { get; set; }
+
+    [Parameter]
+    public EventCallback<CertInfo> OnEdit { get; set; }
+
+    [Parameter]
+    public EventCallback<CertInfo> OnHiddenToggle { get; set; }
+
+    [Flags]
+    public enum ExcludeColumns {
+        None = 0,
+        SubjectNames = 1,
+        Issued = 2,
+        Expires = 4,
+        Issuer = 8,
+        SniMaps = 16,
+        Fingerprints = 32,
+        Serial = 64
+    }
+    
+    [Parameter]
+    public IEnumerable<ExcludeColumns>? Exclude { get; set; }
+
+    private ExcludeColumns _exclude = ExcludeColumns.None;
+
+
+    [Flags]
+    public enum IncludeColumns {
+        None = 0,
+        CertificateDetails = 1
+    }
+
+    [Parameter]
+    public IEnumerable<IncludeColumns>? Include { get; set; }
+
+    private IncludeColumns _include = IncludeColumns.None;
+
+
+    protected override void OnParametersSet() {
+        _exclude = ExcludeColumns.None;
+        if (Exclude != null) {
+            foreach (var column in Exclude) {
+                _exclude |= column;
+            }
+        }
+
+        _include = IncludeColumns.None;
+        if (Include != null) {
+            foreach (var column in Include) {
+                _include |= column;
+            }
+        }
+    }
+
+    private async Task ViewFingerprints(CertInfo certInfo) {
+        await _modal.CertificateDetails(certInfo, true);
+    }
+
+    private async Task ViewDetails(CertInfo certInfo) {
+        await _modal.CertificateDetails(certInfo);
+    }
+}

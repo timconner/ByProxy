@@ -1,0 +1,822 @@
+﻿@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject IStringLocalizer<Language> _strings
+@inject ModalService _modal
+@inject NavigationManager _nav
+
+@if (_clusters == null) {
+    <LoadingIndicator />
+    return;
+}
+
+<fieldset>
+    <legend>@_strings["Description"]</legend>
+    <div class="description">
+        <div>@_strings["Name"]:</div>
+        <div class="name">
+            <input type="text" name="name" @bind="Route.Name" maxlength="20" />
+            <div class="help-text">@_strings["Help_NameDescription"]</div>
+        </div>
+        <div>@_strings["Description"]:</div>
+        <input type="text" name="description" @bind="Route.Description" />
+    </div>
+</fieldset>
+
+<fieldset class="protocols-ports">
+    <legend>@_strings["InboundProtocolsPorts"]</legend>
+
+    <div class="protocols">
+        <div class="option">
+            <label>
+                <input type="checkbox" name="listen-http" @bind="ListenOnHttp" min="1" max="49151" />
+                @_strings["ListenHTTP"]
+            </label>
+        </div>
+        <div class="@(ListenOnHttp ? "port" : "port disabled")">
+            <div>@_strings["Port"]:</div>
+            @if (ListenOnHttp) {
+                <input type="number" name="http-port" min="1" max="49151"
+                    @bind:get="Route.HttpPort"
+                    @bind:set="(value) => Route.HttpPort = Math.Clamp(value ?? 80, 1, 49151)" />
+            } else {
+                <input type="number" name="http-port" disabled />
+            }
+        </div>
+        <div class="@(ListenOnHttp && ListenOnHttps ? "redirect" : "redirect disabled")">
+            <label>
+                @_strings["Redirect"] HTTP → HTTPS
+                @if (ListenOnHttp && ListenOnHttps) {
+                    <input type="checkbox" name="https-redirect" @bind="RedirectToHttps" />
+                } else {
+                    <input type="checkbox" name="https-redirect" disabled />
+                }
+            </label>
+        </div>
+
+        <div class="option">
+            <label>
+                <input type="checkbox" name="listen-https" @bind="ListenOnHttps" />
+                @_strings["ListenHTTPS"]
+            </label>
+        </div>
+        <div class="@(ListenOnHttps ? "port" : "port disabled")">
+            <div>@_strings["Port"]:</div>
+            @if (ListenOnHttps) {
+                <input type="number" name="https-port" min="1" max="49151"
+                       @bind:get="Route.HttpsPort"
+                       @bind:set="(value) => Route.HttpsPort = Math.Clamp(value ?? 443, 1, 49151)" />
+            } else {
+                <input type="number" name="https-port" disabled />
+            }
+        </div>
+        @if (ListenOnHttps) {
+            <div class="help-text">
+                @_strings["Help_RouteSNI"]
+            </div>
+        }
+    </div>
+</fieldset>
+
+<fieldset class="response-type">
+    <legend>@_strings["Route Response"]</legend>
+    <select @bind:get="Route.ResponseType.Type" @bind:set="ChangeRouteResponseType">
+        @foreach (var responseType in RouteResponseType.RouteResponseTypes) {
+            <option value="@responseType.Type">@_strings[$"RouteResponseType_{responseType.Type}"]</option>
+        }
+    </select>
+    @switch (Route.ResponseType.Type) {
+        case RouteResponseType.Constants.Cluster:
+            ProxyCluster? routeCluster = _clusters.FirstOrDefault(_ => _.Id == Route.ClusterId);
+            <div class="cluster response">
+                <div>
+                    <label>
+                        @_strings["Cluster"]:
+                        <select @bind:get="routeCluster?.Id" @bind:set="(id) => Route.ClusterId = id ?? Guid.Empty">
+                            @foreach (var cluster in _clusters) {
+                            <option value="@cluster.Id">@cluster.Name</option>
+                            }
+                        </select>
+                    </label>
+                    <div class="help-text">@_strings["Help_RouteCluster"]</div>
+                </div>
+                <div class="destinations">
+                    @if (routeCluster != null) {
+                        <ol class="monospace">
+                            @foreach (var destination in routeCluster.Destinations) {
+                                <li>
+                                    @destination.Address
+                                    @if (!string.IsNullOrWhiteSpace(destination.Name)) {
+                                        <span class="help-text"> (@destination.Name)</span>
+                                    }
+                                </li>
+                            }
+                        </ol>
+                    }
+                </div>
+            </div>
+            break;
+        case RouteResponseType.Constants.Redirect:
+            <div class="redirect response">
+                <div>
+                    <label>
+                        @_strings["HTTP Status"]:
+                        <select @bind="Route.HttpStatusCode">
+                            <option value="301">301 - @_strings["Redirect_MovedPermanently"]</option>
+                            <option value="302">302 - @_strings["Redirect_Found"]</option>
+                            <option value="307">307 - @_strings["Redirect_TemporaryRedirect"]</option>
+                            <option value="308">308 - @_strings["Redirect_PermanentRedirect"]</option>
+                        </select>
+                    </label>
+                    <div class="help-text">@_strings["Help_RedirectStatus"]</div>
+                </div>
+                <div>
+                    <label>
+                        @_strings["Redirect Location"]:
+                        <input type="text" @bind="Route.RedirectLocation" placeholder="https://example.com" />
+                    </label>
+                    <div class="help-text">@_strings["Help_RedirectLocation"]</div>
+                </div>
+            </div>
+            break;
+        case RouteResponseType.Constants.Status:
+            <div class="status response">
+                <div>
+                    <label>
+                        @_strings["HTTP Status"]:
+                        <select @bind="Route.HttpStatusCode">
+                            @foreach (var status in Enum.GetValues<HttpStatusCode>()) {
+                                int statusCode = (int)status;
+                                <option value="@statusCode">@($"{statusCode} - {Enum.GetName<HttpStatusCode>(status)}")</option>
+                            }
+                        </select>
+                    </label>
+                    <div class="help-text">@_strings["Help_StatusRouteCode"]</div>
+                </div>
+            </div>
+            break;
+        case RouteResponseType.Constants.Tarpit:
+            <div class="tarpit response">
+                <div>
+                    <label>
+                        @_strings["HTTP Status"]:
+                        <select @bind="Route.HttpStatusCode">
+                            @foreach (var status in Enum.GetValues<HttpStatusCode>()) {
+                                int statusCode = (int)status;
+                                <option value="@statusCode">@($"{statusCode} - {Enum.GetName<HttpStatusCode>(status)}")</option>
+                            }
+                        </select>
+                    </label>
+                    <div class="help-text">@_strings["Help_TarpitStatus"]</div>
+                </div>
+            </div>
+            break;
+    }
+</fieldset>
+
+<PageDivider Label="@_strings["Match Criteria"]" MarginTop="48px" MarginBottom="24px" FontSize="20px" FontWeight="bold" />
+
+<fieldset class="hosts">
+    <legend>@_strings["Hosts"]</legend>
+    <div class="help-text">@_strings["Help_HostsMatch"]</div>
+    <form @onsubmit="AddHost">
+        <div class="new-value">
+            <InputText @bind-Value="_newHost" placeholder="example.com" />
+            <button type="submit">@_strings["Add"]</button>
+        </div>
+    </form>
+    @if (Route.Hosts == null || Route.Hosts.Count == 0) {
+        <ul><li>@_strings["MatchAllHosts"]</li></ul>
+    } else {
+        <ul class="monospace">
+            @foreach (var host in Route.Hosts) {
+                <li>
+                    @host
+                    <button @onclick="() => RemoveHost(host)">
+                        <Icon Name="x" Size="18px" />
+                    </button>
+                </li>
+            }
+        </ul>
+    }
+</fieldset>
+
+<fieldset>
+    <legend>@_strings["Path"]</legend>
+    <div class="help-text">@_strings["Help_PathMatch"]</div>
+    <label>
+        @_strings["Path Mode"]:
+        <select @bind:get="Route.PathIsPrefix.ToString()" @bind:set='(b) => Route.PathIsPrefix = b == "True"'>
+            <option value="True">@_strings["PathMode_Prefix"]</option>
+            <option value="False">@_strings["PathMode_ExactMatch"]</option>
+        </select>
+    </label>
+    <label>
+        [@_strings["Host"].ToString().ToLower()]:[@_strings["Port"].ToString().ToLower()]
+        <input type="text" name="path-match" placeholder="/api" @bind="PathMatch" @bind:event="oninput" />
+    </label>
+    <div class="summary">
+        @if (string.IsNullOrWhiteSpace(Route.Path)) {
+            <text>@_strings["Matching all paths"]: </text>
+        } else {
+            <text>@_strings["Matching"]: </text>
+        }
+        <span class="monospace">@Route.GetPathAsYarpMatch()</span>
+    </div>
+</fieldset>
+
+<fieldset class="methods">
+    <legend>@_strings["HTTP Methods"]</legend>
+    <div class="help-text">@_strings["Help_HTTPMethodsMatch"]</div>
+    <form @onsubmit="AddMethod">
+        <div class="new-value">
+            <InputText @bind-Value="_newMethod" placeholder="GET" />
+            <button type="submit">@_strings["Add"]</button>
+        </div>
+    </form>
+    @if (Route.Methods == null || Route.Methods.Count == 0) {
+        <ul><li>@_strings["MatchAllMethods"]</li></ul>
+    } else {
+        <ul>
+            @foreach (var method in Route.Methods) {
+                <li>
+                    @method
+                    <button @onclick="() => RemoveMethod(method)">
+                        <Icon Name="x" Size="18px" />
+                    </button>
+                </li>
+            }
+        </ul>
+    }
+</fieldset>
+
+<fieldset>
+    <legend>@_strings["Headers"]</legend>
+    <div class="help-text">@_strings["Help_HeadersMatch"]</div>
+    <form @onsubmit="AddHeaderMatch">
+        <div class="new-match">
+            <div>
+                <label>
+                    @_strings["Header Name"]:
+                    <input type="text" placeholder="Authorization" @bind="_newHeaderMatchKey" />
+                </label>
+                <div class="help-text">@_strings["Help_HeaderMatchKey"]</div>
+            </div>
+            <div>
+                <label>
+                    @_strings["Match Mode"]:
+                    <select @bind:get="_newHeaderMatchMode.Mode" @bind:set="(value) => _newHeaderMatchMode = ProxyHeaderMatchMode.FromString(value) ?? ProxyHeaderMatchMode.Exact">
+                        @foreach (var mode in ProxyHeaderMatchMode.HeaderMatchModes) {
+                        <option value="@mode.Mode">@_strings[$"HeaderMatchMode_{mode.Mode}"]</option>
+                        }
+                    </select>
+                </label>
+                <div class="help-text">@_strings[$"Help_HeaderMatchMode_{_newHeaderMatchMode.Mode}"]</div>
+            </div>
+            @if (_newHeaderMatchMode.HasValues) {
+               <div>
+                    <label>
+                        <input type="checkbox" @bind="_newHeaderMatchCaseSensitivity" />
+                        @_strings["Case Sensitive Values"]
+                    </label> 
+                    <div class="help-text">@_strings["Help_MatchCaseSensitive"]</div>
+                </div>
+                <div class="match-values">
+                    <span>@_strings["Match Values"]:</span>
+                    @foreach(var value in _newHeaderMatchValues) {
+                        <div class="match-value" @onclick="() => _newHeaderMatchValues.Remove(value)">
+                            @value
+                            <Icon Name="x" Size="12px" Color="var(--disabled-text-color)" />
+                        </div>
+                    }
+                    @if (_newHeaderMatchValues.Count > 0) {
+                        <div class="match-button-separator">|</div>
+                    }
+                    <div class="button" @onclick="AddNewHeaderMatchValue"><Icon Name="circle-plus" Size="20px" />New Value</div>
+                </div>
+            }
+            <button type="submit">@_strings["Add"]</button>
+        </div>
+    </form>
+    @{
+        var headerMatches = Route.MatchCriteria.OfType<ProxyRouteHeaderMatch>();
+    }
+    @if (!headerMatches.Any()) {
+        <div class="empty">@_strings["Matches_Empty"]</div>
+    } else {
+        <table>
+            <thead>
+                <tr>
+                    <th>@_strings["Header Name"]</th>
+                    <th>@_strings["Match Mode"]</th>
+                    <th>@_strings["Case Sensitive"]</th>
+                    <th>@_strings["Match Values"]</th>
+                    <th class="action">@_strings["Remove"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var match in headerMatches) {
+                    <tr>
+                        <td class="monospace">@match.Key</td>
+                        <td>@_strings[$"HeaderMatchMode_{match.HeaderMatchMode.Mode}"]</td>
+                        @if (match.Values == null) {
+                            <td>
+                                <Icon Name="line-dashed" Color="var(--disabled-text-color)" />
+                            </td>
+                            <td>
+                                <Icon Name="line-dashed" Color="var(--disabled-text-color)" />
+                            </td>
+                        } else {
+                            <td>
+                                @if (match.CaseSensitiveValues == true) {
+                                    @_strings["Yes"]
+                                } else {
+                                    @_strings["No"]
+                                }
+                            </td>
+                            <td class="monospace">
+                                @foreach (var value in match.Values) {
+                                    <text>@value</text><br />
+                                }
+                            </td>
+                        }
+                        <td class="action">
+                            <button class="delete" @onclick="() => RemoveHeaderMatch(match)">
+                                <Icon Name="x" Size="18px" />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</fieldset>
+
+<fieldset>
+    <legend>@_strings["Query String"]</legend>
+    <div class="help-text">@_strings["Help_QueryStringMatch"]</div>
+    <form @onsubmit="AddQueryMatch">
+        <div class="new-match">
+            <div>
+                <label>
+                    @_strings["Query Key"]:
+                    <input type="text" @bind="_newQueryMatchKey" />
+                </label>
+                <div class="help-text">@_strings["Help_QueryMatchKey"]</div>
+            </div>
+            <div>
+                <label>
+                    @_strings["Match Mode"]:
+                    <select @bind:get="_newQueryMatchMode.Mode" @bind:set="(value) => _newQueryMatchMode = ProxyQueryMatchMode.FromString(value) ?? ProxyQueryMatchMode.Exact">
+                        @foreach (var mode in ProxyQueryMatchMode.QueryMatchModes) {
+                            <option value="@mode.Mode">@_strings[$"QueryMatchMode_{mode.Mode}"]</option>
+                        }
+                    </select>
+                </label>
+                <div class="help-text">@_strings[$"Help_QueryMatchMode_{_newQueryMatchMode.Mode}"]</div>
+            </div>
+            @if (_newQueryMatchMode.HasValues) {
+                <div>
+                    <label>
+                        <input type="checkbox" @bind="_newQueryMatchCaseSensitivity" />
+                        @_strings["Case Sensitive Values"]
+                    </label>
+                    <div class="help-text">@_strings["Help_MatchCaseSensitive"]</div>
+                </div>
+                <div class="match-values">
+                    <span>@_strings["Match Values"]:</span>
+                    @foreach (var value in _newQueryMatchValues) {
+                        <div class="match-value" @onclick="() => _newQueryMatchValues.Remove(value)">
+                            @value
+                            <Icon Name="x" Size="12px" Color="var(--disabled-text-color)" />
+                        </div>
+                    }
+                    @if (_newQueryMatchValues.Count > 0) {
+                        <div class="match-button-separator">|</div>
+                    }
+                    <div class="button" @onclick="AddNewQueryMatchValue"><Icon Name="circle-plus" Size="20px" />New Value</div>
+                </div>
+            }
+            <button type="submit">@_strings["Add"]</button>
+        </div>
+    </form>
+    @{
+        var queryMatches = Route.MatchCriteria.OfType<ProxyRouteQueryMatch>();
+    }
+    @if (!queryMatches.Any()) {
+        <div class="empty">@_strings["Matches_Empty"]</div>
+    } else {
+        <table>
+            <thead>
+                <tr>
+                    <th>@_strings["Query Key"]</th>
+                    <th>@_strings["Match Mode"]</th>
+                    <th>@_strings["Case Sensitive"]</th>
+                    <th>@_strings["Match Values"]</th>
+                    <th class="action">@_strings["Remove"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var match in queryMatches) {
+                    <tr>
+                        <td class="monospace">@match.Key</td>
+                        <td>@_strings[$"QueryMatchMode_{match.QueryMatchMode.Mode}"]</td>
+                        @if (match.Values == null) {
+                            <td>
+                                <Icon Name="line-dashed" Color="var(--disabled-text-color)" />
+                            </td>
+                            <td>
+                                <Icon Name="line-dashed" Color="var(--disabled-text-color)" />
+                            </td>
+                        } else {
+                            <td>
+                                @if (match.CaseSensitiveValues == true) {
+                                    @_strings["Yes"]
+                                } else {
+                                    @_strings["No"]
+                                }
+                            </td>
+                            <td class="monospace">
+                                @foreach (var value in match.Values) {
+                                    <text>@value</text>
+                    
+                                    <br />
+                                }
+                            </td>
+                        }
+                        <td class="action">
+                            <button class="delete" @onclick="() => RemoveQueryMatch(match)">
+                                <Icon Name="x" Size="18px" />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</fieldset>
+
+
+<PageDivider Label="@_strings["Transforms"]" MarginTop="48px" MarginBottom="24px" FontSize="20px" FontWeight="bold" />
+
+<fieldset>
+    <legend>@_strings["Path"]</legend>
+    <div class="help-text">@_strings["Help_PathTransforms"]</div>
+    <form @onsubmit="AddPathTransform">
+        <div class="new-transform">
+            <div>
+                <label>
+                    @_strings["Operation"]
+                    <select @bind="_newPathTransformMode">
+                        @foreach (var mode in PathTransformMode.PathTransformModes) {
+                            <option value="@mode.Mode">@_strings[$"PathTransformMode_{mode.Mode}"]</option>
+                        }
+                    </select>
+                </label>
+                <div class="help-text">@_strings[$"Help_PathTransform{_newPathTransformMode}"]</div>
+            </div>
+            <div>
+                <label>
+                    @_strings["Value"]:
+                    <input type="text" @bind="_newPathTransformString" />
+                </label>
+                <div class="help-text">@_strings[$"Help_PathTransform{_newPathTransformMode}Value"]</div>
+            </div>
+            <button type="submit">@_strings["Add"]</button>
+        </div>
+    </form>
+
+    @{
+        var pathTransforms = Route.Transforms.OfType<ProxyRoutePathTransform>();
+    }
+    @if (!pathTransforms.Any()) {
+        <div class="empty">@_strings["Transforms_Empty"]</div>
+    } else {
+        <table>
+            <thead>
+                <tr>
+                    <th>@_strings["Operation"]</th>
+                    <th>@_strings["Value"]</th>
+                    <th class="action">@_strings["Remove"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var transform in pathTransforms) {
+                    <tr>
+                        <td>@_strings[$"PathTransformMode_{transform.PathMode.Mode}"]</td>
+                        <td>@transform.PathString</td>
+                        <td class="action">
+                            <button class="delete" @onclick="() => RemovePathTransform(transform)">
+                                <Icon Name="x" Size="18px" />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</fieldset>
+
+
+<fieldset>
+    <legend>@_strings["HTTP Method"]</legend>
+    <div class="help-text">@_strings["Help_HttpMethodChange"]</div>
+    <form @onsubmit="AddMethodTransform">
+        <div class="new-transform">
+            <div>
+                <label>
+                    @_strings["From HTTP Method"]:
+                    <input type="text" placeholder="POST" @bind="_newFromHttpMethod" />
+                </label>
+            </div>
+            <div>
+                <label>
+                    @_strings["To HTTP Method"]:
+                    <input type="text" placeholder="PUT" @bind="_newToHttpMethod" />
+                </label>
+            </div>
+            <button type="submit">@_strings["Add"]</button>
+        </div>
+    </form>
+    @{
+        var methodTransforms = Route.Transforms.OfType<ProxyRouteMethodTransform>();
+    }
+    @if (!methodTransforms.Any()) {
+        <div class="empty">@_strings["Transforms_Empty"]</div>
+    } else {
+        <table>
+            <thead>
+                <tr>
+                    <th>@_strings["From HTTP Method"]</th>
+                    <th>@_strings["To HTTP Method"]</th>
+                    <th class="action">@_strings["Remove"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var transform in methodTransforms) {
+                    <tr>
+                        <td>@transform.FromHttpMethod</td>
+                        <td>@transform.ToHttpMethod</td>
+                        <td class="action">
+                            <button class="delete" @onclick="() => RemoveMethodTransform(transform)">
+                                <Icon Name="x" Size="18px" />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</fieldset>
+
+
+<fieldset>
+    <legend>@_strings["Headers"]</legend>
+    <div>
+        <label>
+            @_strings["Host Header"]:
+            <select @bind:get="Route.PreserveHostHeader.ToString()" @bind:set='(b) => Route.PreserveHostHeader = b == "True"'>
+                <option value="False">@_strings["PreserveHost_False"]</option>
+                <option value="True">@_strings["PreserveHost_True"]</option>
+            </select>
+        </label>
+        <div class="help-text">@_strings["Help_PreserveHost"]</div>
+    </div>
+    <PageDivider />
+    <div>
+        <label>
+            @_strings["Incoming Headers"]:
+            <select @bind:get="@(Route.AllowedHeaders != null ? "Custom" : Route.PreserveClientHeaders.ToString())" @bind:set='SetClientHeaderMode'>
+                <option value="True">@_strings["CopyHeaders_True"]</option>
+                <option value="False">@_strings["CopyHeaders_False"]</option>
+                <option value="Custom">@_strings["CopyHeaders_Custom"]</option>
+            </select>
+        </label>
+        <div class="help-text">@_strings["Help_CopyHeaders"]</div>
+    </div>
+    @if (Route.AllowedHeaders != null) {
+        <form @onsubmit="AddAllowedHeader">
+            <div class="new-value">
+                <InputText @bind-Value="_newAllowedHeader" placeholder="Authorization" />
+                <button type="submit">@_strings["Add"]</button>
+            </div>
+        </form>
+        @if (Route.AllowedHeaders.Count == 0) {
+            <ul><li>@_strings["None"]</li></ul>
+        } else {
+            <ul>
+                @foreach (var header in Route.AllowedHeaders) {
+                    <li>
+                        @header
+                        <button @onclick="() => RemoveAllowedHeader(header)">
+                            <Icon Name="x" Size="18px" />
+                        </button>
+                    </li>
+                }
+            </ul>
+        }
+    }
+    <PageDivider />
+    <div>
+        X-Forwarded Headers:
+    </div>
+    <div class="x-forwarded">
+        <div>@_strings["Change Prefix"]</div>
+        <div>For</div>
+        <div>Proto</div>
+        <div>Host</div>
+        <div>Prefix</div>
+        
+        <div>
+            <input type="text" placeholder="@ProxyRoute.DEFAULT_XFORWARDED_PREFIX" @bind="Route.XForwardedPrefix" />
+        </div>
+        <div>
+            <select @bind:get="Route.XForwardedForAction?.Action ?? ForwardedTransformAction.Constants.Set" @bind:set="(a) => Route.XForwardedForAction = ForwardedTransformAction.FromString(a)">
+                @foreach (var action in ForwardedTransformAction.Actions) {
+                    <option value="@action.Action">@_strings[$"ForwardedTransformAction_{action.Action}"]</option>
+                }
+            </select>
+        </div>
+        <div>
+            <select @bind:get="Route.XForwardedProtoAction?.Action ?? ForwardedTransformAction.Constants.Set" @bind:set="(a) => Route.XForwardedProtoAction = ForwardedTransformAction.FromString(a)">
+                @foreach (var action in ForwardedTransformAction.Actions) {
+                    <option value="@action.Action">@_strings[$"ForwardedTransformAction_{action.Action}"]</option>
+                }
+            </select>
+        </div>
+        <div>
+            <select @bind:get="Route.XForwardedHostAction?.Action ?? ForwardedTransformAction.Constants.Set" @bind:set="(a) => Route.XForwardedHostAction = ForwardedTransformAction.FromString(a)">
+                @foreach (var action in ForwardedTransformAction.Actions) {
+                    <option value="@action.Action">@_strings[$"ForwardedTransformAction_{action.Action}"]</option>
+                }
+            </select>
+        </div>
+        <div>
+            <select @bind:get="Route.XForwardedPrefixAction?.Action ?? ForwardedTransformAction.Constants.Set" @bind:set="(a) => Route.XForwardedPrefixAction = ForwardedTransformAction.FromString(a)">
+                @foreach (var action in ForwardedTransformAction.Actions) {
+                    <option value="@action.Action">@_strings[$"ForwardedTransformAction_{action.Action}"]</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <PageDivider />
+    <div class="help-text">@_strings["Help_HeaderTransforms"]</div>
+    <form @onsubmit="AddHeaderTransform">
+        <div class="new-transform">
+            <div>
+                <label>
+                    @_strings["Operation"]
+                    <select @bind="_newHeaderTransformOperation">
+                        @foreach (var operation in HeaderTransformOperation.HeaderTransformOperations) {
+                            <option value="@operation.Operation">@_strings[$"HeaderTransformOperation_{operation.Operation}"]</option>
+                        }
+                    </select>
+                </label>
+                <div class="help-text">@_strings[$"Help_HeaderTransform{_newHeaderTransformOperation}"]</div>
+            </div>
+            <div>
+                <label>
+                    @_strings["Header Name"]:
+                    <input type="text" @bind="_newHeaderTransformHeaderName" />
+                </label>
+                <div class="help-text">@_strings["Help_HeaderTransformHeaderName"]</div>
+            </div>
+            @if (_newHeaderTransformOperation != HeaderTransformOperation.Remove.Operation) {
+                <div>
+                    @if (
+                        _newHeaderTransformOperation == HeaderTransformOperation.RouteSet.Operation
+                        || _newHeaderTransformOperation == HeaderTransformOperation.RouteAppend.Operation
+                    ) {
+                        <label>
+                            @_strings["Path Variable"]:
+                            <input type="text" placeholder="@Route.GetPathVariable()" @bind="_newHeaderTransformHeaderValue" />
+                        </label>
+                        <div class="help-text">@_strings[$"Help_HeaderTransformRouteValue"]</div>
+                    } else {
+                        <label>
+                            @_strings["Header Value"]:
+                            <input type="text" @bind="_newHeaderTransformHeaderValue" />
+                        </label>
+                        <div class="help-text">@_strings[$"Help_HeaderTransform{_newHeaderTransformOperation}Value"]</div>
+                    }
+                </div>
+            }
+            <button type="submit">@_strings["Add"]</button>
+        </div>
+    </form>
+    @{
+        var headerTransforms = Route.Transforms.OfType<ProxyRouteHeaderTransform>();
+    }
+    @if (!headerTransforms.Any()) {
+        <div class="empty">@_strings["Transforms_Empty"]</div>
+    } else {
+        <table>
+            <thead>
+                <tr>
+                    <th>@_strings["Operation"]</th>
+                    <th>@_strings["Header Name"]</th>
+                    <th>@_strings["Value"]</th>
+                    <th class="action">@_strings["Remove"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var transform in headerTransforms) {
+                    <tr>
+                        <td>@_strings[$"HeaderTransformOperation_{transform.HeaderOperation.Operation}"]</td>
+                        <td>@transform.HeaderName</td>
+                        <td>@transform.HeaderValue</td>
+                        <td class="action">
+                            <button class="delete" @onclick="() => RemoveHeaderTransform(transform)">
+                                <Icon Name="x" Size="18px" />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</fieldset>
+
+
+<fieldset>
+    <legend>@_strings["Query String"]</legend>
+    <div class="help-text">@_strings["Help_QueryTransforms"]</div>
+    <form @onsubmit="AddQueryTransform">
+        <div class="new-transform">
+            <div>
+                <label>
+                    @_strings["Operation"]
+                    <select @bind="_newQueryTransformOperation">
+                        @foreach (var operation in QueryTransformOperation.QueryTransformOperations) {
+                            <option value="@operation.Operation">@_strings[$"QueryTransformOperation_{operation.Operation}"]</option>
+                        }
+                    </select>
+                </label>
+                <div class="help-text">@_strings[$"Help_QueryTransform{_newQueryTransformOperation}"]</div>
+            </div>
+            <div>
+                <label>
+                    @_strings["Query Key"]:
+                    <input type="text" @bind="_newQueryTransformQueryKey" />
+                </label>
+                <div class="help-text">@_strings["Help_QueryTransformQueryKey"]</div>
+            </div>
+            @if (_newQueryTransformOperation != QueryTransformOperation.Remove.Operation) {
+                <div>
+                    @if (
+                        _newQueryTransformOperation == QueryTransformOperation.RouteSet.Operation
+                        || _newQueryTransformOperation == QueryTransformOperation.RouteAppend.Operation
+                    ) {
+                        <label>
+                            @_strings["Path Variable"]:
+                            <input type="text" placeholder="@Route.GetPathVariable()" @bind="_newQueryTransformQueryValue" />
+                        </label>
+                        <div class="help-text">@_strings[$"Help_QueryTransformRouteValue"]</div>
+                    } else {
+                        <label>
+                            @_strings["Query Value"]:
+                            <input type="text" @bind="_newQueryTransformQueryValue" />
+                        </label>
+                        <div class="help-text">@_strings[$"Help_QueryTransform{_newQueryTransformOperation}Value"]</div>
+                    }
+                </div>
+            }
+            <button type="submit">@_strings["Add"]</button>
+        </div>
+    </form>
+    @{
+        var queryTransforms = Route.Transforms.OfType<ProxyRouteQueryTransform>();
+    }
+    @if (!queryTransforms.Any()) {
+        <div class="empty">@_strings["Transforms_Empty"]</div>
+    } else {
+        <table>
+            <thead>
+                <tr>
+                    <th>@_strings["Operation"]</th>
+                    <th>@_strings["Query Key"]</th>
+                    <th>@_strings["Value"]</th>
+                    <th class="action">@_strings["Remove"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var transform in queryTransforms) {
+                    <tr>
+                        <td>@_strings[$"QueryTransformOperation_{transform.QueryOperation.Operation}"]</td>
+                        <td>@transform.QueryKey</td>
+                        <td>@transform.QueryValue</td>
+                        <td class="action">
+                            <button class="delete" @onclick="() => RemoveQueryTransform(transform)">
+                                <Icon Name="x" Size="18px" />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired]
+    public ProxyRoute Route { get; set; }
+}

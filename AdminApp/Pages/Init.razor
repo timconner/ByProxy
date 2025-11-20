@@ -1,0 +1,73 @@
+﻿@page "/init"
+@attribute [AllowAnonymous]
+
+@layout AuthLayout
+
+@inject ConfigurationService _config;
+@inject AuthService _auth;
+@inject NavigationManager _nav
+@inject IStringLocalizer<Language> _strings
+
+<EditForm Model="_input" OnSubmit="CreateAccount">
+    <div class="auth-header">
+        <div class="auth-title">
+            @_strings["CreateInitialAccount"]
+        </div>
+        <hr />
+    </div>
+    <label>
+        <span>@_strings["Full Name"]:</span>
+        <InputText aria-required="true" @bind-Value="_input.Name" placeholder="@_strings["Full Name"]" />
+    </label>
+    <label>
+        <span>@_strings["Display Name"]:</span>
+        <InputText aria-required="true" @bind-Value="_input.DisplayName" placeholder="@_strings["Display Name"]" />
+    </label>
+    <label>
+        <span>@_strings["Username"]:</span>
+        <InputText aria-required="true" @bind-Value="_input.Username" placeholder="@_strings["Username"]" />
+    </label>
+    <label>
+        <span>@_strings["Password"]:</span>
+        <InputText type="password" autocomplete="new-password" aria-required="true" @bind-Value="_input.Password" placeholder="@_strings["Password"]" />
+    </label>
+    <div class="bottom">
+        <div class="error">@_errorMessage</div>
+        <button type="submit">@_strings["Create"]</button>
+    </div>
+</EditForm>
+
+@code {
+    private string? _errorMessage;
+
+    private InputModel _input = new();
+    private sealed class InputModel {
+        [Required]
+        public string Name { get; set; } = string.Empty;
+
+        [Required]
+        public string DisplayName { get; set; } = string.Empty;
+
+        [Required]
+        public string Username { get; set; } = string.Empty;
+
+        [Required]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = string.Empty;
+    }
+
+    protected override async Task OnInitializedAsync() {
+        if (await _config.CheckAdminInitialized()) {
+            _nav.NavigateTo("/", true);
+        }
+    }
+
+    private async Task CreateAccount() {
+        var error = await _auth.CreateInitialAdmin(_input.Name, _input.DisplayName, _input.Username, _input.Password);
+        if (error == null) {
+            _nav.NavigateTo("/login", true);
+        } else {
+            _errorMessage = _strings[error];
+        }
+    }
+}

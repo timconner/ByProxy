@@ -1,0 +1,15 @@
+.cert-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.cert-fields label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.cert-fields label span {
+    margin-left: 6px;
+}

@@ -1,0 +1,89 @@
+﻿@page "/acme"
+
+@inject IStringLocalizer<Language> _strings
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject AcmeClientService _acmeClient
+@inject CertificateService _certService
+@inject ModalService _modal
+@inject NavigationManager _nav
+
+<PageHeader Title="@_strings["ACME Accounts"]">
+    <Toggle IsOn="_showHiddenAccounts" FieldLabel="@_strings["Show"]" OffLabel="@_strings["Active"]" OnLabel="@_strings["Hidden"]" ToggleHandler="ShowInactiveToggled" />
+    <AuthorizeView Roles="@AuthRoles.Editor">
+        <PageHeaderLink href="/acme/create-account" Icon="lock-plus" Label="@_strings["Create Account"]" />
+    </AuthorizeView>
+</PageHeader>
+
+<PageContent>
+    @if (_acmeAccounts == null) {
+        <LoadingIndicator />
+        return;
+    }
+
+    @if (_acmeAccounts.Count == 0) {
+        <div class="empty">@_strings["No ACME Accounts"]</div>
+        return;
+    }
+
+    @foreach (var accountInfo in _acmeAccounts) {
+        <fieldset>
+            <legend>@accountInfo.Account.Name</legend>
+            <div class="acme-account">
+                <div class="details">
+                    <LabelValuePairs>
+                        <LabelValuePair Label="@_strings["Provider"]" Value="@accountInfo.Provider.Name" />
+                        <LabelValuePair Label="@_strings["Account Url"]" Value="@accountInfo.Account.Url" />
+                    </LabelValuePairs>
+                </div>
+                <div class="actions">
+                    <AuthorizeView Roles="@AuthRoles.Editor">
+                        @if (_showHiddenAccounts) {
+                            <button @onclick="() => ReactivateAccount(accountInfo)">
+                                <Icon Size="18px" Name="eye-check" />
+                                @_strings["Reactivate Account"]
+                            </button>
+                        } else {
+                            <a class="button" href="@($"/acme/request/{accountInfo.Account.Id}")">
+                                <Icon Size="18px" Name="script-plus" />
+                                @_strings["Request Certificate"]
+                            </a>
+                            @* <button @onclick="() => PostAsGetTest(accountInfo)">
+                                Troubleshoot
+                            </button> *@
+                            <button @onclick="() => HideAccount(accountInfo)">
+                                <Icon Size="18px" Name="eye-off" />
+                                @_strings["Hide Account"]
+                            </button>
+                        }
+                    </AuthorizeView>
+                </div>
+            </div>
+            <PageDivider Label="Issued Certificates" />
+            @{
+                var showHiddenCerts = _showHiddenAccounts || _showInactiveCerts.Contains(accountInfo.Account.Id);
+                var accountCerts = _showHiddenAccounts ? accountInfo.IssuedCerts : accountInfo.IssuedCerts.Where(_ => _.Metadata.Hidden == showHiddenCerts);
+            }
+            @if (!_showHiddenAccounts) {
+                <div class="active-toggle">
+                    <Toggle IsOn="showHiddenCerts" FieldLabel="@_strings["Show"]" OffLabel="@_strings["Active"]" OnLabel="@_strings["Hidden"]" ToggleHandler="(b) => ToggleAccountCerts(accountInfo, b)" />
+                </div>
+            }
+            @if (!accountCerts.Any()) {
+                <div class="empty">@_strings["No Certificates"]</div>
+            } else {
+                <AuthorizeView Roles="@AuthRoles.Editor">
+                    <Authorized>
+                        @if (_showHiddenAccounts) {
+                            <CertInfoTable Certificates="accountCerts" />
+                        } else {
+                            <CertInfoTable Certificates="accountCerts" OnEdit="EditCert" OnHiddenToggle="ChangeCertVisibility" />
+                        }
+                    </Authorized>
+                    <NotAuthorized>
+                        <CertInfoTable Certificates="accountCerts" />
+                    </NotAuthorized>
+                </AuthorizeView>
+            }
+        </fieldset>
+    }
+</PageContent>

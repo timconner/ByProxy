@@ -1,0 +1,15 @@
+﻿<a class="button" href="@href">
+    <Icon Size="20px" Name="@Icon" />
+    <span>@Label</span>
+</a>
+
+@code {
+    [Parameter]
+    public string? href { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+}

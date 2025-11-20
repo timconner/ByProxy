@@ -1,0 +1,7 @@
+dl {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-gap: 6px;
+    width: fit-content;
+    margin: unset;
+}

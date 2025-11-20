@@ -1,0 +1,24 @@
+legend {
+    font-weight: bold;
+}
+
+.ca {
+    display: flex;
+    justify-content: space-between;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.active-toggle {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.empty {
+    color: var(--disabled-text-color);
+    text-align: center;
+}

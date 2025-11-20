@@ -1,0 +1,11 @@
+﻿a {
+    color: inherit;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+a:hover {
+    color: var(--hover-text-color);
+}

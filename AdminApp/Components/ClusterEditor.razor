@@ -1,0 +1,125 @@
+﻿@inject IStringLocalizer<Language> _strings
+@inject ModalService _modal
+@inject IJSRuntime _js
+
+<fieldset>
+    <legend>@_strings["Description"]</legend>
+    <div class="description">
+        <div>@_strings["Name"]:</div>
+        <div class="name">
+            <input type="text" name="name" @bind="Cluster.Name" maxlength="20" />
+            <div class="help-text">@_strings["Help_NameDescription"]</div>
+        </div>
+        <div>@_strings["Description"]:</div>
+        <input type="text" name="description" @bind="Cluster.Description" />
+    </div>
+</fieldset>
+
+<fieldset class="destinations">
+    <legend>@_strings["Destinations"]</legend>
+    <form @onsubmit="AddDestination">
+        <div class="new-destination">
+            <div class="label">@_strings["Destination Name"]:</div>
+            <input type="text" name="new-name" @bind="_newName" placeholder="Primary" />
+            <div class="help-text">@_strings["Help_DestinationName"]</div>
+
+            <div class="label">@_strings["Destination Address"]:</div>
+            <input type="text" name="new-destination" @bind="_newDestination" placeholder="https://10.20.30.40:5001/app" />
+            <div class="help-text">@_strings["Help_DestinationAddress"]</div>
+
+            <div class="label">@_strings["Health Check Address"]:</div>
+            <input type="text" name="new-health-check" @bind="_newHealthCheck" placeholder="http://10.20.30.40:5000/app/status" />
+            <div class="help-text">@_strings["Help_HealthAddress"]</div>
+
+            <button type="submit">@_strings["Add"]</button>
+        </div>
+    </form>
+    @if (Cluster.Destinations.Count == 0) {
+        <div class="empty">@_strings["Destinations_Empty"]</div>
+    }
+    <table style ="@(Cluster.Destinations.Count == 0 ? "display:none" : null)">
+        <thead>
+            <tr>
+                <th></th>
+                <th>@_strings["Name"]</th>
+                <th>@_strings["Destination Address"]</th>
+                <th>@_strings["Health Check Address"]</th>
+                <th class="action">@_strings["Remove"]</th>
+            </tr>
+        </thead>
+        <tbody @ref="_tbody">
+            @foreach (var destination in Cluster.Destinations) {
+                <tr>
+                    <td class="drag-handle">
+                        <Icon Name="grip-vertical" Size="16px" />
+                    </td>
+                    <td>@destination.Name</td>
+                    <td class="monospace">@destination.Address</td>
+                    <td class="monospace">@destination.Health</td>
+                    <td class="action">
+                        <button class="delete" @onclick="() => RemoveDestination(destination)">
+                            <Icon Name="x" Size="18px" />
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</fieldset>
+
+@{
+    bool multiDestination = IsMultiDestination;
+    bool httpsPresent = IsHttpsPresent;
+}
+
+<fieldset>
+    <legend>@_strings["Multi-Destination Options"]</legend>
+    <div class="@(multiDestination ? "load-balancing" : "load-balancing disabled")">
+        <label>
+            @_strings["Load Balancing Policy"]:
+            @if (!multiDestination) {
+                <select disabled><option>@CurrentOrDefaultLbp.Policy</option></select>
+            } else {
+                <select @bind:get="CurrentOrDefaultLbp.Policy"
+                        @bind:set="(policy) => Cluster.LoadBalancing = LoadBalancingPolicy.FromString(policy) ?? _defaultLbp">
+                    @foreach (var policy in LoadBalancingPolicy.AllPolicies) {
+                        <option value="@policy.Policy">@_strings[$"LBP_{policy.Policy}"]</option>
+                    }
+                </select>
+            }
+        </label>
+        <div class="help-text">@_strings[$"Help_{CurrentOrDefaultLbp.Policy}"]</div>
+    </div>
+
+    <div class="@(multiDestination ? "affinity" : "affinity disabled")">
+        <label>
+            @if (multiDestination) {
+                <input type="checkbox" name="session-affinity" @bind="Cluster.StickySessions" />
+            } else {
+                <input type="checkbox" name="session-affinity" disabled />
+            }
+            Sticky Sessions
+        </label>
+        <div class="help-text">@_strings["Help_StickySessions"]</div>
+    </div>
+</fieldset>
+
+<fieldset>
+    <legend>@_strings["Connection Options"]</legend>
+    <div class="@(httpsPresent ? "https-validation" : "https-validation disabled")">
+        <label>
+            @if (httpsPresent) {
+                <input type="checkbox" name="https-validation" @bind="Cluster.AcceptAnyCert" />
+            } else {
+                <input type="checkbox" name="https-validation" disabled />
+            }
+            @_strings["Disable Destination Certificate Validation"]
+        </label>
+        <div class="help-text">@_strings["Help_DisableDestinationCertificateValidation"]</div>
+    </div>
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired]
+    public ProxyCluster Cluster { get; set; }
+}

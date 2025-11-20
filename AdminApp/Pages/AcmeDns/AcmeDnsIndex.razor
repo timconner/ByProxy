@@ -1,0 +1,73 @@
+﻿@page "/acme/dns"
+@attribute [Authorize(Roles = AuthRoles.Admin)]
+@inject IStringLocalizer<Language> _strings
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ModalService _modal
+@inject NavigationManager _nav
+
+<PageHeader Title="@_strings["ACME DNS Providers"]">
+    <PageHeaderButton Icon="square-plus" Label="@_strings["Create"]" @onclick="CreateProvider" />
+</PageHeader>
+
+<PageContent>
+    @if (_dnsProviders == null) {
+        <LoadingIndicator />
+        return;
+    }
+
+    @if (_dnsProviders.Count == 0) {
+        <div class="empty">
+            @_strings["No DNS Providers"]
+            <br /><br />
+            @_strings["Help_ClickCreate"] <Icon Name="arrow-up-right" />
+        </div>
+        return;
+    } else {
+        <table>
+            <thead>
+                <tr>
+                    <th>@_strings["Name"]</th>
+                    <th>@_strings["Hosts"]</th>
+                    <AuthorizeView Roles="@AuthRoles.Editor">
+                        <th class="action">@_strings["Edit"]</th>
+                        <th class="action">@_strings["Rename"]</th>
+                        <th class="action">@_strings["Delete"]</th>
+                    </AuthorizeView>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var provider in _dnsProviders) {
+                    <tr>
+                        <td>@provider.Name</td>
+                        <td class="monospace">
+                            @if (provider.Hosts.Count == 0) {
+                                <Icon Name="line-dashed" Color="var(--disabled-text-color)" />
+                            } else {
+                                @foreach (var host in provider.Hosts) {
+                                    <div>@host</div>
+                                }
+                            }
+                        </td>
+                        <AuthorizeView Roles="@AuthRoles.Editor">
+                            <td class="action">
+                                <button class="action" title="@_strings["Edit"]" @onclick="() => EditProvider(provider)">
+                                    <Icon Name="pencil-code" Size="18px" />
+                                </button>
+                            </td>
+                            <td class="action">
+                                <button class="action" title="@_strings["Rename"]" @onclick="() => RenameProvider(provider)">
+                                    <Icon Name="signature" Size="18px" />
+                                </button>
+                            </td>
+                            <td class="action">
+                                <button class="delete" title="@_strings["Delete"]" @onclick="() => DeleteProvider(provider)">
+                                    <Icon Name="trash" Size="18px" />
+                                </button>
+                            </td>
+                        </AuthorizeView>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</PageContent>

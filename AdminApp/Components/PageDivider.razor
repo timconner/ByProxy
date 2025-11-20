@@ -1,0 +1,31 @@
+﻿<div class="page-divider" style="@GetStyle()">@Label</div>
+
+@code {
+    [Parameter]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    public bool FullWidthDivider { get; set; } = false;
+
+    [Parameter]
+    public string? MarginTop { get; set; }
+
+    [Parameter]
+    public string? MarginBottom { get; set; }
+
+    [Parameter]
+    public string? FontSize { get; set; }
+
+    [Parameter]
+    public string? FontWeight { get; set; }
+
+    private string GetStyle() {
+        string style = string.Empty;
+        if (MarginTop != null) style += $"margin-top:{MarginTop};";
+        if (MarginBottom != null) style += $"margin-bottom:{MarginBottom};";
+        if (FullWidthDivider) style += "margin-left:-16px;margin-right:-16px;";
+        if (FontSize != null) style += $"font-size:{FontSize};";
+        if (FontWeight != null) style += $"font-weight:{FontWeight};";
+        return style;
+    }
+}

@@ -1,0 +1,15 @@
+﻿<div class="button" @onclick=onclick>
+    <Icon Size="20px" Name="@Icon" />
+    <span>@Label</span>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<MouseEventArgs> onclick { get; set; }
+
+    [Parameter]
+    public string? Icon { get; set; }
+
+    [Parameter]
+    public string? Label { get; set; }
+}

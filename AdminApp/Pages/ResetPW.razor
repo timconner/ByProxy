@@ -1,0 +1,66 @@
+﻿@page "/reset-pw"
+@layout AuthLayout
+@attribute [AllowAnonymous]
+
+@inject AuthService _auth;
+@inject NavigationManager _nav;
+@inject IStringLocalizer<Language> _strings
+
+<EditForm Model="_input" method="post" OnSubmit="ResetUserPassword" FormName="reset-pw">
+    <div class="auth-header">
+        <div class="auth-title">
+            @_strings["Reset Password"]
+        </div>
+        <hr />
+    </div>
+    <label>
+        <span>@_strings["Username"]:</span>
+        <InputText @bind-Value="_input.Username" autocomplete="username" aria-required="true" placeholder="@_strings["Username"]" />
+    </label>
+    <label>
+        <span>@_strings["Current Password"]:</span>
+        <InputText type="password" @bind-Value="_input.OldPassword" autocomplete="current-password" aria-required="true" placeholder="@_strings["Current Password"]" />
+    </label>
+    <label>
+        <span>@_strings["New Password"]</span>
+        <InputText type="password" @bind-Value="_input.NewPassword" autocomplete="new-password" aria-required="true" placeholder="@_strings["New Password"]" />
+    </label>
+    <label>
+        <span>@_strings["Confirm Password"]:</span>
+        <InputText type="password" @bind-Value="_input.ConfirmPassword" autocomplete="new-password" aria-required="true" placeholder="@_strings["Confirm Password"]" />
+    </label>
+    <div class="bottom">
+        <button type="submit">@_strings["Change Password"]</button>
+        @if(_errorMessage != null) { <div class="error">@_errorMessage</div> }
+    </div>
+</EditForm>
+
+@code {
+    private string? _errorMessage;
+
+    private sealed class InputModel {
+        [Required]
+        public string Username { get; set; } = string.Empty;
+
+        [DataType(DataType.Password)]
+        public string OldPassword { get; set; } = string.Empty;
+
+        [Required]
+        public string NewPassword { get; set; } = string.Empty;
+
+        [DataType(DataType.Password)]
+        public string ConfirmPassword { get; set; } = string.Empty;
+    }
+
+    [SupplyParameterFromForm]
+    private InputModel _input { get; set; } = new();
+
+    public async Task ResetUserPassword() {
+        var error = await _auth.TryResetPassword(_input.Username, _input.OldPassword, _input.NewPassword, _input.ConfirmPassword);
+        if (error == null) {
+            _nav.NavigateTo("/login");
+        } else {
+            _errorMessage = _strings[error];
+        }
+    }
+}

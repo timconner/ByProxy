@@ -1,0 +1,21 @@
+﻿@implements IDisposable
+@inject AuthService _auth
+@inject BlazorSessionService _blazorSessions
+@inject NavigationManager _nav
+
+@code {
+    private Guid? _registrationId;
+
+    protected override void OnInitialized() {
+        var userId = _auth.GetUserId();
+        if (userId != null) _registrationId = _blazorSessions.RegisterSessionInvalidationHandler(userId.Value, SessionInvalidated);
+    }
+
+    private void SessionInvalidated() {
+        _nav.NavigateTo("/login", true);
+    }
+
+    public void Dispose() {
+        if (_registrationId != null) _blazorSessions.UnregisterSessionInvalidationHandler(_registrationId.Value);
+    }
+}

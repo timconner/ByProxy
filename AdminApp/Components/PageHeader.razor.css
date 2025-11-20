@@ -1,0 +1,37 @@
+﻿.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 8px 0;
+}
+
+.page-title {
+    display: flex;
+    gap: 6px;
+}
+
+a {
+    color: var(--text-color);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--hover-text-color);
+}
+
+hr {
+    margin: 0;
+}
+
+hr.full-width {
+    margin: 0 -16px;
+}
+
+.links {
+    display: flex;
+    row-gap: 6px;
+    column-gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}

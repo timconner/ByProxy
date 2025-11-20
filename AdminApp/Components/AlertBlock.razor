@@ -1,0 +1,11 @@
+﻿<div class="alert">
+    <Icon Name="alert-square-rounded-filled" />
+    <div>
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

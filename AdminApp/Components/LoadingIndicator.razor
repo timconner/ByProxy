@@ -1,0 +1,18 @@
+﻿<div style="@Style" class="chase">
+    <div class="chase-dot"></div>
+    <div class="chase-dot"></div>
+    <div class="chase-dot"></div>
+    <div class="chase-dot"></div>
+    <div class="chase-dot"></div>
+    <div class="chase-dot"></div>
+</div>
+
+@code {
+    [Parameter]
+    public string Size { get; set; } = "36px";
+
+    [Parameter]
+    public bool AutoMargin { get; set; } = false;
+
+    private string Style => $"width:{Size};height:{Size};{(AutoMargin ? "margin:12px auto;" : "margin:12px")}";
+}

@@ -1,0 +1,55 @@
+﻿@page "/clusters/{ClusterId:guid}"
+@attribute [Authorize(Roles = AuthRoles.Editor)]
+@implements IDisposable
+@inject IStringLocalizer<Language> _strings
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ConfigurationService _config
+@inject ModalService _modal
+@inject NavigationManager _nav
+
+<PageHeader Title="@_strings["Edit Cluster"]">
+    <PageHeaderButton Icon="device-floppy" Label="@_strings["Save"]" @onclick="PerformSave" />
+</PageHeader>
+
+<PageContent>
+    @if (_cluster == null) {
+        <LoadingIndicator />
+    } else {
+        <ClusterEditor Cluster="_cluster" />
+    }
+</PageContent>
+
+@code {
+    [Parameter, EditorRequired]
+    public Guid ClusterId { get; set; }
+
+    private ProxyDb _db = default!;
+    private ProxyCluster? _cluster;
+
+    protected override async Task OnInitializedAsync() {
+        _db = _dbFactory.CreateDbContext();
+        _cluster = await _db.Clusters.FirstAsync(_ => _.Id == ClusterId);
+    }
+
+    private async Task PerformSave() {
+        if (_cluster == null) return;
+
+        var errors = _cluster.GetValidationErrors();
+        if (errors.Count > 0) {
+            await _modal.OkOnly(_strings["Error"], $"{_strings["Validation Errors"]}:\n\n{string.Join("\n- ", errors.Select(e => _strings[e]))}");
+            return;
+        }
+
+        var success = await _modal.PerformSave(async () => {
+            await _db.SaveChangesAsync();
+        });
+        if (success) {
+            _ = _config.UpdateHasChangesPending();
+            _nav.NavigateTo("/clusters");
+        }
+    }
+
+    public void Dispose() {
+        _db?.Dispose();
+    }
+}

@@ -1,0 +1,9 @@
+.active-toggle {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.empty {
+    color: var(--disabled-text-color);
+    text-align: center;
+}

@@ -1,0 +1,101 @@
+﻿@page "/imported-certs/import"
+@attribute [Authorize(Roles = AuthRoles.Editor)]
+@inject IStringLocalizer<Language> _strings
+@inject ModalService _modal
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject NavigationManager _nav
+
+<PageHeader Title="@_strings["Import Certificate"]">
+    <PageHeaderButton Icon="file-download" Label="@_strings["Import"]" @onclick="PerformImport" />
+</PageHeader>
+
+<PageContent>
+    <label>
+        @_strings["Name"]:
+        <input type="text" placeholder="@_strings["Name"]" @bind="_certificateName" />
+    </label>
+    <br /><br />
+    <div class="cert-fields">
+        <label>
+            <span>@_strings["Certificate"]</span>
+            <textarea rows="10" placeholder="@CERTIFICATE_PLACEHOLDER" @bind="_serverCertificate"></textarea>
+        </label>
+
+        <label>
+            <span>@_strings["Private Key"]</span>
+            <textarea rows="8" placeholder="@PRIVATE_KEY_PLACEHOLDER" @bind="_serverPrivateKey"></textarea>
+        </label>
+    </div>
+</PageContent>
+
+@code {
+    private const string CERTIFICATE_PLACEHOLDER = "-----BEGIN CERTIFICATE-----\n\nbase64 encoded certificate data\n\n-----END CERTIFICATE-----\n-----BEGIN CERTIFICATE-----\n\noptional: issuing CA/chain certificate(s)\n\n-----END CERTIFICATE-----";
+    private const string PRIVATE_KEY_PLACEHOLDER = "-----BEGIN PRIVATE KEY-----\n\n\n\n\n\n\n-----END PRIVATE KEY-----";
+
+    private string _certificateName = string.Empty;
+
+    private string _serverCertificate = string.Empty;
+    private string _serverPrivateKey = string.Empty;
+
+    private async Task PerformImport() {
+        if (string.IsNullOrWhiteSpace(_certificateName)) {
+            await _modal.OkOnly(_strings["Error"], _strings["ERR_NameEmpty"]);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_serverCertificate)) {
+            await _modal.OkOnly(_strings["Error"], _strings["ERR_ServerCertificateRequired"]);
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_serverPrivateKey)) {
+            await _modal.OkOnly(_strings["Error"], _strings["ERR_PrivateKeyRequired"]);
+            return;
+        }
+
+        X509Certificate2Collection? serverCert = null;
+        try {
+            try {
+                serverCert = Certificates.ImportPemChainAndKey(_serverCertificate, _serverPrivateKey);
+            } catch (Exception ex) {
+                await _modal.OkOnly(_strings["Error"], $"{_strings["ERR_InvalidServerCert"]}\n\n{ex.Message}");
+                return;
+            }
+
+            bool hasServerAuth = false;
+            foreach (var ext in serverCert[0].Extensions) {
+                if (ext is X509EnhancedKeyUsageExtension eku) {
+                    foreach (Oid oid in eku.EnhancedKeyUsages) {
+                        // Has Server Authentication or Any Use EKU
+                        if (oid.Value == "1.3.6.1.5.5.7.3.1") {
+                            hasServerAuth = true;
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+
+            if (!hasServerAuth) {
+                await _modal.OkOnly(_strings["Error"], _strings["ERR_CertDoesNotHaveServerAuthEKU"]);
+                return;
+            }
+
+            var success = await _modal.PerformSave(async () => {
+                using var db = _dbFactory.CreateDbContext();
+                await using var transaction = await db.Database.BeginTransactionAsync();
+                var entry = db.ImportedCerts.Add(new ImportedCert {
+                    Name = _certificateName
+                });
+                await db.SaveChangesAsync();
+
+                Certificates.ExportCertToDisk(entry.Entity.Id, serverCert);
+                await transaction.CommitAsync();
+            });
+
+            if (success) _nav.NavigateTo("/imported-certs");
+        } finally {
+            serverCert?.DisposeCollection();
+        }
+    }
+}
