@@ -7,6 +7,7 @@
 
         public string Name { get; set; }
         public string Description { get; set; }
+        public bool Disabled { get; set; }
 
         public int Order { get; set; }
 
@@ -230,6 +231,7 @@
                 ConfigRevision = newRevision,
                 Name = Name,
                 Description = Description,
+                Disabled = Disabled,
                 Order = Order,
                 ResponseType = ResponseType,
                 ClusterId = ClusterId,
@@ -261,6 +263,7 @@
                 Id = Id,
                 Name = Name,
                 Description = Description,
+                Disabled = Disabled,
                 Order = Order,
                 ResponseType = ResponseType.Type,
                 ClusterId = ClusterId,

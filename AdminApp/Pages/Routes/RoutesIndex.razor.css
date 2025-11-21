@@ -1,3 +1,7 @@
+tr.disabled {
+    color: var(--disabled-text-color);
+}
+
 .empty {
     display: flex;
     align-items: center;

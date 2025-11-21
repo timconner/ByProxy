@@ -104,6 +104,24 @@ public partial class RoutesIndex : IDisposable {
         _nav.NavigateTo($"/routes/{route.Id}");
     }
 
+    private async Task EnableRoute(ProxyRoute route) {
+        var success = await _modal.PerformProcessing(async () => {
+            route.Disabled = false;
+            await _db.SaveChangesAsync();
+        });
+        _ = _config.UpdateHasChangesPending();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task DisableRoute(ProxyRoute route) {
+        var success = await _modal.PerformProcessing(async () => {
+            route.Disabled = true;
+            await _db.SaveChangesAsync();
+        });
+        _ = _config.UpdateHasChangesPending();
+        await InvokeAsync(StateHasChanged);
+    }
+
     private async Task CloneRoute(ProxyRoute route) {
         var result = await _modal.SingleValue(_strings["Clone Route"], _strings["CloneRoutePrompt"], route.Name);
         if (result.DialogResult != DialogResult.OK) return;

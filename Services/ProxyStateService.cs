@@ -60,6 +60,9 @@
             foreach (var error in RunningConfig.Errors) {
                 _logger.LogError(error);
             }
+            foreach (var warning in RunningConfig.Warnings) {
+                _logger.LogWarning(warning);
+            }
         }
 
         public void UpdateCandidateRevision(int newCandidateRevision) {

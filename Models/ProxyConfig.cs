@@ -33,12 +33,18 @@ namespace ByProxy.Models {
         }
 
         public RunningConfig AsRunningConfig() {
+            var warnings = new List<string>();
             var errors = new List<string>();
             var httpPorts = new HashSet<int>();
             var httpsPorts = new HashSet<int>();
             var validRoutes = new List<ProxyRoute>();
             var nonClusterRoutes = new Dictionary<string, NonClusterRoute>();
             foreach (var route in Routes) {
+                if (route.Disabled) {
+                    warnings.Add($"Route {route.Name} is administratively disabled.");
+                    continue;
+                }
+
                 var error = false;
                 if (route.HttpPort != null) {
                     if (route.HttpPort == AdminPort) {
@@ -57,32 +63,30 @@ namespace ByProxy.Models {
                     }
                 }
 
-                if (!error) {
-                    switch (route.ResponseType.Type) {
-                        case RouteResponseType.Constants.Redirect:
-                            if (route.HttpStatusCode == null || route.RedirectLocation == null) {
-                                errors.Add($"Route {route.Name} ejected. Missing required properties for a redirect route.");
-                                error = true;
-                            } else {
-                                nonClusterRoutes.Add(route.Id.ToString(), new RedirectRoute {
-                                    RedirectStatus = route.HttpStatusCode.Value,
-                                    RedirectLocation = route.RedirectLocation 
-                                });
-                            }
-                            break;
-                        case RouteResponseType.Constants.Status:
-                        case RouteResponseType.Constants.Tarpit:
-                            if (route.HttpStatusCode == null) {
-                                errors.Add($"Route {route.Name} ejected. Missing required properties for a redirect route.");
-                                error = true;
-                            } else {
-                                nonClusterRoutes.Add(route.Id.ToString(), new StatusResponseRoute {
-                                    HttpStatusCode = route.HttpStatusCode.Value,
-                                    UseTarpit = route.ResponseType == RouteResponseType.Tarpit
-                                });
-                            }
-                            break;
-                    }
+                switch (route.ResponseType.Type) {
+                    case RouteResponseType.Constants.Redirect:
+                        if (route.HttpStatusCode == null || route.RedirectLocation == null) {
+                            errors.Add($"Route {route.Name} ejected. Missing required properties for a redirect route.");
+                            error = true;
+                        } else {
+                            nonClusterRoutes.Add(route.Id.ToString(), new RedirectRoute {
+                                RedirectStatus = route.HttpStatusCode.Value,
+                                RedirectLocation = route.RedirectLocation 
+                            });
+                        }
+                        break;
+                    case RouteResponseType.Constants.Status:
+                    case RouteResponseType.Constants.Tarpit:
+                        if (route.HttpStatusCode == null) {
+                            errors.Add($"Route {route.Name} ejected. Missing required properties for a redirect route.");
+                            error = true;
+                        } else {
+                            nonClusterRoutes.Add(route.Id.ToString(), new StatusResponseRoute {
+                                HttpStatusCode = route.HttpStatusCode.Value,
+                                UseTarpit = route.ResponseType == RouteResponseType.Tarpit
+                            });
+                        }
+                        break;
                 }
 
                 if (!error) validRoutes.Add(route);
@@ -116,6 +120,7 @@ namespace ByProxy.Models {
                 Revision = Revision,
                 ConfigHash = GenerateConfigHash(),
                 CommittedAt = CommittedAt ?? DateTime.MinValue,
+                Warnings = warnings.ToImmutableArray(),
                 Errors = errors.ToImmutableArray(),
                 AdminListenAny = AdminListenAny,
                 AdminPort = AdminPort,

@@ -44,13 +44,14 @@
                     <th class="action"></th>
                     <th class="action"></th>
                     <th class="action"></th>
+                    <th class="action"></th>
                 </AuthorizeView>
             </tr>
         </thead>
         <tbody @ref="_tbody">
             @if (_routes != null && _clusterNames != null) {
                 @foreach (var route in _routes) {
-                    <tr>
+                    <tr class="@(route.Disabled ? "disabled" : null)">
                         <AuthorizeView Roles="@AuthRoles.Editor">
                             <td class="drag-handle">
                                 <Icon Name="grip-vertical" Size="16px" />
@@ -87,6 +88,17 @@
                                 <button class="edit" title="@_strings["Edit"]" @onclick="() => EditRoute(route)">
                                     <Icon Name="pencil" Size="18px" />
                                 </button>
+                            </td>
+                            <td class="action">
+                                @if (route.Disabled) {
+                                    <button class="clone" title="@_strings["Enable"]" @onclick="() => EnableRoute(route)">
+                                        <Icon Name="power" Size="18px" />
+                                    </button>
+                                } else {
+                                    <button class="clone" title="@_strings["Disable"]" @onclick="() => DisableRoute(route)">
+                                        <Icon Name="road-off" Size="18px" />
+                                    </button>
+                                }
                             </td>
                             <td class="action">
                                 <button class="clone" title="@_strings["Clone"]" @onclick="() => CloneRoute(route)">

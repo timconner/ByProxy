@@ -16,7 +16,8 @@
         public required int Revision { get; init; }
         public required string ConfigHash { get; init; }
         public required DateTime CommittedAt { get; init; }
-
+        
+        public required ImmutableArray<string> Warnings { get; init; }
         public required ImmutableArray<string> Errors { get; init; }
 
         public required bool AdminListenAny { get; init; }

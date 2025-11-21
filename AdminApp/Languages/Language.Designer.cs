@@ -1024,6 +1024,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disable.
+        /// </summary>
+        public static string Disable {
+            get {
+                return ResourceManager.GetString("Disable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Disable Destination Certificate Validation.
         /// </summary>
         public static string Disable_Destination_Certificate_Validation {
@@ -1164,6 +1173,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Edit_User {
             get {
                 return ResourceManager.GetString("Edit User", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enable.
+        /// </summary>
+        public static string Enable {
+            get {
+                return ResourceManager.GetString("Enable", resourceCulture);
             }
         }
         

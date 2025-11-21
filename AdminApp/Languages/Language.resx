@@ -2144,4 +2144,12 @@ Continue editing the draft or click Discard to restore the saved version.</value
     <value>Tarpit</value>
     <comment>Used in RouteEditor</comment>
   </data>
+  <data name="Disable" xml:space="preserve">
+    <value>Disable</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="Enable" xml:space="preserve">
+    <value>Enable</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
 </root>
