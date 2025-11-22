@@ -98,3 +98,17 @@ services:
 
 The UI is currently available in **English**, but the application is structured for straightforward expansion into additional languages.
 All translatable text is organized into language files located in `AdminApp\Languages`.
+
+---
+
+## Screenshots
+
+![Intro Screen](./Screenshots/intro.png)
+
+![Clusters](./Screenshots/clusters.png)
+
+![Routes](./Screenshots/routes.png)
+
+![SNI Maps](./Screenshots/sni-maps.png)
+
+![Settings](./Screenshots/settings.png)
