@@ -234,7 +234,6 @@ namespace ByProxy {
 
                 builder.Services.AddSingleton<BlazorSessionService>();
                 builder.Services.AddScoped<AuthService>();
-                builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, AuthorizationMiddlewareResultHandler>();
                 builder.Services.AddAuthorization(options => {
                     options.DefaultPolicy = new AuthorizationPolicyBuilder()
                         .RequireRole(AuthRoles.Admin)
@@ -332,6 +331,10 @@ namespace ByProxy {
                     admin.UseEndpoints(endpoints =>
                         endpoints.MapRazorComponents<App>()
                         .AddInteractiveServerRenderMode()
+                        
+                        // Allow Blazor to handle authorization for blazor pages instead of cookie middleware
+                        // cookie middleware just returns a empty 401 instead of routing to the login page
+                        .AllowAnonymous()
                     );
                 });
             }
