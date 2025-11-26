@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
-using System.Globalization;
-using ByProxy.AdminApp.Components;
-
-namespace ByProxy.Services {
+﻿namespace ByProxy.Services {
     public class AuthService {
         private readonly ILogger<AuthService> _logger;
         private readonly ProxyDb _db;
@@ -41,6 +35,11 @@ namespace ByProxy.Services {
             if (_context.HttpContext == null) return null;
             string? userId = _context.HttpContext.User.FindFirstValue(Claims.UserId);
             return userId == null ? null : Guid.Parse(userId);
+        }
+
+        public string? GetSessionKey() {
+            if (_context.HttpContext == null) return null;
+            return _context.HttpContext.User.FindFirstValue(Claims.SessionKey);
         }
 
         public string? GetDisplayName() {
@@ -193,7 +192,7 @@ namespace ByProxy.Services {
             if (user.PasswordResetRequired) return LoginResult.PasswordResetRequired;
 
             // Authentication Successful - Perform login
-            var claimsPrincipal = await GenerateUserPrincipal(CookieAuthenticationDefaults.AuthenticationScheme, user.Id);
+            var claimsPrincipal = await GenerateSignInUserPrincipal(CookieAuthenticationDefaults.AuthenticationScheme, user.Id);
             if (claimsPrincipal == null) return LoginResult.Failed;
 
             await _context.HttpContext.SignInAsync(claimsPrincipal);
@@ -278,7 +277,9 @@ namespace ByProxy.Services {
                 numBytesRequested: 256 / 8));
         }
 
-        private async Task<ClaimsPrincipal?> GenerateUserPrincipal(string authScheme, Guid userId) {
+        private Task<ClaimsPrincipal?> GenerateSignInUserPrincipal(string authScheme, Guid userId) => GenerateUserPrincipal(authScheme, userId, null);
+
+        private async Task<ClaimsPrincipal?> GenerateUserPrincipal(string authScheme, Guid userId, string? sessionKey) {
             var user = await _db.Users
                         .IgnoreQueryFilters()
                         .AsNoTracking()
@@ -293,6 +294,7 @@ namespace ByProxy.Services {
                 new Claim(Claims.FullName, user.FullName),
                 new Claim(ClaimTypes.Role, AuthRoles.User)
             };
+            if (sessionKey != null) claims.Add(new Claim(Claims.SessionKey, sessionKey));
             if (user.Culture != null) claims.Add(new Claim(Claims.Culture, user.Culture));
             if (user.PreferredTheme != null) claims.Add(new Claim(Claims.PreferredTheme, user.PreferredTheme));
 
@@ -315,12 +317,18 @@ namespace ByProxy.Services {
             await _db.AuthSessions
                 .Where(_ => _.Key == token)
                 .ExecuteDeleteAsync();
+
+            _blazorSessions.SessionInvalidationRequested(token);
         }
 
         public async Task<string> CreateToken(AuthenticationTicket ticket) {
             if (!Guid.TryParse(ticket.Principal.FindFirstValue(Claims.UserId), out Guid userId)) throw new Exception("UserId Not Found");
             var user = await _db.Users.FirstAsync(_ => _.Id == userId);
             var session = await GenerateUserSession(user);
+
+            var identity = ticket.Principal.Identities.First(_ => _.HasClaim(Claims.UserId, user.Id.ToString()));
+            identity.AddClaim(new Claim(Claims.SessionKey, session.Key));
+
             _cache.Set($"{CachePrefix}{session.Key}", ticket);
             return session.Key;
         }
@@ -346,7 +354,7 @@ namespace ByProxy.Services {
             if (session.ExpiresAt < DateTime.UtcNow)
                 return AuthenticateResult.Fail("Token Expired");
 
-            var claimsPrincipal = await GenerateUserPrincipal(authScheme, session.UserId!.Value);
+            var claimsPrincipal = await GenerateUserPrincipal(authScheme, session.UserId!.Value, token);
             if (claimsPrincipal == null) return AuthenticateResult.Fail("User associated with session not found.");
 
             AuthenticationProperties authProperties = new AuthenticationProperties { ExpiresUtc = session.ExpiresAt };

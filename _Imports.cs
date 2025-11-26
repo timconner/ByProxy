@@ -26,6 +26,7 @@ global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Components;
 global using Microsoft.AspNetCore.Components.Web;
 global using Microsoft.AspNetCore.Connections;
+global using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 global using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
 global using Microsoft.AspNetCore.Http.Extensions;
 global using Microsoft.AspNetCore.HttpOverrides;

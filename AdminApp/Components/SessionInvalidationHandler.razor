@@ -8,7 +8,8 @@
 
     protected override void OnInitialized() {
         var userId = _auth.GetUserId();
-        if (userId != null) _registrationId = _blazorSessions.RegisterSessionInvalidationHandler(userId.Value, SessionInvalidated);
+        var sessionKey = _auth.GetSessionKey();
+        if (userId != null && sessionKey != null) _registrationId = _blazorSessions.RegisterSessionInvalidationHandler(userId.Value, sessionKey, SessionInvalidated);
     }
 
     private void SessionInvalidated() {
