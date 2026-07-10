@@ -36,6 +36,6 @@ namespace ByProxy.Infrastructure.Acme {
         public required string Status { get; init; }
         public DateTime? Validated { get; init; }
         public AcmeProblem? Error { get; init; }
-        public required string Token { get; init; }
+        public string? Token { get; init; }
     }
 }

@@ -320,6 +320,10 @@
         private async Task<Func<IProgress<(string, string?)>?, Task>?> PerformDns01ChallengeAsync(AcmeAccount account, ECDsa accountKey, AcmeChallenge challenge, AcmeDnsCertHost dnsHost, IProgress<(string Step, string? Detail)>? progress = null, CancellationToken cancellationToken = default) {
             progress?.Report(("AcmeStep_StartingDns01", challenge.Url));
 
+            if (string.IsNullOrEmpty(challenge.Token)) {
+                throw new Exception("Token is missing from the DNS-01 Challenge response.");
+            }
+
             var keyAuthorization = $"{challenge.Token}.{AcmeHelpers.GenerateJwkThumbprint(accountKey)}";
             var txtValue = AcmeHelpers.Base64UrlEncode(SHA256.HashData(Encoding.UTF8.GetBytes(keyAuthorization)));
             var provider = await _scriptCompilation.RetrieveAcmeDnsProvider(dnsHost.DnsProviderId);
@@ -353,6 +357,10 @@
 
         private async Task PerformHttp01ChallengeAsync(AcmeAccount account, ECDsa accountKey, AcmeChallenge challenge, IProgress<(string Step, string? Detail)>? progress = null, CancellationToken cancellationToken = default) {
             progress?.Report(("AcmeStep_StartingHttp01", challenge.Url));
+
+            if (string.IsNullOrEmpty(challenge.Token)) {
+                throw new Exception("Token is missing from the HTTP-01 Challenge response.");
+            }
 
             var keyAuthorization = $"{challenge.Token}.{AcmeHelpers.GenerateJwkThumbprint(accountKey)}";
 
