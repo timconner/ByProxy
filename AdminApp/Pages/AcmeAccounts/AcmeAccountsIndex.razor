@@ -4,6 +4,7 @@
 @inject IDbContextFactory<ProxyDb> _dbFactory
 @inject AcmeClientService _acmeClient
 @inject CertificateService _certService
+@inject ProxyStateService _proxyState
 @inject ModalService _modal
 @inject NavigationManager _nav
 
@@ -76,7 +77,7 @@
                         @if (_showHiddenAccounts) {
                             <CertInfoTable Certificates="accountCerts" />
                         } else {
-                            <CertInfoTable Certificates="accountCerts" OnEdit="EditCert" OnHiddenToggle="ChangeCertVisibility" />
+                            <CertInfoTable Certificates="accountCerts" OnEdit="EditCert" OnHiddenToggle="ChangeCertVisibility" OnRenew="RenewCert" />
                         }
                     </Authorized>
                     <NotAuthorized>

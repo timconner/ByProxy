@@ -274,6 +274,29 @@ namespace ByProxy.Services {
             try { _signal.Release(); } catch (SemaphoreFullException) { }
         }
 
+        public async Task<bool> RenewCertificate(ProxyDb db, Guid certId, bool rebuildCacheOnSuccess, IProgress<(string Step, string? Detail)>? progress = null, CancellationToken cancellationToken = default) {
+            try {
+                var dbEntry = await db.AcmeCerts
+                    .Include(_ => _.AcmeAccount)
+                    .Include(_ => _.Hosts)
+                    .FirstOrDefaultAsync(_ => _.Id == certId);
+                if (dbEntry == null) throw new Exception($"Certificate {certId} not found in database.");
+
+                dbEntry.LastAttempt = DateTime.UtcNow;
+                await db.SaveChangesAsync();
+
+                var renewedCert = await _acmeClient.RequestNewCertificateAsync(dbEntry.AcmeAccount, dbEntry.Hosts, progress, cancellationToken);
+                Certificates.ExportCertToDisk(dbEntry.Id, renewedCert);
+
+                if (rebuildCacheOnSuccess) await RebuildCertCache();
+
+                return true;
+            } catch (Exception ex) {
+                _logger.LogError($"Failed to renew ACME certificate: {ex.Message}", ex);
+            }
+            return false;
+        }
+
         protected async Task ExecuteAsync(CancellationToken stoppingToken) {
             while (!stoppingToken.IsCancellationRequested) {
                 bool certRenewed = false;
@@ -282,18 +305,8 @@ namespace ByProxy.Services {
                     using var db = _dbFactory.CreateDbContext();
                     foreach (var cert in certsToRenew) {
                         try {
-                            var dbEntry = await db.AcmeCerts
-                                .Include(_ => _.AcmeAccount)
-                                .Include(_ => _.Hosts)
-                                .FirstOrDefaultAsync(_ => _.Id == cert.Metadata.Id);
-                            if (dbEntry == null) continue;
-
-                            cert.Metadata.LastAttempt = dbEntry.LastAttempt = DateTime.UtcNow;
-                            await db.SaveChangesAsync();
-
-                            var renewedCert = await _acmeClient.RequestNewCertificateAsync(dbEntry.AcmeAccount, dbEntry.Hosts, null, stoppingToken);
-                            Certificates.ExportCertToDisk(dbEntry.Id, renewedCert);
-                            certRenewed = true;
+                            var success = await RenewCertificate(db, cert.Metadata.Id, false, null, stoppingToken);
+                            if (success) certRenewed = true;
                         } catch (Exception ex) {
                             _logger.LogError($"Failed to renew ACME certificate: {ex.Message}", ex);
                         }

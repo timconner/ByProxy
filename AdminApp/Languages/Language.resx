@@ -2152,4 +2152,11 @@ Continue editing the draft or click Discard to restore the saved version.</value
     <value>Enable</value>
     <comment>Used in RoutesIndex</comment>
   </data>
+  <data name="Renew" xml:space="preserve">
+    <value>Renew</value>
+  </data>
+  <data name="ACME Renewal Progress" xml:space="preserve">
+    <value>ACME Renewal Progress</value>
+    <comment>Used in AcmeAccountsIndex</comment>
+  </data>
 </root>

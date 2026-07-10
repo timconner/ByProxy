@@ -29,10 +29,14 @@
             @if (OnHiddenToggle.HasDelegate) {
                 <th></th>
             }
+            @if (OnRenew.HasDelegate) {
+                <th></th>
+            }
         </tr>
     </thead>
     <tbody>
         @foreach (var cert in Certificates) {
+            if (cert.Cert.Handle == nint.Zero) continue;
             <tr>
                 <td>
                     <div class="name-cell">
@@ -99,6 +103,13 @@
                         }
                     </td>
                 }
+                @if (OnRenew.HasDelegate) {
+                    <td>
+                        <button class="action" title="@_strings["Renew"]" @onclick="() => OnRenew.InvokeAsync(cert)">
+                            <Icon Name="rotate-clockwise-2" />
+                        </button>
+                    </td>
+                }
             </tr>
         }
     </tbody>
@@ -117,6 +128,9 @@
     [Parameter]
     public EventCallback<CertInfo> OnHiddenToggle { get; set; }
 
+    [Parameter]
+    public EventCallback<CertInfo> OnRenew { get; set; }
+
     [Flags]
     public enum ExcludeColumns {
         None = 0,
@@ -128,7 +142,7 @@
         Fingerprints = 32,
         Serial = 64
     }
-    
+
     [Parameter]
     public IEnumerable<ExcludeColumns>? Exclude { get; set; }
 
@@ -145,7 +159,6 @@
     public IEnumerable<IncludeColumns>? Include { get; set; }
 
     private IncludeColumns _include = IncludeColumns.None;
-
 
     protected override void OnParametersSet() {
         _exclude = ExcludeColumns.None;

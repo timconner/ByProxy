@@ -16,7 +16,7 @@ public partial class AcmeAccountsIndex {
     }
 
     private async Task ReloadAccounts() {
-        var db = _dbFactory.CreateDbContext();
+        using var db = _dbFactory.CreateDbContext();
         var accounts = await db.AcmeAccounts
             .AsNoTracking()
             .Where(_ => _.Hidden == _showHiddenAccounts)
@@ -67,6 +67,15 @@ public partial class AcmeAccountsIndex {
 
     private void EditCert(CertInfo cert) {
         _nav.NavigateTo($"/acme/edit-cert/{cert.Metadata.Id}");
+    }
+
+    private async Task RenewCert(CertInfo cert) {
+        var success = await _modal.RunWithProgressViewer(_strings["ACME Renewal Progress"], async (progress) => {
+            using var db = _dbFactory.CreateDbContext();
+            var localizedProgress = new LocalizingProgress(progress, _strings);
+            await _certService.RenewCertificate(db, cert.Metadata.Id, true, localizedProgress, _proxyState.StoppingOrRestarting);
+        });
+        await ReloadAccounts();
     }
 
     private async Task ChangeCertVisibility(CertInfo cert) {
