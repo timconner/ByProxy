@@ -9,11 +9,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <link rel="stylesheet" href="css/app.css" />
-    @{ #if DEBUG }
+@{
+#if DEBUG
+}
     <link rel="stylesheet" href="ByProxy.styles.css" />
-    @{ #else }
+@{
+#else
+}
     <link href="css/components.css" rel="stylesheet" />
-    @{ #endif }    
+@{
+#endif
+}    
 
     @if (_renderMode != null) {
         <script src="js/sortable.js"></script>

@@ -21,7 +21,7 @@ namespace ByProxy.Utility {
             } else {
                 keyFlags |= X509KeyStorageFlags.EphemeralKeySet;
             }
-            return new X509Certificate2(filePath, (string?)null, keyFlags);
+            return X509CertificateLoader.LoadPkcs12FromFile(filePath, (string?)null, keyFlags);
         }
 
         public static void ExportCertToDisk(Guid certId, X509Certificate2 x509Cert) {

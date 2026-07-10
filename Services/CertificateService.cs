@@ -104,7 +104,7 @@ namespace ByProxy.Services {
                 // Failsafe in case no valid certificate was found.
                 _logger.LogWarning("Valid admin certificate not found, generating ephemeral cert...");
                 using var newAdminCert = Certificates.GenerateSelfSignedCert(Certificates.LoopbackHosts);
-                _adminCert = new X509Certificate2(
+                _adminCert = X509CertificateLoader.LoadPkcs12(
                     newAdminCert.Export(X509ContentType.Pfx, (string?)null),
                     (string?)null,
                     X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable

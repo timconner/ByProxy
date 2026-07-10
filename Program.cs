@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.Logging.Console;
-
 namespace ByProxy {
     internal class Program {
 
