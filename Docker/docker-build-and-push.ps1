@@ -1,6 +1,8 @@
 ﻿param(
     [switch]$Force,     # Bypass Confirmation
-    [switch]$NoPush     # Don't Push to Docker Hub
+    [switch]$NoPush,     # Don't Push to Docker Hub
+    [switch]$NoLatest,     # Don't Build/Push latest tag
+    [switch]$LatestOnly     # Only build latest tag
 )
 
 $dllPath = ".\ByProxy\ByProxy.dll"
@@ -10,11 +12,25 @@ $version = [Version](Get-Item $dllPath).VersionInfo.FileVersion
 $tagMajorMinor = "{0}.{1}" -f $version.Major, $version.Minor
 $tagFull = "{0}.{1}.{2}" -f $version.Major, $version.Minor, $version.Build
 
-$tags = @(
-    "$repo`:latest"
-    "$repo`:$tagMajorMinor"
-    "$repo`:$tagFull"
-)
+if ($NoLatest -and $LatestOnly) {
+    Write-Error "Conflicting options: -NoLatest and -LatestOnly cannot be used together."
+    exit 1
+}
+
+if ($LatestOnly) {
+    $tags = @(
+        "$repo`:latest"
+    )
+} else {
+    $tags = @(
+        "$repo`:$tagMajorMinor"
+        "$repo`:$tagFull"
+    )
+
+    if (-not $NoLatest) {
+        $tags += "$repo`:latest"
+    }
+}
 
 Write-Host ("`nVersion: {0}.{1}.{2}" -f $version.Major, $version.Minor, $version.Build)
 Write-Host "The following tags will be built:`n"
