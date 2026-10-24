@@ -34,7 +34,9 @@
     }
 
     [SupplyParameterFromForm]
-    private InputModel _input { get; set; } = new();
+    private InputModel _input { get; set; } = default!;
+
+    protected override void OnInitialized() => _input ??= new();
 
     public async Task LoginUser() {
         var result = await _auth.CookieLogin(_input.Username, _input.Password);

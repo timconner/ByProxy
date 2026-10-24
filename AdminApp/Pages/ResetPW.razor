@@ -53,7 +53,9 @@
     }
 
     [SupplyParameterFromForm]
-    private InputModel _input { get; set; } = new();
+    private InputModel _input { get; set; } = default!;
+
+    protected override void OnInitialized() => _input ??= new();
 
     public async Task ResetUserPassword() {
         var error = await _auth.TryResetPassword(_input.Username, _input.OldPassword, _input.NewPassword, _input.ConfirmPassword);
