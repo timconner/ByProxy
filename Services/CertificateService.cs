@@ -158,31 +158,26 @@ namespace ByProxy.Services {
         public async Task<List<CertInfo>> CompileAvailableServerCerts(IStringLocalizer strings, bool includeHidden = false) {
             using var db = _dbFactory.CreateDbContext();
 
-            List<ServerCert> certResults;
+            var certQuery = db.ServerCerts
+                .AsNoTracking();
 
-            if (includeHidden) {
-                certResults = await db.ServerCerts
-                    .AsNoTracking()
-                    .IgnoreQueryFilters()
-                    .ToListAsync();
-            } else {
-                certResults = await db.ServerCerts
-                    .AsNoTracking()
-                    .WhereIsActive()
-                    .ToListAsync();
-            }
+            if (!includeHidden) certQuery = certQuery.WhereIsActive();
+
+            var certResults = await certQuery.ToListAsync();
 
             return await CompileAvailableServerCerts(certResults, db, strings);
         }
 
-        public async Task<List<CertInfo>> CompileAvailableServerCerts<T>(IStringLocalizer strings) where T : ServerCert {
+        public async Task<List<CertInfo>> CompileAvailableServerCerts<T>(IStringLocalizer strings, bool includeHidden = false) where T : ServerCert {
             using var db = _dbFactory.CreateDbContext();
 
-            var certResults = await db.ServerCerts
+            var certQuery = db.ServerCerts
                 .AsNoTracking()
-                .OfType<T>()
-                .WhereIsActive()
-                .ToListAsync();
+                .OfType<T>();
+
+            if (!includeHidden) certQuery = certQuery.WhereIsActive();
+            
+            var certResults = await certQuery.ToListAsync();
 
             return await CompileAvailableServerCerts(certResults.Cast<ServerCert>().ToList(), db, strings);
         }

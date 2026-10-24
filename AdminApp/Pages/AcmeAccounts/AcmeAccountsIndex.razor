@@ -61,21 +61,19 @@
             </div>
             <PageDivider Label="Issued Certificates" />
             @{
-                var showHiddenCerts = _showHiddenAccounts || _showInactiveCerts.Contains(accountInfo.Account.Id);
-                var accountCerts = _showHiddenAccounts ? accountInfo.IssuedCerts : accountInfo.IssuedCerts.Where(_ => _.Metadata.Hidden == showHiddenCerts);
+                var showHiddenCerts = _showInactiveCerts.Contains(accountInfo.Account.Id);
+                var accountCerts = accountInfo.IssuedCerts.Where(_ => _.Metadata.Hidden == showHiddenCerts);
             }
-            @if (!_showHiddenAccounts) {
-                <div class="active-toggle">
-                    <Toggle IsOn="showHiddenCerts" FieldLabel="@_strings["Show"]" OffLabel="@_strings["Active"]" OnLabel="@_strings["Hidden"]" ToggleHandler="(b) => ToggleAccountCerts(accountInfo, b)" />
-                </div>
-            }
+            <div class="active-toggle">
+                <Toggle IsOn="showHiddenCerts" FieldLabel="@_strings["Show"]" OffLabel="@_strings["Active"]" OnLabel="@_strings["Hidden"]" ToggleHandler="(b) => ToggleAccountCerts(accountInfo, b)" />
+            </div>
             @if (!accountCerts.Any()) {
                 <div class="empty">@_strings["No Certificates"]</div>
             } else {
                 <AuthorizeView Roles="@AuthRoles.Editor">
                     <Authorized>
-                        @if (_showHiddenAccounts) {
-                            <CertInfoTable Certificates="accountCerts" />
+                        @if (showHiddenCerts) {
+                            <CertInfoTable Certificates="accountCerts" OnHiddenToggle="ChangeCertVisibility" />
                         } else {
                             <CertInfoTable Certificates="accountCerts" OnEdit="EditCert" OnHiddenToggle="ChangeCertVisibility" OnRenew="RenewCert" />
                         }

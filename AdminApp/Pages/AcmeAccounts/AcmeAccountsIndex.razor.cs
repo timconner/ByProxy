@@ -22,7 +22,7 @@ public partial class AcmeAccountsIndex {
             .Where(_ => _.Hidden == _showHiddenAccounts)
             .ToListAsync();
 
-        var certs = await _certService.CompileAvailableServerCerts<AcmeCert>(_strings);
+        var certs = await _certService.CompileAvailableServerCerts<AcmeCert>(_strings, true);
 
         var accountInfo = new List<AccountInfo>();
         foreach (var account in accounts) {
