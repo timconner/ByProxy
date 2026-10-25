@@ -100,6 +100,27 @@ public partial class RouteEditor {
         }
     }
 
+    private string MaxRequestBodySizeMode {
+        get => Route.MaxRequestBodySize switch {
+            null => "Inherit",
+            -1 => "Unlimited",
+            _ => "Limited"
+        };
+        set {
+            Route.MaxRequestBodySize = value switch {
+                "Unlimited" => -1L,
+                "Limited" => _proxyState.RunningConfig.MaxRequestBodySize ?? 30_000_000L,
+                _ => null
+            };
+        }
+    }
+
+    private async Task UpdateMaxRequestBodySize(long? newLimit) {
+        Route.MaxRequestBodySize = newLimit == null || newLimit < -1
+            ? null
+            : newLimit;
+    }
+
     private void AddHost() {
         var newHost = _newHost.Trim();
         if (string.IsNullOrWhiteSpace(newHost)) return;

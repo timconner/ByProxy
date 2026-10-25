@@ -2159,4 +2159,27 @@ Continue editing the draft or click Discard to restore the saved version.</value
     <value>ACME Renewal Progress</value>
     <comment>Used in AcmeAccountsIndex</comment>
   </data>
+  <data name="Max Request Body Size" xml:space="preserve">
+    <value>Max Request Body Size</value>
+  </data>
+  <data name="Unlimited" xml:space="preserve">
+    <value>Unlimited</value>
+  </data>
+  <data name="Limited" xml:space="preserve">
+    <value>Limited</value>
+  </data>
+  <data name="Size In Bytes" xml:space="preserve">
+    <value>Size In Bytes</value>
+  </data>
+  <data name="Help_SystemMaxRequestBodySize" xml:space="preserve">
+    <value>Sets the default maximum allowed size, in bytes, of an HTTP request body. This can be overridden at the route level.</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Inherit From System" xml:space="preserve">
+    <value>Inherit From System</value>
+  </data>
+  <data name="Help_RouteMaxRequestBodySize" xml:space="preserve">
+    <value>Sets the maximum allowed HTTP request body size for this route: inherit the system default, specify a limit in bytes, or allow unlimited size.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
 </root>

@@ -22,6 +22,7 @@ namespace ByProxy.Models {
         public List<ProxyRoute> Routes { get; set; }
         public List<ProxyCluster> Clusters { get; set; }
         public List<ProxySniMap> SniMaps { get; set; }
+        public long? MaxRequestBodySize { get; set; }
         public int UnmatchedStatus { get; set; }
         public bool Tarpit { get; set; }
 
@@ -125,6 +126,7 @@ namespace ByProxy.Models {
                 AdminListenAny = AdminListenAny,
                 AdminPort = AdminPort,
                 AdminCert = AdminCertId,
+                MaxRequestBodySize = MaxRequestBodySize,
                 Tarpit = Tarpit,
                 UnmatchedStatus = unmatchedStatus,
                 HttpPorts = httpPorts.ToImmutableHashSet(),
@@ -159,6 +161,7 @@ namespace ByProxy.Models {
                 Clusters = Clusters.Select(_ => _.Clone(newRevision)).ToList(),
                 SniMaps = SniMaps.Select(_ => _.Clone(newRevision)).ToList(),
                 FallbackCertId = FallbackCertId,
+                MaxRequestBodySize = MaxRequestBodySize,
                 UnmatchedStatus = UnmatchedStatus,
                 Tarpit = Tarpit
             };
@@ -171,6 +174,7 @@ namespace ByProxy.Models {
                 AdminPort = AdminPort,
                 AdminCertId = AdminCertId,
                 FallbackCertId = FallbackCertId,
+                MaxRequestBodySize = MaxRequestBodySize,
                 UnmatchedStatus = UnmatchedStatus,
                 Tarpit = Tarpit,
                 Routes = Routes

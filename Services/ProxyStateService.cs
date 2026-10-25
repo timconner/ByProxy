@@ -78,7 +78,8 @@
                 || currentConfig.AdminListenAny != newConfig.AdminListenAny
                 || !currentConfig.HttpPorts.ToHashSet().SetEquals(newConfig.HttpPorts)
                 || !currentConfig.HttpsPorts.ToHashSet().SetEquals(newConfig.HttpsPorts)
-                || currentConfig.FallbackCert.HasValue != newConfig.FallbackCert.HasValue; // HTTPS Refuse/Fallback behavior changed
+                || currentConfig.FallbackCert.HasValue != newConfig.FallbackCert.HasValue // HTTPS Refuse/Fallback behavior changed
+                || currentConfig.MaxRequestBodySize != newConfig.MaxRequestBodySize;
         }
 
         public void RequestKestrelRestart() {

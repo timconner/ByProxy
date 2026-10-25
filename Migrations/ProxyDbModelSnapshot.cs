@@ -15,7 +15,7 @@ namespace ByProxy.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.20");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.13");
 
             modelBuilder.Entity("AuthRoleUserEntity", b =>
                 {
@@ -229,6 +229,9 @@ namespace ByProxy.Migrations
                     b.Property<Guid?>("FallbackCertId")
                         .HasColumnType("TEXT");
 
+                    b.Property<long?>("MaxRequestBodySize")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("ReversionReason")
                         .HasColumnType("TEXT");
 
@@ -295,7 +298,7 @@ namespace ByProxy.Migrations
                     b.Property<int>("ConfigRevision")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("AllowedHeaders")
+                    b.PrimitiveCollection<string>("AllowedHeaders")
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("ClusterConfigRevision")
@@ -311,7 +314,7 @@ namespace ByProxy.Migrations
                     b.Property<bool>("Disabled")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Hosts")
+                    b.PrimitiveCollection<string>("Hosts")
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("HttpPort")
@@ -323,7 +326,10 @@ namespace ByProxy.Migrations
                     b.Property<int?>("HttpsPort")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Methods")
+                    b.Property<long?>("MaxRequestBodySize")
+                        .HasColumnType("INTEGER");
+
+                    b.PrimitiveCollection<string>("Methods")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -405,7 +411,7 @@ namespace ByProxy.Migrations
                         .HasMaxLength(21)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Values")
+                    b.PrimitiveCollection<string>("Values")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id", "ConfigRevision");

@@ -2645,6 +2645,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sets the maximum allowed HTTP request body size for this route: inherit the system default, specify a limit in bytes, or allow unlimited size..
+        /// </summary>
+        public static string Help_RouteMaxRequestBodySize {
+            get {
+                return ResourceManager.GetString("Help_RouteMaxRequestBodySize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Certificates are configured through the SNI Maps page..
         /// </summary>
         public static string Help_RouteSNI {
@@ -2677,6 +2686,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Help_StickySessions {
             get {
                 return ResourceManager.GetString("Help_StickySessions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sets the default maximum allowed size, in bytes, of an HTTP request body. This can be overridden at the route level..
+        /// </summary>
+        public static string Help_SystemMaxRequestBodySize {
+            get {
+                return ResourceManager.GetString("Help_SystemMaxRequestBodySize", resourceCulture);
             }
         }
         
@@ -2942,6 +2960,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Inherit From System.
+        /// </summary>
+        public static string Inherit_From_System {
+            get {
+                return ResourceManager.GetString("Inherit From System", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid Login.
         /// </summary>
         public static string Invalid_Login {
@@ -3073,6 +3100,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string LBP_RoundRobin {
             get {
                 return ResourceManager.GetString("LBP_RoundRobin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Limited.
+        /// </summary>
+        public static string Limited {
+            get {
+                return ResourceManager.GetString("Limited", resourceCulture);
             }
         }
         
@@ -3271,6 +3307,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string MatchSummary_NotMatch {
             get {
                 return ResourceManager.GetString("MatchSummary_NotMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Max Request Body Size.
+        /// </summary>
+        public static string Max_Request_Body_Size {
+            get {
+                return ResourceManager.GetString("Max Request Body Size", resourceCulture);
             }
         }
         
@@ -4433,6 +4478,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Size In Bytes.
+        /// </summary>
+        public static string Size_In_Bytes {
+            get {
+                return ResourceManager.GetString("Size In Bytes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to SNI Maps.
         /// </summary>
         public static string SNI_Maps {
@@ -4582,6 +4636,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Transforms_Empty {
             get {
                 return ResourceManager.GetString("Transforms_Empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unlimited.
+        /// </summary>
+        public static string Unlimited {
+            get {
+                return ResourceManager.GetString("Unlimited", resourceCulture);
             }
         }
         

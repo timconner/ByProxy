@@ -21,6 +21,21 @@
     }
 
     <fieldset>
+        <legend>@_strings["System Defaults"]</legend>
+
+        <div>
+            <Toggle FieldLabel="@_strings["Max Request Body Size"]" OffLabel="@_strings["Unlimited"]" IsOn="_proxyConfig.MaxRequestBodySize != null" OnLabel="@_strings["Limited"]" ToggleHandler="ToggleRequestBodySizeLimit" />
+            @if (_proxyConfig.MaxRequestBodySize != null) {
+                <label>
+                    @_strings["Size In Bytes"]:
+                    <input type="number" name="body-size" min="0" max="@long.MaxValue" @bind:get="_proxyConfig.MaxRequestBodySize" @bind:set="UpdateMaxRequestBodySize" />
+                </label>
+            }
+            <div class="help-text">@_strings["Help_SystemMaxRequestBodySize"]</div>
+        </div>
+    </fieldset>
+
+    <fieldset>
         <legend>@_strings["Unmatched Traffic Handling"]</legend>
 
 

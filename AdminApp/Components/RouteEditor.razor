@@ -1,5 +1,6 @@
 ﻿@inject IDbContextFactory<ProxyDb> _dbFactory
 @inject IStringLocalizer<Language> _strings
+@inject ProxyStateService _proxyState
 @inject ModalService _modal
 @inject NavigationManager _nav
 
@@ -171,6 +172,28 @@
             break;
     }
 </fieldset>
+
+@if (Route.ResponseType == RouteResponseType.Cluster) {
+    <fieldset>
+        <legend>Request Body Size Limit</legend>
+        <div>
+            <select @bind="MaxRequestBodySizeMode">
+                <option value="Inherit">@_strings["Inherit From System"]</option>
+                <option value="Unlimited">@_strings["Unlimited"]</option>
+                <option value="Limited">@_strings["Limited"]</option>
+            </select>
+        </div>
+        @if (Route.MaxRequestBodySize >= 0) {
+            <div>
+                <label>
+                    @_strings["Size In Bytes"]:
+                    <input type="number" name="body-size" min="0" max="@long.MaxValue" @bind:get="Route.MaxRequestBodySize" @bind:set="UpdateMaxRequestBodySize" />
+                </label>
+            </div>
+        }
+        <div class="help-text">@_strings["Help_RouteMaxRequestBodySize"]</div>
+    </fieldset>
+}
 
 <PageDivider Label="@_strings["Match Criteria"]" MarginTop="48px" MarginBottom="24px" FontSize="20px" FontWeight="bold" />
 

@@ -44,6 +44,8 @@
         public int? HttpsPort { get; set; }
         public bool SuppressHttpsRedirect { get; set; }
 
+        public long? MaxRequestBodySize { get; set; }
+
         public List<ProxyRouteTransform> Transforms { get; set; }
 
         public string GetPathAsYarpMatch() {
@@ -116,6 +118,8 @@
                         errors.Add("ERR_HttpsRoutePortUsedByHttp");
                     }
                 }
+
+                if (MaxRequestBodySize < -1) MaxRequestBodySize = -1;
             }
 
             foreach (var criteria in MatchCriteria) {
@@ -163,7 +167,15 @@
                     Path = GetPathAsYarpMatch(),
                     Headers = MatchCriteria.ToYarpHeaders(),
                     QueryParameters = MatchCriteria.ToYarpQueryParameters(),
-                }
+                },
+                MaxRequestBodySize = MaxRequestBodySize,
+                // BEGIN WORKAROUND
+                // YARP 2.3 is missing MaxRequestBodySize comparison for detecting route changes
+                // TODO: Remove after next YARP stable release
+                Metadata = MaxRequestBodySize.HasValue
+                    ? new Dictionary<string, string> { ["MaxRequestBodySize"] = MaxRequestBodySize.Value.ToString() }
+                    : null
+                // END WORKAROUND
             };
 
             if (ClusterId != null) { // Don't process transforms on Redirect routes
@@ -254,6 +266,7 @@
                 HttpPort = HttpPort,
                 HttpsPort = HttpsPort,
                 SuppressHttpsRedirect = SuppressHttpsRedirect,
+                MaxRequestBodySize = MaxRequestBodySize,
                 Transforms = Transforms.Select(_ => _.Clone(newRevision)).ToList()
             };
         }
@@ -285,6 +298,7 @@
                 HttpPort = HttpPort,
                 HttpsPort = HttpsPort,
                 SuppressHttpsRedirect = SuppressHttpsRedirect,
+                MaxRequestBodySize = MaxRequestBodySize,
                 Transforms = Transforms.OrderBy(_ => _.Id).Select(_ => _.ToComparable()).ToArray(),
             };
         }

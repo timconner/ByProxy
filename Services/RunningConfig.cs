@@ -24,6 +24,7 @@
         public required int AdminPort { get; init; }
         public required Guid AdminCert { get; init; }
 
+        public required long? MaxRequestBodySize { get; init; }
         public required int UnmatchedStatus { get; init; }
         public required bool Tarpit { get; init; }
 

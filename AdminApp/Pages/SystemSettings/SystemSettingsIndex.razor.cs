@@ -27,6 +27,22 @@ public partial class SystemSettingsIndex : IDisposable {
         _ = _configService.UpdateHasChangesPending();
     }
 
+    private async Task ToggleRequestBodySizeLimit() {
+        if (_proxyConfig == null) return;
+        _proxyConfig.MaxRequestBodySize = _proxyConfig.MaxRequestBodySize == null
+            ? 30_000_000
+            : null;
+        await SaveChanges();
+    }
+
+    private async Task UpdateMaxRequestBodySize(long? newLimit) {
+        if (_proxyConfig == null) return;
+        _proxyConfig.MaxRequestBodySize = newLimit == null || newLimit < 0
+            ? null
+            : newLimit;
+        await SaveChanges();
+    }
+
     private async Task TarpitToggled(bool tarpitEnabled) {
         if (_proxyConfig == null) return;
         if (tarpitEnabled) {

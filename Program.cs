@@ -123,7 +123,8 @@ namespace ByProxy {
                     AdminListenAny = adminListenAny,
                     AdminPort = adminPort,
                     AdminCertId = adminCertId,
-                    UnmatchedStatus = 404
+                    UnmatchedStatus = 404,
+                    MaxRequestBodySize = 30_000_000
                 };
                 proxyConfig.Committed = true;
                 proxyConfig.Confirmed = true;
@@ -216,6 +217,7 @@ namespace ByProxy {
                         }));
                     }
                 }
+                serverOptions.Limits.MaxRequestBodySize = config.MaxRequestBodySize;
             });
 
             builder.Services.AddSingleton<MatcherPolicy, PortMatcher>();
