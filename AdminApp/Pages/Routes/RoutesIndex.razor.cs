@@ -129,9 +129,15 @@ public partial class RoutesIndex : IDisposable {
         var newRoute = route.Clone(route.ConfigRevision);
         newRoute.Id = Guid.NewGuid();
         newRoute.Name = result.Value;
+        
         foreach (var transform in newRoute.Transforms) {
             transform.Id = Guid.NewGuid();
             transform.RouteId = newRoute.Id;
+        }
+
+        foreach (var matchCriteria in newRoute.MatchCriteria) {
+            matchCriteria.Id = Guid.NewGuid();
+            matchCriteria.RouteId = newRoute.Id;
         }
 
         var success = await _modal.PerformSave(async () => {
