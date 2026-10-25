@@ -300,6 +300,22 @@ namespace ByProxy {
             });
 
             if (!disableAdminApp) {
+                // BEGIN WORKAROUND
+                // During shutdown, a Blazor client can reconnect before Kestrel stops accepting them.
+                // That connection prevents the server from restarting gracefully if someone is using the admin app.
+                // Issue: https://github.com/dotnet/aspnetcore/issues/58947
+                // TODO: Remove once the fixed in dotnet
+                var stopping = app.Lifetime.ApplicationStopping;
+                app.Use(async (context, next) => {
+                    if (!context.Request.Path.StartsWithSegments("/_blazor")) {
+                        await next(context);
+                        return;
+                    }
+                    using var registration = stopping.UnsafeRegister(static state => ((HttpContext)state!).Abort(), context);
+                    await next(context);
+                });
+                // END WORKAROUND
+
                 app.MapWhen(context => context.Connection.LocalPort == config.AdminPort, admin => {
                     admin.UseForwardedHeaders(
                         new ForwardedHeadersOptions {
@@ -342,6 +358,8 @@ namespace ByProxy {
                 var stopOrRestartSource = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken, restartToken);
                 try {
                     await app.RunAsync(stopOrRestartSource.Token);
+                } catch (OperationCanceledException) {
+                    // Shutdown timed-out, continue gracefully
                 } catch (IOException ex) {
                     return (StopReason.StartupFailure, ex.Message);
                 } catch (Exception ex) {
