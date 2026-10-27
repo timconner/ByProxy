@@ -244,6 +244,33 @@ namespace ByProxy.Utility {
             return result;
         }
 
+        private static readonly IdnMapping _idn = new();
+        private static string[] SplitHostname(string hostname) {
+            var parts = hostname.Split('.');
+            for (int i = 0; i < parts.Length; i++) {
+                if (parts[i] != "*") parts[i] = _idn.GetAscii(parts[i]);
+            }
+            for (int i = 0; i < parts.Length; i++) {
+                if (parts[i] == "*") continue;
+                parts[i] = _idn.GetAscii(parts[i]);
+            }
+            return parts;
+        }
+
+        private static bool SubjectMatchesHostParts(string subject, string[] hostParts) {
+            var subjectParts = SplitHostname(subject);
+            if (subjectParts.Length != hostParts.Length) return false;
+            
+            for (int i = 1; i < hostParts.Length; i++) {
+                if (!string.Equals(subjectParts[i], hostParts[i], StringComparison.OrdinalIgnoreCase)) {
+                    return false;
+                }
+            }
+
+            if (subjectParts[0] == "*") return true;
+            return string.Equals(subjectParts[0], hostParts[0], StringComparison.OrdinalIgnoreCase);
+        }
+
         public static List<string> GetCertIssues(ProxyCert metadata, X509Certificate2 cert, string? host = null) {
             var certIssues = new List<string>();
             if (metadata.Hidden) certIssues.Add("Inactive Certificate");
@@ -252,11 +279,9 @@ namespace ByProxy.Utility {
 
             if (host == null) return certIssues;
 
+            var hostParts = SplitHostname(host);
             var subjectNames = GetSubjectAltNames(cert);
-            if (
-                !subjectNames.Contains(host, StringComparer.OrdinalIgnoreCase)
-                && !subjectNames.Contains($"*.{host}", StringComparer.OrdinalIgnoreCase)
-            ) {
+            if (!subjectNames.Any(subject => SubjectMatchesHostParts(subject, hostParts))) {
                 certIssues.Add("Subject Not Present");
             }
             return certIssues;
