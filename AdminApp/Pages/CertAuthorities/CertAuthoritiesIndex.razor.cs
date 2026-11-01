@@ -22,7 +22,7 @@ public partial class CertAuthoritiesIndex {
             .WhereIsActive(!_showHiddenCAs)
             .ToListAsync();
 
-        var certs = await _certService.CompileAvailableServerCerts<IssuedCert>(_strings);
+        var certs = await _certService.CompileAvailableServerCerts<IssuedCert>(_strings, true);
 
         var caInfo = new List<CaInfo>();
         foreach (var ca in caResults) {

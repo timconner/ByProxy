@@ -49,7 +49,7 @@
     }
 
     private async Task ReloadCerts() {
-        _certs = await _certService.CompileAvailableServerCerts<ImportedCert>(_strings);
+        _certs = await _certService.CompileAvailableServerCerts<ImportedCert>(_strings, true);
     }
 
     private async void ToggleHidden(bool showHidden) {

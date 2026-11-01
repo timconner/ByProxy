@@ -61,19 +61,17 @@
             <PageDivider Label="Issued Certificates" />
             @{
                 var showHiddenCerts = _showHiddenCAs || _showInactiveCerts.Contains(ca.Metadata.Id);
-                var caCerts = _showHiddenCAs ? ca.IssuedCerts : ca.IssuedCerts.Where(_ => _.Metadata.Hidden == showHiddenCerts);
+                var caCerts = ca.IssuedCerts.Where(_ => _.Metadata.Hidden == showHiddenCerts);
             }
-            @if (!_showHiddenCAs) {
-                <div class="active-toggle">
-                    <Toggle IsOn="showHiddenCerts" FieldLabel="@_strings["Show"]" OffLabel="@_strings["Active"]" OnLabel="@_strings["Hidden"]" ToggleHandler="(b) => ToggleCaCerts(ca, b)" />
-                </div>
-            }
+            <div class="active-toggle">
+                <Toggle IsOn="showHiddenCerts" FieldLabel="@_strings["Show"]" OffLabel="@_strings["Active"]" OnLabel="@_strings["Hidden"]" ToggleHandler="(b) => ToggleCaCerts(ca, b)" />
+            </div>
             @if (!caCerts.Any()) {
                 <div class="empty">@_strings["No Certificates"]</div>
             } else {
                 <AuthorizeView Roles="@AuthRoles.Editor">
                     <Authorized>
-                        @if (_showHiddenCAs) {
+                        @if (showHiddenCerts) {
                             <CertInfoTable Certificates="caCerts" />
                         } else {
                             <CertInfoTable Certificates="caCerts" OnEdit="RenameCert" OnHiddenToggle="ChangeCertVisibility" />
