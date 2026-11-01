@@ -1,0 +1,84 @@
+﻿@implements IAsyncDisposable
+@inject IStringLocalizer<Language> _strings
+@inject IJSRuntime _js
+@inject AdminAppStateService _appState
+@inject ModalService _modal
+
+<MonacoLoader OnLoaded="() => SpawnEditor(_content)" />
+<div @ref="_editorElement" class="editor"></div>
+
+@code {
+    [Parameter]
+    public bool ReadOnly { get; set; } = false;
+
+    private string? _content = null;
+    private string? _language = null;
+
+    public async Task SetContent(string content, string? language = null) {
+        if (_rendered) {
+            await DisposeEditor();
+            await SpawnEditor(content);
+        } else {
+            _content = content;
+            _language = language;
+        }
+    }
+
+    private ElementReference _editorElement;
+    private bool _rendered = false;
+
+    private async void OnThemeChanged() => await ReloadEditor();
+
+    private async Task ReloadEditor() {
+        var content = await GetContents();
+        await DisposeEditor();
+        await SpawnEditor(content);
+    }
+
+    private async Task SpawnEditor(string? content) {
+        await _js.InvokeVoidAsync(
+             "createMonacoEditor",
+             _editorElement,
+             _language,
+             content,
+             _appState.PreferredTheme?.IsDarkTheme ?? true,
+             ReadOnly
+        );
+
+        if (!_rendered) {
+            _appState.OnThemeChange += OnThemeChanged;
+            _rendered = true;
+        }
+    }
+
+    public async Task<string?> GetContents() {
+        if (!_rendered) return _content;
+        try {
+            var contentLength = await _js.InvokeAsync<int?>("startMonacoGetContent");
+            if (contentLength == null) throw new Exception("Unable to retrieve file contents from editor.");
+            int bufferLength = 1024;
+            StringBuilder fileContents = new();
+            for (int i = 0; i < contentLength; i += bufferLength) {
+                fileContents.Append(await _js.InvokeAsync<string>("getMonacoContentBuffer", i, bufferLength));
+            }
+            await _js.InvokeVoidAsync("endMonacoGetContent");
+            return fileContents.ToString();
+        } catch (Exception ex) {
+            await _modal.OkOnly(_strings["Error"], ex.Message);
+        }
+        return null;
+    }
+
+    private async Task DisposeEditor() {
+        if (_rendered) {
+            try {
+                await _js.InvokeVoidAsync("disposeMonacoEditor");
+            } catch { }
+        }
+    }
+
+    public async ValueTask DisposeAsync() {
+        if (_rendered) _appState.OnThemeChange -= OnThemeChanged;
+        await DisposeEditor();
+    }
+}

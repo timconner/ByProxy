@@ -55,12 +55,13 @@ function createMonacoDiff(editorElement, currentConfig, candidateConfig, darkThe
     });
 }
 
-function createMonacoEditor(editorElement, language, code, darkTheme) {
+function createMonacoEditor(editorElement, language, code, darkTheme, readOnly) {
     const theme = darkTheme ? 'vs-dark' : 'vs'
 
     monacoEditor = monaco.editor.create(editorElement, {
         value: code,
         language: language,
+        readOnly: readOnly,
         theme: theme
     });
 }

@@ -1,11 +1,9 @@
 ﻿@page "/acme/dns/edit/{ProviderId:guid}"
 @attribute [Authorize(Roles = AuthRoles.Admin)]
 @inject IStringLocalizer<Language> _strings
-@inject IJSRuntime _js
 @inject IDbContextFactory<ProxyDb> _dbFactory
 @inject ScriptCompilationService _scriptCompilation
 @inject ModalService _modal
-@inject AdminAppStateService _appState
 @inject ProxyStateService _proxyState
 @inject NavigationManager _nav
 
@@ -19,5 +17,5 @@
 </PageHeader>
 
 <div class="editor-container">
-    <div @ref="_editorElement" class="editor"></div>
+    <MonacoEditor @ref="_editor" />
 </div>

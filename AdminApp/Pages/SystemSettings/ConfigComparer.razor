@@ -1,7 +1,6 @@
 ﻿@page "/system/configs"
 @attribute [Authorize(Roles = AuthRoles.Admin)]
 @inject IStringLocalizer<Language> _strings
-@inject IJSRuntime _js
 @inject IDbContextFactory<ProxyDb> _dbFactory
 @inject ModalService _modal
 @inject ProxyStateService _proxyState
@@ -24,7 +23,7 @@
     <LoadingIndicator />
 } else {
     <div class="config-pickers">
-        <select @bind="_compareRev" @bind:after="ReloadDiff">
+        <select @bind="_compareRev" @bind:after="UpdateDiff">
             @foreach (var config in _availableConfigs) {
                 <option value="@config.Revision">
                     @config.Revision
@@ -43,7 +42,7 @@
                 </option>
             }
         </select>
-        <select @bind="_compareToRev" @bind:after="ReloadDiff">
+        <select @bind="_compareToRev" @bind:after="UpdateDiff">
             @foreach (var config in _availableConfigs) {
                 <option value="@config.Revision">
                     @config.Revision
@@ -68,6 +67,6 @@
 <PageDivider MarginTop="0" MarginBottom="0" FullWidthDivider />
 
 <div class="editor-container">
-    <div @ref="_editorElement" class="editor"></div>
+    <MonacoDiff From="@_from" To="@_to" />
 </div>
 

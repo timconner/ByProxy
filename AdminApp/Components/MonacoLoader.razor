@@ -1,0 +1,40 @@
+﻿@inject IJSRuntime _js
+@inject IStringLocalizer<Language> _strings;
+@inject ModalService _modal
+
+@code {
+    [Parameter]
+    public EventCallback OnLoaded { get; set; }
+
+    private System.Threading.Timer? _monacoWaitTimer;
+    private bool _monacoLoaded = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (!firstRender) return;
+        _monacoLoaded = await _js.InvokeAsync<bool>("isMonacoLoaded");
+        if (_monacoLoaded) {
+            await OnLoaded.InvokeAsync();
+        } else {
+            await _js.InvokeVoidAsync("loadMonaco");
+            _monacoWaitTimer = new(CheckMonacoLoaded, null, 250, Timeout.Infinite);
+            _modal.StartLoad(_strings["LoadingWait"]);
+        }
+    }
+
+    private async void CheckMonacoLoaded(object? state) {
+        try {
+            _monacoLoaded = await _js.InvokeAsync<bool>("isMonacoLoaded");
+            if (_monacoLoaded) {
+                _monacoWaitTimer?.Dispose();
+                await InvokeAsync(() => _modal.EndLoad(true));
+                await InvokeAsync(OnLoaded.InvokeAsync);
+            } else {
+                _monacoWaitTimer?.Change(250, Timeout.Infinite);
+            }
+        } catch { }
+    }
+
+    public async ValueTask DisposeAsync() {
+        _monacoWaitTimer?.Dispose();
+    }
+}

@@ -10,9 +10,3 @@
     height: 100%;
     position: relative;
 }
-
-.editor {
-    position: absolute;
-    inset: 0;
-}
-

@@ -1,0 +1,58 @@
+﻿@implements IAsyncDisposable
+@inject IJSRuntime _js
+@inject AdminAppStateService _appState
+
+<MonacoLoader OnLoaded="SpawnDiff" />
+<div @ref="_editorElement" class="editor"></div>
+
+@code {
+    [Parameter]
+    public string From { get; set; } = string.Empty;
+
+    [Parameter]
+    public string To { get; set; } = string.Empty;
+
+    private ElementReference _editorElement;
+    private bool _rendered = false;
+
+    protected override async Task OnParametersSetAsync() {
+        await ReloadDiff();
+    }
+
+    private async void OnThemeChanged() => await ReloadDiff();
+
+    private async Task ReloadDiff() {
+        if (!_rendered) return;
+        await DisposeDiff();
+        await SpawnDiff();
+    }
+
+    private async Task SpawnDiff() {
+        await _js.InvokeVoidAsync(
+            "createMonacoDiff",
+            _editorElement,
+            From,
+            To,
+            _appState.PreferredTheme?.IsDarkTheme ?? true
+        );
+
+        if (!_rendered) {
+            _appState.OnThemeChange += OnThemeChanged;
+            _rendered = true;
+        }
+        ;
+    }
+
+    private async Task DisposeDiff() {
+        if (_rendered) {
+            try {
+                await _js.InvokeVoidAsync("disposeMonacoEditor");
+            } catch { }
+        }
+    }
+
+    public async ValueTask DisposeAsync() {
+        if (_rendered) _appState.OnThemeChange -= OnThemeChanged;
+        await DisposeDiff();
+    }
+}
