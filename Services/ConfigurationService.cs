@@ -1,8 +1,4 @@
-﻿using Microsoft.VisualBasic;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-
-namespace ByProxy.Services {
+﻿namespace ByProxy.Services {
     public class ConfigurationService : IHostedService {
         private readonly ILogger<ConfigurationService> _logger;
         private readonly IConfiguration _config;
@@ -129,6 +125,13 @@ namespace ByProxy.Services {
 
         private async Task DiscardCandidateConfig(int newCandidateBasedOnRevision) {
             using var db = _dbFactory.CreateDbContext();
+            var basisConfig = await db.Configurations.SelectSpecificRevision(newCandidateBasedOnRevision);
+            if (basisConfig == null) throw new Exception("Unable to requested configuration from database.");
+            await DiscardCandidateConfig(basisConfig);
+        }
+
+        private async Task DiscardCandidateConfig(ProxyConfig basisConfig) {
+            using var db = _dbFactory.CreateDbContext();
             var startingCandidateRevision = _proxyState.CandidateConfigRevision;
             await using var transaction = await db.Database.BeginTransactionAsync();
             try {
@@ -136,9 +139,6 @@ namespace ByProxy.Services {
                 if (currentCandidate == null) throw new Exception("No candidate configuration found.");
                 db.Configurations.Remove(currentCandidate);
                 await db.SaveChangesAsync();
-
-                var basisConfig = await db.Configurations.SelectSpecificRevision(newCandidateBasedOnRevision);
-                if (basisConfig == null) throw new Exception("Unable to retrieve current configuration from database.");
 
                 var nextRevision = await db.Configurations.GetNextAvailableRevision();
                 _proxyState.UpdateCandidateRevision(nextRevision);
@@ -262,7 +262,25 @@ namespace ByProxy.Services {
         }
 
         public async Task PromoteRevisionToCandidate(int revisionToPromote) {
-            await DiscardCandidateConfig(revisionToPromote);
+            await _configSemaphore.WaitAsync();
+            try {
+                await DiscardCandidateConfig(revisionToPromote);
+            } catch (Exception ex) {
+                throw new Exception($"Failed to discard changes: {ex.Message}", ex);
+            } finally {
+                _configSemaphore.Release();
+            }
+        }
+
+        public async Task PromoteImportedConfigToCandidate(ProxyConfig newConfig) {
+            await _configSemaphore.WaitAsync();
+            try {
+                await DiscardCandidateConfig(newConfig);
+            } catch (Exception ex) {
+                throw new Exception($"Failed to discard changes: {ex.Message}", ex);
+            } finally {
+                _configSemaphore.Release();
+            }
         }
 
         public async Task UpdateHasChangesPending() {

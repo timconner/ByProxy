@@ -15,11 +15,14 @@
         public string? Health { get; set; }
 
         public DestinationConfig ToYarp() {
-            return new DestinationConfig() { Address = Address, Health = Health };   
+            return new DestinationConfig {
+                Address = Address,
+                Health = Health
+            };
         }
 
         public ProxyDestination Clone(int newRevision) {
-            return new ProxyDestination() {
+            return new ProxyDestination {
                 Id = Id,
                 ConfigRevision = newRevision,
                 Name = Name,
@@ -31,10 +34,33 @@
             };
         }
 
-        public dynamic ToComparable() {
-            return new {
+        public DestinationExport ToExport() {
+            return new DestinationExport {
                 Id = Id,
                 Name = Name,
+                ClusterId = ClusterId,
+                Order = Order,
+                Address = Address,
+                Health = Health
+            };
+        }
+    }
+
+    public class DestinationExport {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public Guid ClusterId { get; set; }
+        public int Order { get; set; }
+        public string Address { get; set; }
+        public string? Health { get; set; }
+
+        public ProxyDestination Realize(int revision) {
+            return new ProxyDestination {
+                Id = Id,
+                ConfigRevision = revision,
+                Name = Name,
+                ClusterId = ClusterId,
+                ClusterConfigRevision = revision,
                 Order = Order,
                 Address = Address,
                 Health = Health

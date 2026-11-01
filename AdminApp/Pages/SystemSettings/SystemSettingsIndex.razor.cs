@@ -60,8 +60,8 @@ public partial class SystemSettingsIndex : IDisposable {
     private async Task FallbackCertToggled(bool useFallbackCert) {
         if (_proxyConfig == null) return;
         if (useFallbackCert) {
-            _proxyConfig.FallbackCertId = _proxyConfig.AdminCertId;
-            _proxyConfig.FallbackCert = _proxyConfig.AdminCert;
+                _proxyConfig.FallbackCertId = _proxyConfig.AdminCertId;
+                _proxyConfig.FallbackCert = _proxyConfig.AdminCert;
         } else {
             if (_proxyConfig.Tarpit) {
                 var result = await _modal.OkCancel("Tarpit", _strings["WARN_RefusingConnectionsTarpit"]);

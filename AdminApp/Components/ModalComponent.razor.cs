@@ -64,14 +64,18 @@
             ModalOpen = new TaskCompletionSource<DialogResult>();
             await InvokeAsync(StateHasChanged);
             var result = await ModalOpen.Task;
+            CloseModal();
+            await InvokeAsync(StateHasChanged);
+            return result;
+        }
+
+        private void CloseModal() {
             ModalOpen = null;
             _visible = false;
             _validationRegex = null;
             _inputIsValid = true;
             _title = null;
             _prompt = null;
-            await InvokeAsync(StateHasChanged);
-            return result;
         }
 
         private void CheckForExit(KeyboardEventArgs e) {
@@ -198,6 +202,11 @@
             _error = message;
             await ShowModal();
             _error = null;
+        }
+
+        public async Task CloseProgressViewer() {
+            CloseModal();
+            await InvokeAsync(StateHasChanged);
         }
 
         public Task OkOnly(string title, string prompt) {

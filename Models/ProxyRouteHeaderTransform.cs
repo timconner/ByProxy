@@ -7,7 +7,7 @@
         public string? HeaderValue { get; set; }
 
         public override ProxyRouteTransform Clone(int newRevision) {
-            return new ProxyRouteHeaderTransform() {
+            return new ProxyRouteHeaderTransform {
                 Id = Id,
                 ConfigRevision = newRevision,
                 RouteId = RouteId,
@@ -18,11 +18,29 @@
             };
         }
 
-        public override dynamic ToComparable() {
-            return new {
+        public override RouteTransformExport ToExport() {
+            return new RouteHeaderTransformExport {
                 Id = Id,
-                Type = TransformType.Type,
-                HeaderOperation = HeaderOperation.Operation,
+                RouteId = RouteId,
+                Operation = HeaderOperation.Operation,
+                HeaderName = HeaderName,
+                HeaderValue = HeaderValue
+            };
+        }
+    }
+
+    public class RouteHeaderTransformExport : RouteTransformExport {
+        public string Operation { get; set; }
+        public string HeaderName { get; set; }
+        public string? HeaderValue { get; set; }
+
+        public override ProxyRouteTransform Realize(int revision) {
+            return new ProxyRouteHeaderTransform {
+                Id = Id,
+                ConfigRevision = revision,
+                RouteId = RouteId,
+                RouteConfigRevision = revision,
+                HeaderOperation = HeaderTransformOperation.FromString(Operation) ?? throw new NotImplementedException($"Unknown Header Transform Operation: {Operation}"),
                 HeaderName = HeaderName,
                 HeaderValue = HeaderValue
             };

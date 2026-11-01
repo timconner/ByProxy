@@ -5,7 +5,7 @@
         public ProxyHeaderMatchMode HeaderMatchMode { get; set; }
 
         public override ProxyRouteMatch Clone(int newRevision) {
-            return new ProxyRouteHeaderMatch() {
+            return new ProxyRouteHeaderMatch {
                 Id = Id,
                 ConfigRevision = newRevision,
                 RouteId = RouteId,
@@ -26,12 +26,29 @@
             };
         }
 
-        public override dynamic ToComparable() {
-            return new {
+        public override RouteMatchExport ToExport() {
+            return new RouteHeaderMatchExport {
                 Id = Id,
-                Type = MatchType.Type,
-                MatchMode = HeaderMatchMode.Mode,
-                Header = Key,
+                RouteId = RouteId,
+                Mode = HeaderMatchMode.Mode,
+                Key = Key,
+                Values = Values?.Order().ToList(),
+                CaseSensitiveValues = CaseSensitiveValues
+            };
+        }
+    }
+
+    public class RouteHeaderMatchExport : RouteMatchExport {
+        public string Mode { get; set; }
+
+        public override ProxyRouteMatch Realize(int revision) {
+            return new ProxyRouteHeaderMatch {
+                Id = Id,
+                ConfigRevision = revision,
+                RouteId = RouteId,
+                RouteConfigRevision = revision,
+                HeaderMatchMode = ProxyHeaderMatchMode.FromString(Mode) ?? throw new NotImplementedException($"Unknown Header Match Mode: {Mode}"),
+                Key = Key,
                 Values = Values,
                 CaseSensitiveValues = CaseSensitiveValues
             };

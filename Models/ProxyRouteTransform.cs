@@ -14,7 +14,20 @@
 
         public abstract ProxyRouteTransform Clone(int newRevision);
 
-        public abstract dynamic ToComparable();
+        public abstract RouteTransformExport ToExport();
+    }
+
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
+    [JsonDerivedType(typeof(RoutePathTransformExport), "Path")]
+    [JsonDerivedType(typeof(RouteMethodTransformExport), "Method")]
+    [JsonDerivedType(typeof(RouteHeaderTransformExport), "Header")]
+    [JsonDerivedType(typeof(RouteQueryTransformExport), "Query")]
+
+    public abstract class RouteTransformExport {
+        public Guid Id { get; set; }
+        public Guid RouteId { get; set; }
+
+        public abstract ProxyRouteTransform Realize(int revision);
     }
 
     public record RouteTransformType(string Type) {

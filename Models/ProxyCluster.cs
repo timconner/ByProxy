@@ -1,7 +1,7 @@
 ﻿namespace ByProxy.Models {
     public class ProxyCluster : IVersioned {
         public Guid Id { get; set; }
-        
+
         public int ConfigRevision { get; set; }
         public ProxyConfig Config { get; set; }
 
@@ -42,7 +42,7 @@
                 };
             }
 
-            return new ClusterConfig() {
+            return new ClusterConfig {
                 ClusterId = Id.ToString(),
                 Destinations = destinations,
                 LoadBalancingPolicy = LoadBalancing?.Policy,
@@ -54,7 +54,7 @@
         }
 
         public ProxyCluster Clone(int newRevision) {
-            return new ProxyCluster() {
+            return new ProxyCluster {
                 Id = Id,
                 ConfigRevision = newRevision,
                 Name = Name,
@@ -66,16 +66,41 @@
             };
         }
 
-        public dynamic ToComparable(bool sortByOrder) {
-            return new {
+        public ClusterExport ToExport(bool sortByOrder = false) {
+            return new ClusterExport {
                 Id = Id,
                 Name = Name,
                 Description = Description,
-                Destinations = Destinations
-                    .OrderBy(_ => sortByOrder ? (IComparable)_.Order : (IComparable)_.Id)
-                    .Select(_ => _.ToComparable())
-                    .ToArray(),
-                LoadBalancing = LoadBalancing,
+                Destinations = (
+                    sortByOrder
+                        ? Destinations.OrderBy(_ => _.Order)
+                        : Destinations.OrderBy(_ => _.Id))
+                    .Select(_ => _.ToExport())
+                    .ToList(),
+                LoadBalancing = LoadBalancing?.Policy,
+                StickySessions = StickySessions,
+                AcceptAnyCert = AcceptAnyCert
+            };
+        }
+    }
+
+    public class ClusterExport {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public List<DestinationExport> Destinations { get; set; }
+        public string? LoadBalancing { get; set; }
+        public bool StickySessions { get; set; }
+        public bool AcceptAnyCert { get; set; }
+
+        public ProxyCluster Realize(int revision) {
+            return new ProxyCluster {
+                Id = Id,
+                ConfigRevision = revision,
+                Name = Name,
+                Description = Description,
+                Destinations = Destinations.Select(_ => _.Realize(revision)).ToList(),
+                LoadBalancing = LoadBalancing == null ? null : (LoadBalancingPolicy.FromString(LoadBalancing) ?? throw new NotImplementedException($"Unknown Load Balancing Policy: {LoadBalancing}")),
                 StickySessions = StickySessions,
                 AcceptAnyCert = AcceptAnyCert
             };

@@ -5,7 +5,7 @@
         public ProxyQueryMatchMode QueryMatchMode { get; set; }
 
         public override ProxyRouteMatch Clone(int newRevision) {
-            return new ProxyRouteQueryMatch() {
+            return new ProxyRouteQueryMatch {
                 Id = Id,
                 ConfigRevision = newRevision,
                 RouteId = RouteId,
@@ -26,12 +26,29 @@
             };
         }
 
-        public override dynamic ToComparable() {
-            return new {
+        public override RouteMatchExport ToExport() {
+            return new RouteQueryMatchExport {
                 Id = Id,
-                Type = MatchType.Type,
-                MatchMode = QueryMatchMode.Mode,
-                Parameter = Key,
+                RouteId = RouteId,
+                Mode = QueryMatchMode.Mode,
+                Key = Key,
+                Values = Values?.Order().ToList(),
+                CaseSensitiveValues = CaseSensitiveValues
+            };
+        }
+    }
+
+    public class RouteQueryMatchExport : RouteMatchExport {
+        public string Mode { get; set; }
+
+        public override ProxyRouteMatch Realize(int revision) {
+            return new ProxyRouteQueryMatch {
+                Id = Id,
+                ConfigRevision = revision,
+                RouteId = RouteId,
+                RouteConfigRevision = revision,
+                QueryMatchMode = ProxyQueryMatchMode.FromString(Mode) ?? throw new NotImplementedException($"Unknown Query Match Mode: {Mode}"),
+                Key = Key,
                 Values = Values,
                 CaseSensitiveValues = CaseSensitiveValues
             };

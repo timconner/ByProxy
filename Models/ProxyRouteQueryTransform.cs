@@ -7,7 +7,7 @@
         public string? QueryValue { get; set; }
 
         public override ProxyRouteTransform Clone(int newRevision) {
-            return new ProxyRouteQueryTransform() {
+            return new ProxyRouteQueryTransform {
                 Id = Id,
                 ConfigRevision = newRevision,
                 RouteId = RouteId,
@@ -18,11 +18,29 @@
             };
         }
 
-        public override dynamic ToComparable() {
-            return new {
+        public override RouteTransformExport ToExport() {
+            return new RouteQueryTransformExport {
                 Id = Id,
-                Type = TransformType.Type,
-                QueryOperation = QueryOperation.Operation,
+                RouteId = RouteId,
+                Operation = QueryOperation.Operation,
+                QueryKey = QueryKey,
+                QueryValue = QueryValue
+            };
+        }
+    }
+
+    public class RouteQueryTransformExport : RouteTransformExport {
+        public string Operation { get; set; }
+        public string QueryKey { get; set; }
+        public string? QueryValue { get; set; }
+
+        public override ProxyRouteTransform Realize(int revision) {
+            return new ProxyRouteQueryTransform {
+                Id = Id,
+                ConfigRevision = revision,
+                RouteId = RouteId,
+                RouteConfigRevision = revision,
+                QueryOperation = QueryTransformOperation.FromString(Operation) ?? throw new NotImplementedException($"Unknown Query Transform Operation: {Operation}"),
                 QueryKey = QueryKey,
                 QueryValue = QueryValue
             };

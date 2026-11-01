@@ -2182,4 +2182,161 @@ Continue editing the draft or click Discard to restore the saved version.</value
     <value>Sets the maximum allowed HTTP request body size for this route: inherit the system default, specify a limit in bytes, or allow unlimited size.</value>
     <comment>Used in RouteEditor</comment>
   </data>
+  <data name="WARN_SensitiveExportWithoutEncryption" xml:space="preserve">
+    <value>The current export options include sensitive material (e.g. private keys). Are you sure you want to disable encryption?</value>
+    <comment>Used in SystemBackup</comment>
+  </data>
+  <data name="ERR_ExportDecryptionFailed" xml:space="preserve">
+    <value>Decryption of the export file failed. Verify the password is correct.</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="System Backup" xml:space="preserve">
+    <value>System Backup</value>
+  </data>
+  <data name="System Restore" xml:space="preserve">
+    <value>System Restore</value>
+  </data>
+  <data name="Areas to Export" xml:space="preserve">
+    <value>Areas to Export</value>
+    <comment>Used in SystemBackup</comment>
+  </data>
+  <data name="Include System Settings" xml:space="preserve">
+    <value>Include System Settings</value>
+  </data>
+  <data name="Include System Certificates" xml:space="preserve">
+    <value>Include System Certificates</value>
+  </data>
+  <data name="Include Routes and Clusters" xml:space="preserve">
+    <value>Include Routes and Clusters</value>
+  </data>
+  <data name="Include SNI Maps" xml:space="preserve">
+    <value>Include SNI Maps</value>
+  </data>
+  <data name="Certificates to Include" xml:space="preserve">
+    <value>Certificates to Include</value>
+  </data>
+  <data name="Referenced Only" xml:space="preserve">
+    <value>Referenced Only</value>
+  </data>
+  <data name="All Certificates" xml:space="preserve">
+    <value>All Certificates</value>
+  </data>
+  <data name="None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="Encrypted Backup" xml:space="preserve">
+    <value>Encrypted Backup</value>
+  </data>
+  <data name="Unencrypted" xml:space="preserve">
+    <value>Unencrypted</value>
+  </data>
+  <data name="AES-256 Encrypted" xml:space="preserve">
+    <value>AES-256 Encrypted</value>
+  </data>
+  <data name="Encryption Password" xml:space="preserve">
+    <value>Encryption Password</value>
+  </data>
+  <data name="Download Backup" xml:space="preserve">
+    <value>Download Backup</value>
+  </data>
+  <data name="Accept" xml:space="preserve">
+    <value>Accept</value>
+  </data>
+  <data name="Preview Restore" xml:space="preserve">
+    <value>Preview Restore</value>
+  </data>
+  <data name="Areas to Import" xml:space="preserve">
+    <value>Areas to Import</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="Not Found in Uploaded File" xml:space="preserve">
+    <value>Not Found in Uploaded File</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="Not Included" xml:space="preserve">
+    <value>Not Included</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="System Certificates" xml:space="preserve">
+    <value>System Certificates</value>
+  </data>
+  <data name="Admin Port/Listen" xml:space="preserve">
+    <value>Admin Port/Listen</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="Overwrite" xml:space="preserve">
+    <value>Overwrite</value>
+  </data>
+  <data name="Keep Current" xml:space="preserve">
+    <value>Keep Current</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="Merge" xml:space="preserve">
+    <value>Merge</value>
+  </data>
+  <data name="ACME DNS Script Conflicts" xml:space="preserve">
+    <value>ACME DNS Script Conflicts</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="ACME Certificate Conflicts" xml:space="preserve">
+    <value>ACME Certificate Conflicts</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="Keep Latest Expiry" xml:space="preserve">
+    <value>Keep Latest Expiry</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="File Summary" xml:space="preserve">
+    <value>File Summary</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="Configuration Preview" xml:space="preserve">
+    <value>Configuration Preview</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="Reading File" xml:space="preserve">
+    <value>Reading File</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="Uploading File" xml:space="preserve">
+    <value>Uploading File</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="Decrypting File" xml:space="preserve">
+    <value>Decrypting File</value>
+  </data>
+  <data name="Deserializing File" xml:space="preserve">
+    <value>Deserializing File</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="Restore Progress" xml:space="preserve">
+    <value>Restore Progress</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="RestoreStep_ProcessingFile" xml:space="preserve">
+    <value>Processing File</value>
+    <comment>Used in ImportExportService</comment>
+  </data>
+  <data name="RestoreStep_ImportingCertificateData" xml:space="preserve">
+    <value>Importing Certificates and Related Data</value>
+    <comment>Used in ImportExportService</comment>
+  </data>
+  <data name="RestoreStep_PromotingCandidateConfig" xml:space="preserve">
+    <value>Promoting New Candidate Config</value>
+    <comment>Used in ImportExportService</comment>
+  </data>
+  <data name="Restore Finished Successfully" xml:space="preserve">
+    <value>Restore Finished Successfully</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="Changes Pending" xml:space="preserve">
+    <value>Changes Pending</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
+  <data name="WARN_RestoreChangesPending" xml:space="preserve">
+    <value>There are pending changes in the current candidate config. These changes will be overwitten by a restore.
+
+Are you sure you wish to continue?</value>
+    <comment>Used in SystemRestore</comment>
+  </data>
 </root>

@@ -42,19 +42,19 @@
             Providers = providers.ToImmutableList();
         }
 
-        private string GetKeyPath(Guid accountId) => Path.Combine(AppPaths.AcmeAccountDir, $"{accountId}.key");
+        public static string GetKeyFilePath(Guid accountId) => Path.Combine(AppPaths.AcmeAccountDir, $"{accountId}.key");
 
         public AcmeProvider GetProvider(string providerId) => Providers.First(_ => _.Id == providerId);
 
         private ECDsa ImportAccountKeyFromDisk(Guid accountId) {
-            var filePath = GetKeyPath(accountId);
+            var filePath = GetKeyFilePath(accountId);
             var key = ECDsa.Create();
             key.ImportPkcs8PrivateKey(File.ReadAllBytes(filePath), out _);
             return key;
         }
 
         private void ExportAccountKeyToDisk(Guid accountId, ECDsa key) {
-            var filePath = GetKeyPath(accountId);
+            var filePath = GetKeyFilePath(accountId);
             byte[] keyBytes = key.ExportPkcs8PrivateKey();
             File.WriteAllBytes(filePath, keyBytes);
         }
@@ -194,7 +194,7 @@
         }
 
         public void PurgeAccount(Guid accountId) {
-            var filePath = GetKeyPath(accountId);
+            var filePath = GetKeyFilePath(accountId);
             File.Delete(filePath);
         }
 

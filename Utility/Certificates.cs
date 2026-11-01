@@ -4,7 +4,7 @@ namespace ByProxy.Utility {
     public static class Certificates {
         public static readonly ImmutableList<string> LoopbackHosts = ["localhost", IPAddress.Loopback.ToString(), IPAddress.IPv6Loopback.ToString()];
 
-        private static string GetCertPath(Guid certId) => Path.Combine(AppPaths.CertDir, $"{certId}.pfx");
+        public static string GetCertFilePath(Guid certId) => Path.Combine(AppPaths.CertDir, $"{certId}.pfx");
 
         public static void DisposeCollection(this X509Certificate2Collection collection) {
             foreach(var cert in collection) {
@@ -14,7 +14,7 @@ namespace ByProxy.Utility {
         }
 
         public static X509Certificate2 ImportCertFromDisk(Guid certId) {
-            var filePath = GetCertPath(certId);
+            var filePath = GetCertFilePath(certId);
             X509KeyStorageFlags keyFlags = X509KeyStorageFlags.Exportable;
             if (OperatingSystem.IsWindows()) {
                 keyFlags |= X509KeyStorageFlags.UserKeySet | X509KeyStorageFlags.PersistKeySet;
@@ -25,19 +25,29 @@ namespace ByProxy.Utility {
         }
 
         public static void ExportCertToDisk(Guid certId, X509Certificate2 x509Cert) {
-            File.WriteAllBytes(GetCertPath(certId), x509Cert.Export(X509ContentType.Pfx, (string?)null));
+            File.WriteAllBytes(GetCertFilePath(certId), x509Cert.Export(X509ContentType.Pfx, (string?)null));
         }
 
         public static void ExportCertToDisk(Guid certId, X509Certificate2Collection x509Collection) {
             byte[]? pfxBytes = x509Collection.Export(X509ContentType.Pfx);
             if (pfxBytes == null) throw new Exception("Unknown error exporting certificate collection.");
-            File.WriteAllBytes(GetCertPath(certId), pfxBytes);
+            File.WriteAllBytes(GetCertFilePath(certId), pfxBytes);
         }
 
         public static void DeleteCertFromDisk(Guid certId) {
-            File.Delete(GetCertPath(certId));
+            File.Delete(GetCertFilePath(certId));
         }
 
+        public static X509Certificate2 FromBase64(string base64) {
+            X509KeyStorageFlags keyFlags = X509KeyStorageFlags.Exportable;
+            if (OperatingSystem.IsWindows()) {
+                keyFlags |= X509KeyStorageFlags.UserKeySet | X509KeyStorageFlags.PersistKeySet;
+            } else {
+                keyFlags |= X509KeyStorageFlags.EphemeralKeySet;
+            }
+            var data = Convert.FromBase64String(base64);
+            return X509CertificateLoader.LoadPkcs12(data, (string?)null, keyFlags);
+        }
 
         public static X509Certificate2Collection ImportPemChainAndKey(string pem, string key) {
             var chain = new X509Certificate2Collection();

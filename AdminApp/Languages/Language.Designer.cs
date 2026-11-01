@@ -61,6 +61,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Accept.
+        /// </summary>
+        public static string Accept {
+            get {
+                return ResourceManager.GetString("Accept", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Account Name.
         /// </summary>
         public static string Account_Name {
@@ -88,11 +97,29 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ACME Certificate Conflicts.
+        /// </summary>
+        public static string ACME_Certificate_Conflicts {
+            get {
+                return ResourceManager.GetString("ACME Certificate Conflicts", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ACME DNS Providers.
         /// </summary>
         public static string ACME_DNS_Providers {
             get {
                 return ResourceManager.GetString("ACME DNS Providers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ACME DNS Script Conflicts.
+        /// </summary>
+        public static string ACME_DNS_Script_Conflicts {
+            get {
+                return ResourceManager.GetString("ACME DNS Script Conflicts", resourceCulture);
             }
         }
         
@@ -358,6 +385,33 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Admin Port/Listen.
+        /// </summary>
+        public static string Admin_Port_Listen {
+            get {
+                return ResourceManager.GetString("Admin Port/Listen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to AES-256 Encrypted.
+        /// </summary>
+        public static string AES_256_Encrypted {
+            get {
+                return ResourceManager.GetString("AES-256 Encrypted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to All Certificates.
+        /// </summary>
+        public static string All_Certificates {
+            get {
+                return ResourceManager.GetString("All Certificates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to All fields are required..
         /// </summary>
         public static string AllFieldsRequired {
@@ -390,6 +444,24 @@ namespace ByProxy.AdminApp.Languages {
         public static string AppName {
             get {
                 return ResourceManager.GetString("AppName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Areas to Export.
+        /// </summary>
+        public static string Areas_to_Export {
+            get {
+                return ResourceManager.GetString("Areas to Export", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Areas to Import.
+        /// </summary>
+        public static string Areas_to_Import {
+            get {
+                return ResourceManager.GetString("Areas to Import", resourceCulture);
             }
         }
         
@@ -520,6 +592,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Certificates to Include.
+        /// </summary>
+        public static string Certificates_to_Include {
+            get {
+                return ResourceManager.GetString("Certificates to Include", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Challenge Type.
         /// </summary>
         public static string Challenge_Type {
@@ -570,6 +651,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Changes {
             get {
                 return ResourceManager.GetString("Changes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Changes Pending.
+        /// </summary>
+        public static string Changes_Pending {
+            get {
+                return ResourceManager.GetString("Changes Pending", resourceCulture);
             }
         }
         
@@ -705,6 +795,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Compiling_Script {
             get {
                 return ResourceManager.GetString("Compiling Script", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configuration Preview.
+        /// </summary>
+        public static string Configuration_Preview {
+            get {
+                return ResourceManager.GetString("Configuration Preview", resourceCulture);
             }
         }
         
@@ -943,6 +1042,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Decrypting File.
+        /// </summary>
+        public static string Decrypting_File {
+            get {
+                return ResourceManager.GetString("Decrypting File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete.
         /// </summary>
         public static string Delete {
@@ -993,6 +1101,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Description {
             get {
                 return ResourceManager.GetString("Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deserializing File.
+        /// </summary>
+        public static string Deserializing_File {
+            get {
+                return ResourceManager.GetString("Deserializing File", resourceCulture);
             }
         }
         
@@ -1114,6 +1231,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Download Backup.
+        /// </summary>
+        public static string Download_Backup {
+            get {
+                return ResourceManager.GetString("Download Backup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Draft Loaded.
         /// </summary>
         public static string Draft_Loaded {
@@ -1195,6 +1321,24 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Encrypted Backup.
+        /// </summary>
+        public static string Encrypted_Backup {
+            get {
+                return ResourceManager.GetString("Encrypted Backup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Encryption Password.
+        /// </summary>
+        public static string Encryption_Password {
+            get {
+                return ResourceManager.GetString("Encryption Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The specifed port is already in use by one or more routes. The management port can not be shared with routes..
         /// </summary>
         public static string ERR_AdminPortInUse {
@@ -1263,6 +1407,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string ERR_DuplicateDestination {
             get {
                 return ResourceManager.GetString("ERR_DuplicateDestination", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Decryption of the export file failed. Verify the password is correct..
+        /// </summary>
+        public static string ERR_ExportDecryptionFailed {
+            get {
+                return ResourceManager.GetString("ERR_ExportDecryptionFailed", resourceCulture);
             }
         }
         
@@ -1551,6 +1704,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Fallback_Certificate {
             get {
                 return ResourceManager.GetString("Fallback Certificate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to File Summary.
+        /// </summary>
+        public static string File_Summary {
+            get {
+                return ResourceManager.GetString("File Summary", resourceCulture);
             }
         }
         
@@ -2897,6 +3059,42 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Include Routes and Clusters.
+        /// </summary>
+        public static string Include_Routes_and_Clusters {
+            get {
+                return ResourceManager.GetString("Include Routes and Clusters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Include SNI Maps.
+        /// </summary>
+        public static string Include_SNI_Maps {
+            get {
+                return ResourceManager.GetString("Include SNI Maps", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Include System Certificates.
+        /// </summary>
+        public static string Include_System_Certificates {
+            get {
+                return ResourceManager.GetString("Include System Certificates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Include System Settings.
+        /// </summary>
+        public static string Include_System_Settings {
+            get {
+                return ResourceManager.GetString("Include System Settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Incoming Headers.
         /// </summary>
         public static string Incoming_Headers {
@@ -3028,6 +3226,24 @@ namespace ByProxy.AdminApp.Languages {
         public static string IssuingCaOptional {
             get {
                 return ResourceManager.GetString("IssuingCaOptional", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keep Current.
+        /// </summary>
+        public static string Keep_Current {
+            get {
+                return ResourceManager.GetString("Keep Current", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Keep Latest Expiry.
+        /// </summary>
+        public static string Keep_Latest_Expiry {
+            get {
+                return ResourceManager.GetString("Keep Latest Expiry", resourceCulture);
             }
         }
         
@@ -3320,6 +3536,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Merge.
+        /// </summary>
+        public static string Merge {
+            get {
+                return ResourceManager.GetString("Merge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Multi-Destination Options.
         /// </summary>
         public static string Multi_Destination_Options {
@@ -3482,11 +3707,38 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to None.
+        /// </summary>
+        public static string None {
+            get {
+                return ResourceManager.GetString("None", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to HTTPS Connections Without SNI Match.
         /// </summary>
         public static string NoSniMatch {
             get {
                 return ResourceManager.GetString("NoSniMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not Found in Uploaded File.
+        /// </summary>
+        public static string Not_Found_in_Uploaded_File {
+            get {
+                return ResourceManager.GetString("Not Found in Uploaded File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not Included.
+        /// </summary>
+        public static string Not_Included {
+            get {
+                return ResourceManager.GetString("Not Included", resourceCulture);
             }
         }
         
@@ -3523,6 +3775,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Operation {
             get {
                 return ResourceManager.GetString("Operation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Overwrite.
+        /// </summary>
+        public static string Overwrite {
+            get {
+                return ResourceManager.GetString("Overwrite", resourceCulture);
             }
         }
         
@@ -3658,6 +3919,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string PreserveHost_True {
             get {
                 return ResourceManager.GetString("PreserveHost_True", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Preview Restore.
+        /// </summary>
+        public static string Preview_Restore {
+            get {
+                return ResourceManager.GetString("Preview Restore", resourceCulture);
             }
         }
         
@@ -4028,6 +4298,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reading File.
+        /// </summary>
+        public static string Reading_File {
+            get {
+                return ResourceManager.GetString("Reading File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Redirect.
         /// </summary>
         public static string Redirect {
@@ -4078,6 +4357,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Redirect_TemporaryRedirect {
             get {
                 return ResourceManager.GetString("Redirect_TemporaryRedirect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Referenced Only.
+        /// </summary>
+        public static string Referenced_Only {
+            get {
+                return ResourceManager.GetString("Referenced Only", resourceCulture);
             }
         }
         
@@ -4154,11 +4442,56 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Restore Finished Successfully.
+        /// </summary>
+        public static string Restore_Finished_Successfully {
+            get {
+                return ResourceManager.GetString("Restore Finished Successfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restore Progress.
+        /// </summary>
+        public static string Restore_Progress {
+            get {
+                return ResourceManager.GetString("Restore Progress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Restore Prior Configuration.
         /// </summary>
         public static string RestorePriorRev {
             get {
                 return ResourceManager.GetString("RestorePriorRev", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Importing Certificates and Related Data.
+        /// </summary>
+        public static string RestoreStep_ImportingCertificateData {
+            get {
+                return ResourceManager.GetString("RestoreStep_ImportingCertificateData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Processing File.
+        /// </summary>
+        public static string RestoreStep_ProcessingFile {
+            get {
+                return ResourceManager.GetString("RestoreStep_ProcessingFile", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Promoting New Candidate Config.
+        /// </summary>
+        public static string RestoreStep_PromotingCandidateConfig {
+            get {
+                return ResourceManager.GetString("RestoreStep_PromotingCandidateConfig", resourceCulture);
             }
         }
         
@@ -4568,6 +4901,33 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to System Backup.
+        /// </summary>
+        public static string System_Backup {
+            get {
+                return ResourceManager.GetString("System Backup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to System Certificates.
+        /// </summary>
+        public static string System_Certificates {
+            get {
+                return ResourceManager.GetString("System Certificates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to System Restore.
+        /// </summary>
+        public static string System_Restore {
+            get {
+                return ResourceManager.GetString("System Restore", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to System Settings.
         /// </summary>
         public static string System_Settings {
@@ -4640,6 +5000,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unencrypted.
+        /// </summary>
+        public static string Unencrypted {
+            get {
+                return ResourceManager.GetString("Unencrypted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unlimited.
         /// </summary>
         public static string Unlimited {
@@ -4654,6 +5023,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Unmatched_Traffic_Handling {
             get {
                 return ResourceManager.GetString("Unmatched Traffic Handling", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Uploading File.
+        /// </summary>
+        public static string Uploading_File {
+            get {
+                return ResourceManager.GetString("Uploading File", resourceCulture);
             }
         }
         
@@ -4932,11 +5310,31 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There are pending changes in the current candidate config. These changes will be overwitten by a restore.
+        ///
+        ///Are you sure you wish to continue?.
+        /// </summary>
+        public static string WARN_RestoreChangesPending {
+            get {
+                return ResourceManager.GetString("WARN_RestoreChangesPending", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Discard the current candidate config and promote this prior revision to candidate?.
         /// </summary>
         public static string WARN_RestorePriorRev {
             get {
                 return ResourceManager.GetString("WARN_RestorePriorRev", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The current export options include sensitive material (e.g. private keys). Are you sure you want to disable encryption?.
+        /// </summary>
+        public static string WARN_SensitiveExportWithoutEncryption {
+            get {
+                return ResourceManager.GetString("WARN_SensitiveExportWithoutEncryption", resourceCulture);
             }
         }
         

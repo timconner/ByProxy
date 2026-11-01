@@ -18,7 +18,20 @@
 
         public abstract ProxyRouteMatch Clone(int newRevision);
 
-        public abstract dynamic ToComparable();
+        public abstract RouteMatchExport ToExport();
+    }
+
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
+    [JsonDerivedType(typeof(RouteHeaderMatchExport), "Header")]
+    [JsonDerivedType(typeof(RouteQueryMatchExport), "Query")]
+    public abstract class RouteMatchExport {
+        public Guid Id { get; set; }        
+        public Guid RouteId { get; set; }
+        public string Key { get; set; }
+        public List<string>? Values { get; set; }
+        public bool? CaseSensitiveValues { get; set; }
+
+        public abstract ProxyRouteMatch Realize(int revision);
     }
 
     public static class ProxyRouteMatchExtensions {

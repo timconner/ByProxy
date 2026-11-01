@@ -1,5 +1,7 @@
 ﻿<div class="button" @onclick=onclick>
-    <Icon Size="20px" Name="@Icon" />
+    @if (Icon != null) {
+        <Icon Size="20px" Name="@Icon" />
+    }
     <span>@Label</span>
 </div>
 

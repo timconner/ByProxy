@@ -271,8 +271,8 @@
             };
         }
 
-        public dynamic ToComparable() {
-            return new {
+        public RouteExport ToExport() {
+            return new RouteExport {
                 Id = Id,
                 Name = Name,
                 Description = Description,
@@ -280,14 +280,14 @@
                 Order = Order,
                 ResponseType = ResponseType.Type,
                 ClusterId = ClusterId,
-                HttpStatusCode = HttpStatusCode,
                 RedirectLocation = RedirectLocation,
-                Methods = Methods?.OrderBy(m => m).ToArray(),
-                Hosts = Hosts?.OrderBy(h => h).ToArray(),
-                MatchCriteria = MatchCriteria.OrderBy(_ => _.Id).Select(_ => _.ToComparable()).ToArray(),
+                HttpStatusCode = HttpStatusCode,
+                Methods = Methods?.Order().ToList(),
+                Hosts = Hosts?.Order().ToList(),
+                MatchCriteria = MatchCriteria.OrderBy(_ => _.Id).Select(_ => _.ToExport()).ToList(),
                 PreserveHostHeader = PreserveHostHeader,
                 PreserveClientHeaders = PreserveClientHeaders,
-                AllowedHeaders = AllowedHeaders?.OrderBy(h => h).ToArray(),
+                AllowedHeaders = AllowedHeaders?.Order().ToList(),
                 XForwardedPrefix = XForwardedPrefix,
                 XForwardedForAction = XForwardedForAction?.Action,
                 XForwardedProtoAction = XForwardedProtoAction?.Action,
@@ -299,7 +299,71 @@
                 HttpsPort = HttpsPort,
                 SuppressHttpsRedirect = SuppressHttpsRedirect,
                 MaxRequestBodySize = MaxRequestBodySize,
-                Transforms = Transforms.OrderBy(_ => _.Id).Select(_ => _.ToComparable()).ToArray(),
+                Transforms = Transforms.OrderBy(_ => _.Id).Select(_ => _.ToExport()).ToList()
+            };
+        }
+    }
+
+    public class RouteExport {
+        public Guid Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public bool Disabled { get; set; }
+        public int Order { get; set; }
+        public string ResponseType { get; set; }
+        public Guid? ClusterId { get; set; }
+        public int? HttpStatusCode { get; set; }
+        public string? RedirectLocation { get; set; }
+        public List<string>? Methods { get; set; }
+        public List<string>? Hosts { get; set; }
+        public List<RouteMatchExport> MatchCriteria { get; set; }
+        public bool PreserveHostHeader { get; set; }
+        public bool PreserveClientHeaders { get; set; }
+        public List<string>? AllowedHeaders { get; set; }
+        public string? XForwardedPrefix { get; set; }
+        public string? XForwardedForAction { get; set; }
+        public string? XForwardedProtoAction { get; set; }
+        public string? XForwardedHostAction { get; set; }
+        public string? XForwardedPrefixAction { get; set; }
+        public string? Path { get; set; }
+        public bool PathIsPrefix { get; set; }
+        public int? HttpPort { get; set; }
+        public int? HttpsPort { get; set; }
+        public bool SuppressHttpsRedirect { get; set; }
+        public long? MaxRequestBodySize { get; set; }
+        public List<RouteTransformExport> Transforms { get; set; }
+
+        public ProxyRoute Realize(int revision) {
+            return new ProxyRoute {
+                Id = Id,
+                ConfigRevision = revision,
+                Name = Name,
+                Description = Description,
+                Disabled = Disabled,
+                Order = Order,
+                ResponseType = RouteResponseType.FromString(ResponseType) ?? throw new NotImplementedException($"Unknown Route Response Type: {ResponseType}"),
+                ClusterId = ClusterId,
+                ClusterConfigRevision = revision,
+                RedirectLocation = RedirectLocation,
+                HttpStatusCode = HttpStatusCode,
+                Methods = Methods?.ToList(),
+                Hosts = Hosts?.ToList(),
+                MatchCriteria = MatchCriteria.Select(_ => _.Realize(revision)).ToList(),
+                PreserveHostHeader = PreserveHostHeader,
+                PreserveClientHeaders = PreserveClientHeaders,
+                AllowedHeaders = AllowedHeaders?.ToList(),
+                XForwardedPrefix = XForwardedPrefix,
+                XForwardedForAction = XForwardedForAction == null ? null : (ForwardedTransformAction.FromString(XForwardedForAction) ?? throw new NotImplementedException($"Unknown X-Forwarded Action: {XForwardedForAction}")),
+                XForwardedProtoAction = XForwardedProtoAction == null ? null : (ForwardedTransformAction.FromString(XForwardedProtoAction) ?? throw new NotImplementedException($"Unknown X-Forwarded Action: {XForwardedProtoAction}")),
+                XForwardedHostAction = XForwardedHostAction == null ? null : (ForwardedTransformAction.FromString(XForwardedHostAction) ?? throw new NotImplementedException($"Unknown X-Forwarded Action: {XForwardedHostAction}")),
+                XForwardedPrefixAction = XForwardedPrefixAction == null ? null : (ForwardedTransformAction.FromString(XForwardedPrefixAction) ?? throw new NotImplementedException($"Unknown X-Forwarded Action: {XForwardedPrefixAction}")),
+                Path = Path,
+                PathIsPrefix = PathIsPrefix,
+                HttpPort = HttpPort,
+                HttpsPort = HttpsPort,
+                SuppressHttpsRedirect = SuppressHttpsRedirect,
+                MaxRequestBodySize = MaxRequestBodySize,
+                Transforms = Transforms.Select(_ => _.Realize(revision)).ToList()
             };
         }
     }

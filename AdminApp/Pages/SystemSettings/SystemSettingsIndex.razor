@@ -115,13 +115,16 @@
             <button @onclick="RestartProxy">@_strings["Restart Proxy Server"]</button>
             <button @onclick="ShutdownProxy">@_strings["Shutdown Proxy Server"]</button>
         </div>
+        <div class="backup-restore">
+            <a href="/system/backup" class="button">@_strings["System Backup"]</a>
+            <a href="/system/restore" class="button">@_strings["System Restore"]</a>
+        </div>
         <div class="certificates">
             <LabelValuePairs>
                 <LabelValuePair Label="@_strings["Last Commit"]" Value="@_proxyState.RunningConfig.CommittedAt.ToLocalTime().ToString("g")" />
             </LabelValuePairs>
             <a href="/system/configs" class="button">@_strings["ConfigurationCompareRestore"]</a>
             <a href="/system/cert-purge" class="button">@_strings["Certificate Purge Utility"]</a>
-            <div />
         </div>
     </div>
 </PageContent>

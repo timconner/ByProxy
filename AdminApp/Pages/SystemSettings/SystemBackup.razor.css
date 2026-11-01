@@ -1,0 +1,17 @@
+fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.not-included {
+    color: var(--disabled-text-color);
+    line-height: 26px;
+}
+
+.export-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 12px;
+}

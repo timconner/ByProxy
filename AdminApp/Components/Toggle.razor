@@ -27,6 +27,9 @@
     [Parameter]
     public EventCallback<bool> ToggleHandler { get; set; }
 
+    [Parameter]
+    public bool DisableToggleStateManagement { get; set; } = false;
+
     private string _iconName => IsOn ? "toggle-right" : "toggle-left";
 
     protected override void OnParametersSet() {
@@ -35,7 +38,11 @@
     }
 
     private async Task InvokeToggle() {
-        IsOn = !IsOn;
-        await ToggleHandler.InvokeAsync(IsOn);
+        if (DisableToggleStateManagement) {
+            await ToggleHandler.InvokeAsync(!IsOn);
+        } else {
+            IsOn = !IsOn;
+            await ToggleHandler.InvokeAsync(IsOn);
+        }
     }
 }

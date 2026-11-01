@@ -1,0 +1,105 @@
+﻿@page "/system/backup"
+@attribute [Authorize(Roles = AuthRoles.Admin)]
+@inject IStringLocalizer<Language> _strings
+@inject ModalService _modal
+@inject ImportExportService _importExport
+
+<PageHeader Title="@_strings["System Backup"]">
+</PageHeader>
+
+<PageContent>
+    <form method="post" action="/system/export/download" target="_blank">
+        <AntiforgeryToken />
+        <fieldset>
+            <legend>@_strings["Areas to Export"]</legend>
+            <input type="hidden" name="options" value="@_options" />
+
+            <Toggle FieldLabel="@_strings["Include System Settings"]"
+                    OffLabel="@_strings["No"]"
+                    OnLabel="@_strings["Yes"]"
+                    IsOn="_options.HasFlag(ExportOptions.IncludeSystemSettings)"
+                    ToggleHandler="() => ToggleOption(ExportOptions.IncludeSystemSettings)"
+                    DisableToggleStateManagement />
+
+            @if (_options.HasFlag(ExportOptions.IncludeSystemSettings)) {
+                <Toggle FieldLabel="@_strings["Include System Certificates"]"
+                        OffLabel="@_strings["No"]"
+                        OnLabel="@_strings["Yes"]"
+                        IsOn="_options.HasFlag(ExportOptions.IncludeSystemCertificates)"
+                        ToggleHandler="() => ToggleOption(ExportOptions.IncludeSystemCertificates)"
+                        DisableToggleStateManagement />
+            } else {
+                <div class="not-included">@_strings["Include System Certificates"]: @_strings["No"]</div>
+            }
+
+            <Toggle FieldLabel="@_strings["Include Routes and Clusters"]"
+                    OffLabel="@_strings["No"]"
+                    OnLabel="@_strings["Yes"]"
+                    IsOn="_options.HasFlag(ExportOptions.IncludeRoutesAndClusters)"
+                    ToggleHandler="() => ToggleOption(ExportOptions.IncludeRoutesAndClusters)"
+                    DisableToggleStateManagement />
+
+            <Toggle FieldLabel="@_strings["Include SNI Maps"]"
+                    OffLabel="@_strings["No"]"
+                    OnLabel="@_strings["Yes"]"
+                    IsOn="_options.HasFlag(ExportOptions.IncludeSniMaps)"
+                    ToggleHandler="() => ToggleOption(ExportOptions.IncludeSniMaps)"
+                    DisableToggleStateManagement />
+
+            <Toggle FieldLabel="@_strings["Certificates to Include"]"
+                    OffLabel="@(_options.HasFlag(ExportOptions.IncludeSystemCertificates) || _options.HasFlag(ExportOptions.IncludeSniMaps)
+                        ? _strings["Referenced Only"]
+                        : _strings["None"])"
+                    OnLabel="@_strings["All Certificates"]"
+                    IsOn="_options.HasFlag(ExportOptions.IncludeAllCertificates)"
+                    ToggleHandler="() => ToggleOption(ExportOptions.IncludeAllCertificates)"
+                    DisableToggleStateManagement />
+        </fieldset>
+
+        <div class="export-options">
+            <Toggle FieldLabel="@_strings["Encrypted Backup"]"
+                    OffLabel="@_strings["Unencrypted"]"
+                    OnLabel="@_strings["AES-256 Encrypted"]"
+                    IsOn="_encrypt"
+                    ToggleHandler="ToggleEncrypt"
+                    DisableToggleStateManagement />
+
+            @if (_encrypt) {
+                <label>
+                    <span>@_strings["Encryption Password"]:</span>
+                    <input type="password" name="password" autocomplete="off" @bind="_password" @bind:event="oninput" />
+                </label>
+            }
+        </div>
+        <button type="submit" disabled="@(!IsReady)">@_strings["Download Backup"]</button>
+    </form>
+</PageContent>
+
+@code {
+    private ExportOptions _options = ExportOptions.FullExport;
+    private bool _encrypt = true;
+    private string _password = string.Empty;
+
+    private bool IsReady => _options != ExportOptions.None
+            && (!_encrypt || !string.IsNullOrEmpty(_password));
+
+    private void ToggleOption(ExportOptions option) {
+        _options ^= option;
+
+        if (!_options.HasFlag(ExportOptions.IncludeSystemSettings)) {
+            _options &= ~ExportOptions.IncludeSystemCertificates;
+        }
+
+        if (ExportOptions.Sensitive.HasFlag(option) && !_encrypt) {
+            _encrypt = true;
+        }
+    }
+
+    private async Task ToggleEncrypt() {
+        if (_encrypt && (_options & ExportOptions.Sensitive) != 0) {
+            var result = await _modal.YesNo(_strings["Warning"], _strings["WARN_SensitiveExportWithoutEncryption"]);
+            if (result != DialogResult.Yes) return;
+        }
+        _encrypt = !_encrypt;
+    }
+}

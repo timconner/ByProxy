@@ -267,6 +267,7 @@ namespace ByProxy {
                 builder.Services.AddLocalization();
                 builder.Services.AddScoped<AdminAppStateService>();
                 builder.Services.AddModalService();
+                builder.Services.AddTransient<ImportExportService>();
                 builder.Services.AddRazorComponents()
                     .AddInteractiveServerComponents();
             }
@@ -343,13 +344,17 @@ namespace ByProxy {
 
                     admin.UseAntiforgery();
                     admin.UseAuthorization();
-                    admin.UseEndpoints(endpoints =>
-                        endpoints.MapRazorComponents<App>()
-                        .AddInteractiveServerRenderMode()
+                    admin.UseEndpoints(endpoints => {
+                        endpoints.MapPost("/system/export/download", ImportExportService.GenerateDownload)
+                            .RequireAuthorization(new AuthorizeAttribute { Roles = AuthRoles.Admin });
                         
-                        // Allow Blazor to handle authorization for blazor pages instead of cookie middleware
-                        // cookie middleware just returns a empty 401 instead of routing to the login page
-                        .AllowAnonymous()
+                        endpoints.MapRazorComponents<App>()
+                            .AddInteractiveServerRenderMode()
+
+                            // Allow Blazor to handle authorization for blazor pages instead of cookie middleware
+                            // cookie middleware just returns a empty 401 instead of routing to the login page
+                            .AllowAnonymous();
+                        }
                     );
                 });
             }

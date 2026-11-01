@@ -16,10 +16,23 @@
             };
         }
 
-        public dynamic ToComparable() {
-            return new {
+        public SniMapExport ToExport() {
+            return new SniMapExport {
                 Host = Host,
-                CertId = CertificateId
+                CertificateId = CertificateId
+            };
+        }
+    }
+
+    public class SniMapExport {
+        public string Host { get; set; }
+        public Guid CertificateId { get; set; }
+
+        public ProxySniMap Realize(int revision) {
+            return new ProxySniMap {
+                ConfigRevision = revision,
+                Host = Host,
+                CertificateId = CertificateId
             };
         }
     }

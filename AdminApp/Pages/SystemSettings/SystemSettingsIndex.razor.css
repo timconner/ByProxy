@@ -20,9 +20,19 @@ fieldset {
 }
 
 .danger-zone {
-    display: flex;
-    justify-content: space-around;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: end;
+    column-gap: 48px;
+    row-gap: 36px;
+    margin-bottom: 12px;
 }
+
+    .danger-zone .backup-restore {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
 
     .danger-zone .services {
         display: flex;
@@ -35,3 +45,9 @@ fieldset {
         flex-direction: column;
         gap: 12px;
     }
+
+@media only screen and (max-width : 667px) {
+    .danger-zone {
+        grid-template-columns: 1fr;
+    }
+}

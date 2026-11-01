@@ -167,28 +167,34 @@ namespace ByProxy.Models {
             };
         }
 
-        private dynamic GenerateComparable(bool sortByOrder) {
-            return new {
-                //ConfirmSeconds = ConfirmSeconds, Intentionally Excluded (Set at time of commit)
+        public SystemSettingsExport SystemSettingsToExport(bool includeCertificates) {
+            return new SystemSettingsExport {
                 AdminListenAny = AdminListenAny,
                 AdminPort = AdminPort,
-                AdminCertId = AdminCertId,
-                FallbackCertId = FallbackCertId,
+                AdminCertId = includeCertificates ? AdminCertId : null,
+                FallbackCertId = includeCertificates ? FallbackCertId : null,
                 MaxRequestBodySize = MaxRequestBodySize,
                 UnmatchedStatus = UnmatchedStatus,
-                Tarpit = Tarpit,
-                Routes = Routes
-                    .OrderBy(_ => sortByOrder ? (IComparable)_.Order : (IComparable)_.Id)
-                    .Select(_ => _.ToComparable())
-                    .ToArray(),
+                Tarpit = Tarpit
+            };
+        }
+
+        private ComparableConfig GenerateComparable(bool sortByOrder) {
+            return new ComparableConfig {
+                SystemSettings = SystemSettingsToExport(true),
+                Routes = (
+                    sortByOrder
+                        ? Routes.OrderBy(_ => _.Order)
+                        : Routes.OrderBy(_ => _.Id))
+                    .Select(_ => _.ToExport())
+                    .ToList(),
                 Clusters = Clusters
-                    .OrderBy(_ => _.Id)
-                    .Select(_ => _.ToComparable(sortByOrder))
-                    .ToArray(),
+                    .Select(_ => _.ToExport(sortByOrder))
+                    .ToList(),
                 SniMaps = SniMaps
                     .OrderByHost()
-                    .Select(_ => _.ToComparable())
-                    .ToArray()
+                    .Select(_ => _.ToExport())
+                    .ToList()
             };
         }
 
@@ -212,49 +218,23 @@ namespace ByProxy.Models {
             });
 
             return json;
-        }
+        }        
+    }
 
-        //private ProxyRoute GenerateRoute(string name, string? hostname, string destination, int httpPort, int httpsPort, AcmeProvider? acmeProvider) {
-        //    var id = Guid.NewGuid();
+    public class ComparableConfig {
+        public SystemSettingsExport SystemSettings { get; set; }
+        public List<RouteExport> Routes { get; set; }
+        public List<ClusterExport> Clusters { get; set; }
+        public List<SniMapExport> SniMaps { get; set; }
+    }
 
-        //    var cluster = new ProxyCluster() {
-        //        Id = id,
-        //        ConfigRevision = Revision,
-        //        Name = name,
-        //        Description = string.Empty
-        //    };
-
-        //    cluster.Destinations = new List<ProxyDestination>() {
-        //        new ProxyDestination() {
-        //            Id = id,
-        //            ConfigRevision = Revision,
-        //            Name = name,
-        //            ClusterId = cluster.Id,
-        //            Cluster = cluster,
-        //            Address = destination
-        //        }
-        //    };
-
-        //    Clusters.Add(cluster);
-
-        //    return new ProxyRoute {
-        //        Id = id,
-        //        ConfigRevision = Revision,
-        //        Name = name,
-        //        Description = string.Empty,
-        //        ClusterId = cluster.Id,
-        //        Cluster = cluster,
-        //        Hosts = hostname == null ? null : [hostname],
-        //        Path = null,
-        //        HttpPort = httpPort,
-        //        HttpsPort = httpsPort
-        //    };
-        //}
-
-        public void AddSimpleConfig(string hostname, string destination) {
-            throw new NotImplementedException("Simple mode ACME integration pending");
-            //var route = GenerateRoute("Simple", hostname, destination, 80, 443, AcmeProvider.Providers.FirstOrDefault());
-            //Routes.Add(route);
-        }
+    public class SystemSettingsExport {
+        public bool AdminListenAny { get; set; }
+        public int AdminPort { get; set; }
+        public Guid? AdminCertId { get; set; }
+        public Guid? FallbackCertId { get; set; }
+        public long? MaxRequestBodySize { get; set; }
+        public int UnmatchedStatus { get; set; }
+        public bool Tarpit { get; set; }
     }
 }

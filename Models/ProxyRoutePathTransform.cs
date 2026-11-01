@@ -6,7 +6,7 @@
         public string PathString { get; set; }
 
         public override ProxyRouteTransform Clone(int newRevision) {
-            return new ProxyRoutePathTransform() {
+            return new ProxyRoutePathTransform {
                 Id = Id,
                 ConfigRevision = newRevision,
                 RouteId = RouteId,
@@ -16,11 +16,27 @@
             };
         }
 
-        public override dynamic ToComparable() {
-            return new {
+        public override RouteTransformExport ToExport() {
+            return new RoutePathTransformExport {
                 Id = Id,
-                Type = TransformType.Type,
-                PathMode = PathMode.Mode,
+                RouteId = RouteId,
+                Mode = PathMode.Mode,
+                PathString = PathString
+            };
+        }
+    }
+
+    public class RoutePathTransformExport : RouteTransformExport {
+        public string Mode { get; set; }
+        public string PathString { get; set; }
+
+        public override ProxyRouteTransform Realize(int revision) {
+            return new ProxyRoutePathTransform {
+                Id = Id,
+                ConfigRevision = revision,
+                RouteId = RouteId,
+                RouteConfigRevision = revision,
+                PathMode = PathTransformMode.FromString(Mode) ?? throw new NotImplementedException($"Unknown Path Transform Mode: {Mode}"),
                 PathString = PathString
             };
         }

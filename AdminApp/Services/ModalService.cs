@@ -93,13 +93,17 @@
             }
         }
 
-        public async Task<bool> RunWithProgressViewer(string title, Func<IProgress<(string Main, string? Detail)>, Task> processingAction) {
+        public async Task<bool> RunWithProgressViewer(string title, Func<IProgress<(string Main, string? Detail)>, Task> processingAction, bool autoClose = false) {
             AssertComponentRegistered();
             var progress = new Progress<(string Main, string? Detail)>();
             _modal.StartProgressViewer(title, progress);
             try {
                 await processingAction(progress);
-                await _modal.EndProgressViewer(true, null);
+                if (autoClose) {
+                    await _modal.CloseProgressViewer();
+                } else {
+                    await _modal.EndProgressViewer(true, null);
+                }
                 return true;
             } catch (DbUpdateException ex) {
                 await _modal.EndProgressViewer(false, ex.InnerException?.Message ?? ex.Message);

@@ -1,0 +1,218 @@
+﻿@page "/system/restore"
+@attribute [Authorize(Roles = AuthRoles.Admin)]
+@inject IStringLocalizer<Language> _strings
+@inject IJSRuntime _js
+@inject IDbContextFactory<ProxyDb> _dbFactory
+@inject ModalService _modal
+@inject ProxyStateService _proxyState
+@inject AdminAppStateService _appState
+@inject ConfigurationService _config
+@inject NavigationManager _nav
+@inject ImportExportService _importExport
+
+<PageHeader Title="@_strings["System Restore"]">
+    @if (_export != null) {
+        <PageHeaderButton Icon="arrow-back-up" Label="@_strings["Cancel"]" @onclick=Reset />
+        <PageHeaderButton Icon="database-import" Label="@_strings["Accept"]" @onclick=ProcessImport />
+    }
+</PageHeader>
+
+@if (_export == null) {
+    <div class="import-options">
+        <InputFile OnChange="FileSelected" />
+
+        <Toggle FieldLabel="@_strings["Encrypted Backup"]" OffLabel="@_strings["Unencrypted"]" IsOn="_isEncrypted" OnLabel="@_strings["AES-256 Encrypted"]" ToggleHandler="(state) => _isEncrypted = state" />
+
+        @if (_isEncrypted) {
+            <label>
+                <span>@_strings["Encryption Password"]:</span>
+                <input type="password" name="password" autocomplete="off" @bind="_password" @bind:event="oninput" />
+            </label>
+        }
+    </div>
+    <div>
+        <button type="button" @onclick="BeginImport" disabled="@(!IsReady())">
+            @_strings["Preview Restore"]
+        </button>
+    </div>
+} else {
+    <div class="restore-preview">
+        <div class="restore-options">
+            <fieldset class="import-areas">
+                <legend>@_strings["Areas to Import"]</legend>
+                @if (_export.HasSystemSettings()) {
+                    <Toggle FieldLabel="@_strings["System Settings"]"
+                            OffLabel="@_strings["No"]"
+                            OnLabel="@_strings["Yes"]"
+                            IsOn="_areasToImport.HasFlag(ExportOptions.IncludeSystemSettings)"
+                            ToggleHandler="() => ToggleArea(ExportOptions.IncludeSystemSettings)"
+                            DisableToggleStateManagement />
+                } else {
+                    <div class="not-included">@_strings["System Settings"]: @_strings["Not Found in Uploaded File"]</div>
+                }
+
+                @if (_export.HasSystemCertificates()) {
+                    @if (_areasToImport.HasFlag(ExportOptions.IncludeSystemSettings)) {
+                        <Toggle FieldLabel="@_strings["System Certificates"]"
+                                OffLabel="@_strings["No"]"
+                                OnLabel="@_strings["Yes"]"
+                                IsOn="_areasToImport.HasFlag(ExportOptions.IncludeSystemCertificates)"
+                                ToggleHandler="() => ToggleArea(ExportOptions.IncludeSystemCertificates)"
+                                DisableToggleStateManagement />
+                    } else {
+                        <div class="not-included">@_strings["System Certificates"]: @_strings["Not Included"]</div>
+                    }
+                } else {
+                    <div class="not-included">@_strings["System Certificates"]: @_strings["Not Found in Uploaded File"]</div>
+                }
+
+                @if (_export.HasRoutesAndClusters()) {
+                    <Toggle FieldLabel="@_strings["Routes and Clusters"]"
+                            OffLabel="@_strings["No"]"
+                            OnLabel="@_strings["Yes"]"
+                            IsOn="_areasToImport.HasFlag(ExportOptions.IncludeRoutesAndClusters)"
+                            ToggleHandler="() => ToggleArea(ExportOptions.IncludeRoutesAndClusters)"
+                            DisableToggleStateManagement />
+                } else {
+                    <div class="not-included">@_strings["Routes and Clusters"]: @_strings["Not Found in Uploaded File"]</div>
+                }
+
+                @if (_export.HasSniMaps()) {
+                    <Toggle FieldLabel="@_strings["SNI Maps"]"
+                            OffLabel="@_strings["No"]"
+                            OnLabel="@_strings["Yes"]"
+                            IsOn="_areasToImport.HasFlag(ExportOptions.IncludeSniMaps)"
+                            ToggleHandler="() => ToggleArea(ExportOptions.IncludeSniMaps)"
+                            DisableToggleStateManagement />
+                } else {
+                    <div class="not-included">@_strings["SNI Maps"]: @_strings["Not Found in Uploaded File"]</div>
+                }
+
+                @if (_export.HasCertificates()) {
+                    <Toggle FieldLabel="@_strings["Certificates to Include"]"
+                            OffLabel="@_strings["Referenced Only"]"
+                            OnLabel="@_strings["All Certificates"]"
+                            IsOn="_areasToImport.HasFlag(ExportOptions.IncludeAllCertificates)"
+                            ToggleHandler="() => ToggleArea(ExportOptions.IncludeAllCertificates)"
+                            DisableToggleStateManagement />
+                } else {
+                    <div class="not-included">@_strings["Certificates to Include"]: @_strings["Not Found in Uploaded File"]</div>
+                }
+            </fieldset>
+            <fieldset class="merge-options">
+                <legend>Merge Options</legend>
+                @if (_export.HasSystemSettings()) {
+                    if (_areasToImport.HasFlag(ExportOptions.IncludeSystemSettings)) {
+                        <Toggle FieldLabel="@_strings["Admin Port/Listen"]"
+                                OffLabel="@_strings["Overwrite"]"
+                                OnLabel="@_strings["Keep Current"]"
+                                IsOn="_mergeOptions.HasFlag(ImportMergeOptions.SkipAdminPortAndListen)"
+                                ToggleHandler="() => ToggleMergeOption(ImportMergeOptions.SkipAdminPortAndListen)"
+                                DisableToggleStateManagement />
+                    } else {
+                        <div class="not-included">@_strings["Admin Port/Listen"]: @_strings["Not Included"]</div>
+                    }
+                } else {
+                    <div class="not-included">@_strings["Admin Port/Listen"]: @_strings["Not Found in Uploaded File"]</div>
+                }
+
+                @if (_export.HasRoutesAndClusters()) {
+                    if (_areasToImport.HasFlag(ExportOptions.IncludeRoutesAndClusters)) {
+                        <Toggle FieldLabel="@_strings["Routes and Clusters"]"
+                                OffLabel="@_strings["Overwrite"]"
+                                OnLabel="@_strings["Merge"]"
+                                IsOn="_mergeOptions.HasFlag(ImportMergeOptions.MergeClustersAndRoutes)"
+                                ToggleHandler="() => ToggleMergeOption(ImportMergeOptions.MergeClustersAndRoutes)"
+                                DisableToggleStateManagement />
+                    } else {
+                        <div class="not-included">@_strings["Routes and Clusters"]: @_strings["Not Included"]</div>
+                    }
+                } else {
+                    <div class="not-included">@_strings["Routes and Clusters"]: @_strings["Not Found in Uploaded File"]</div>
+                }
+
+                @if (_export.HasSniMaps()) {
+                    if (_areasToImport.HasFlag(ExportOptions.IncludeSniMaps)) {
+                        <Toggle FieldLabel="@_strings["SNI Maps"]"
+                                OffLabel="@_strings["Overwrite"]"
+                                OnLabel="@_strings["Merge"]"
+                                IsOn="_mergeOptions.HasFlag(ImportMergeOptions.MergeSniMaps)"
+                                ToggleHandler="() => ToggleMergeOption(ImportMergeOptions.MergeSniMaps)"
+                                DisableToggleStateManagement />
+                    } else {
+                        <div class="not-included">@_strings["SNI Maps"]: @_strings["Not Included"]</div>
+                    }
+                } else {
+                    <div class="not-included">@_strings["SNI Maps"]: @_strings["Not Found in Uploaded File"]</div>
+                }
+
+                @if (_export.HasAcmeDnsProviders()) {
+                    <Toggle FieldLabel="@_strings["ACME DNS Script Conflicts"]"
+                            OffLabel="@_strings["Overwrite"]"
+                            OnLabel="@_strings["Keep Current"]"
+                            IsOn="_mergeOptions.HasFlag(ImportMergeOptions.UpdateDnsScriptsOnConflict)"
+                            ToggleHandler="() => ToggleMergeOption(ImportMergeOptions.UpdateDnsScriptsOnConflict)"
+                            DisableToggleStateManagement />
+                } else {
+                    <div class="not-included">@_strings["ACME DNS Providers"]: @_strings["Not Found in Uploaded File"]</div>
+                }
+
+                @if (_export.HasAcmeCertificates()) {
+                    <Toggle FieldLabel="@_strings["ACME Certificate Conflicts"]"
+                            OffLabel="@_strings["Keep Latest Expiry"]"
+                            OnLabel="@_strings["Keep Current"]"
+                            IsOn="_mergeOptions.HasFlag(ImportMergeOptions.IgnoreOnAcmeConflict)"
+                            ToggleHandler="() => ToggleMergeOption(ImportMergeOptions.IgnoreOnAcmeConflict)"
+                            DisableToggleStateManagement />
+                } else {
+                    <div class="not-included">@_strings["ACME Certificates"]: @_strings["Not Found in Uploaded File"]</div>
+                }
+            </fieldset>
+        </div>
+        <div class="summary-container">
+            <div class="summary-switcher">
+                <button class="@(!_viewCandidateConfig ? "selected" : "")" @onclick="() => ChangeSummaryView(false)">
+                    @_strings["File Summary"]
+                </button>
+                <button class="@(_viewCandidateConfig ? "selected" : "")" @onclick="() => ChangeSummaryView(true)">
+                    @_strings["Configuration Preview"]
+                </button>
+            </div>
+            <div class="summary-content">
+                <div class="summary-table" hidden="@_viewCandidateConfig">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Count</th>
+                                <th>Values</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var entry in _export.GetSummary()) {
+                                <tr>
+                                    <td>@entry.Key</td>
+                                    <td>@entry.Value.Count</td>
+                                    <td>
+                                        @if (entry.Value.Count == 0) {
+                                            <span class="empty">None</span>
+                                        } else {
+                                            <ul>
+                                                @foreach (var value in entry.Value) {
+                                                    <li>@value</li>
+                                                }
+                                            </ul>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="editor-container" hidden="@(!_viewCandidateConfig)">
+                    <MonacoEditor @ref="_editor" ReadOnly />
+                </div>
+            </div>
+        </div>
+    </div>
+}
