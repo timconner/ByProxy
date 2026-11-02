@@ -58,7 +58,6 @@ ByProxy uses YARP as the underlying proxy engine while layering on:
 ## Ideas for Future Enhancements
 
 ### Near-Term
-- Configuration backup and restore from UI
 - Response Transforms
 
 ### Mid-Term
