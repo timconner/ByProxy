@@ -2339,4 +2339,10 @@ Continue editing the draft or click Discard to restore the saved version.</value
 Are you sure you wish to continue?</value>
     <comment>Used in SystemRestore</comment>
   </data>
+  <data name="ACME Certificates" xml:space="preserve">
+    <value>ACME Certificates</value>
+  </data>
+  <data name="CA Issued Certificates" xml:space="preserve">
+    <value>CA Issued Certificates</value>
+  </data>
 </root>

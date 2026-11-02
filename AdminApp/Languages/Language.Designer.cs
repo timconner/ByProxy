@@ -106,6 +106,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ACME Certificates.
+        /// </summary>
+        public static string ACME_Certificates {
+            get {
+                return ResourceManager.GetString("ACME Certificates", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ACME DNS Providers.
         /// </summary>
         public static string ACME_DNS_Providers {
@@ -480,6 +489,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Authorities {
             get {
                 return ResourceManager.GetString("Authorities", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CA Issued Certificates.
+        /// </summary>
+        public static string CA_Issued_Certificates {
+            get {
+                return ResourceManager.GetString("CA Issued Certificates", resourceCulture);
             }
         }
         

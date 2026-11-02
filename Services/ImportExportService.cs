@@ -560,27 +560,6 @@
 
             return UpgradeExportToLatest(export);
         }
-
-        private ProxyExportV1_20 DecryptExportV1_20(ReadOnlySpan<byte> headerBytes, ReadOnlySpan<byte> contents, string password) {
-            var header = JsonSerializer.Deserialize<EncryptionHeaderV1_20>(headerBytes) ?? throw new InvalidDataException("Invalid encryption header.");
-            int tagSize = EncryptionParametersV1_20.TagSize;
-            if (contents.Length < tagSize) throw new InvalidDataException("Encrypted payload is truncated.");
-
-            var ciphertext = contents.Slice(0, contents.Length - tagSize);
-            var tag = contents.Slice(contents.Length - tagSize, tagSize);
-
-            byte[] plaintext = new byte[ciphertext.Length];
-            byte[] key = Rfc2898DeriveBytes.Pbkdf2(password, header.Salt,
-                EncryptionParametersV1_20.Iterations,
-                EncryptionParametersV1_20.HashAlgorithm,
-                EncryptionParametersV1_20.KeySize);
-
-            using (var aes = new AesGcm(key, tagSize))
-                aes.Decrypt(header.Nonce, ciphertext, tag, plaintext, headerBytes);
-
-            return JsonSerializer.Deserialize<ProxyExportV1_20>(plaintext) ?? throw new InvalidDataException("Invalid export contents.");
-        }
-
     }
 
     public static class ImportExportHelpers {
@@ -627,9 +606,9 @@
                 { "SNI Maps", latest.SniMaps?.Select(_ => _.Host).ToList() ?? [] },
                 { "ACME Accounts", latest.AcmeAccounts?.Select(_ => _.Name).ToList() ?? [] },
                 { "ACME DNS Providers", latest.AcmeDnsProviders?.Select(_ => _.Name).ToList() ?? [] },
-                /*check strings */ { "ACME Certificates", latest.ServerCertificates?.OfType<AcmeCertExportVLatest>().Select(_ => _.Name).ToList() ?? [] },
+                { "ACME Certificates", latest.ServerCertificates?.OfType<AcmeCertExportVLatest>().Select(_ => _.Name).ToList() ?? [] },
                 { "Certificate Authorities", latest.CertificateAuthorities?.Select(_ => _.Name).ToList() ?? [] },
-                /*check strings */ { "CA Issued Certificates", latest.ServerCertificates?.OfType<IssuedCertExportVLatest>().Select(_ => _.Name).ToList() ?? [] },
+                { "CA Issued Certificates", latest.ServerCertificates?.OfType<IssuedCertExportVLatest>().Select(_ => _.Name).ToList() ?? [] },
                 { "Imported Certificates", latest.ServerCertificates?.OfType<ImportedCertExportVLatest>().Select(_ => _.Name).ToList() ?? [] }
             };
         }
