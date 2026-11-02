@@ -6,6 +6,27 @@ ByProxy extends YARP’s core capabilities with certificate automation, advanced
 
 ---
 
+## Getting Started
+
+The easiest way to run ByProxy is via Docker Compose.
+The admin UI is exposed on **https://\<host\>:8081**
+
+```yaml
+services:
+  byproxy:
+    container_name: byproxy
+    image: timconner/byproxy
+    ports:
+      - 80:80
+      - 443:443
+      - 8081:8081
+    volumes:
+      - ./byproxy:/app/data
+    restart: unless-stopped
+```
+
+---
+
 ## Features
 
 ### Enhanced Routing & Control
@@ -72,26 +93,7 @@ ByProxy uses YARP as the underlying proxy engine while layering on:
 
 ---
 
-## Getting Started
-
-The easiest way to run ByProxy is via Docker Compose.
-The admin UI is exposed on **https://\<host\>:8081**
-
-```yaml
-services:
-  byproxy:
-    container_name: byproxy
-    image: timconner/byproxy
-    ports:
-      - 80:80
-      - 443:443
-      - 8081:8081
-    volumes:
-      - ./byproxy:/app/data
-    restart: unless-stopped
-```
-
-### Running Without Docker
+## Running Without Docker
 
 You can also run ByProxy directly on Windows or Linux. Install the
 [ASP.NET Core Runtime for .NET 10](https://dotnet.microsoft.com/download/dotnet/10.0)
