@@ -91,6 +91,86 @@ services:
     restart: unless-stopped
 ```
 
+### Running Without Docker
+
+You can also run ByProxy directly on Windows or Linux. Install the
+[ASP.NET Core Runtime for .NET 10](https://dotnet.microsoft.com/download/dotnet/10.0)
+and extract the published application files.
+
+#### Windows
+
+Run `ByProxy.exe` from the extracted application folder. You can double-click
+it in File Explorer or launch it from a terminal:
+
+```text
+ByProxy.exe
+```
+
+If using PowerShell, use `.\ByProxy.exe`.
+
+#### Linux
+
+Open a terminal in the application folder and run:
+
+```bash
+dotnet ByProxy.dll
+```
+
+Binding to ports 80 and 443 may require additional permissions on Linux.
+If running as a systemd service, use `AmbientCapabilities=CAP_NET_BIND_SERVICE`
+to allow a non-root service account to bind to these ports.
+
+### Data Storage
+
+ByProxy stores its persistent data in a single folder:
+
+```text
+data/
+├── proxy.db          # SQLite database
+├── certs/            # Certificates and their private keys (.pfx)
+└── acme/
+    └── accounts/     # ACME account keys
+```
+
+By default, ByProxy creates a `data` folder **one level above the application
+folder**. For example:
+
+| Application location | Default data folder |
+| --- | --- |
+| `C:\ByProxy\app\ByProxy.exe` | `C:\ByProxy\data` |
+| `/opt/byproxy/app/ByProxy.dll` | `/opt/byproxy/data` |
+
+This location is based on where the application files are stored, not the
+terminal's current directory.
+
+#### Using a Different Data Folder
+
+Set the `Proxy__DataDir` environment variable before starting ByProxy.
+The folder must already exist, and the account running ByProxy must have
+read and write access to it. Use an absolute path to avoid ambiguity.
+
+**Windows (PowerShell):**
+
+```powershell
+New-Item -ItemType Directory -Force -Path "C:\ByProxy\Data" | Out-Null
+$env:Proxy__DataDir = "C:\ByProxy\Data"
+.\ByProxy.exe
+```
+
+**Linux:**
+
+```bash
+mkdir -p "/opt/byproxy/data"
+export Proxy__DataDir="/opt/byproxy/data"
+dotnet ByProxy.dll
+```
+
+These examples set the variable for the current terminal session.
+For a service, set it in the service configuration instead.
+
+**Ensure access to the folder is restricted. It contains
+certificate private keys and ACME account keys.**
+
 ---
 
 ## Localization
