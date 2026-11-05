@@ -2345,4 +2345,18 @@ Are you sure you wish to continue?</value>
   <data name="CA Issued Certificates" xml:space="preserve">
     <value>CA Issued Certificates</value>
   </data>
+  <data name="Certificate Export" xml:space="preserve">
+    <value>Certificate Export</value>
+  </data>
+  <data name="Certificate Password" xml:space="preserve">
+    <value>Certificate Password</value>
+    <comment>Used in CertExport</comment>
+  </data>
+  <data name="Prompt_CertificatePassword" xml:space="preserve">
+    <value>Enter password for PFX / PKCS #12 export:</value>
+  </data>
+  <data name="Export Key" xml:space="preserve">
+    <value>Export Key</value>
+    <comment>Used in CertExport</comment>
+  </data>
 </root>

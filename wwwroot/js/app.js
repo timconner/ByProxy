@@ -21,6 +21,17 @@ function startReorder(element, dno) {
     });
 }
 
+function downloadBytesAsFile(bytes, filename) {
+    const blob = new Blob([bytes]);
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+}
+
 // ** Monaco Editor ** //
 var monacoLoading = false;
 var monacoEditor;
@@ -31,7 +42,7 @@ function isMonacoLoaded() {
 function loadMonaco() {
     if (monacoLoading) return;
     monacoLoading = true;
-    
+
     const script = document.createElement('script');
     script.src = 'monaco/vs/editor/editor.main.js';
     document.head.appendChild(script);

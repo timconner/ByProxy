@@ -1,0 +1,43 @@
+﻿@page "/system/cert-export"
+@attribute [Authorize(Roles = AuthRoles.Admin)]
+@inject IJSRuntime _js
+@inject IStringLocalizer<Language> _strings
+@inject CertificateService _certService
+@inject ModalService _modal
+
+<PageHeader Title="@_strings["Certificate Export"]">
+    <Toggle IsOn="_includeKey" FieldLabel="@_strings["Export Key"]" OnLabel="@_strings["Yes"]" OffLabel="@_strings["No"]" ToggleHandler="(state) => _includeKey = state" />
+    <Toggle IsOn="_showHidden" FieldLabel="@_strings["Show"]" OffLabel="@_strings["Active"]" OnLabel="@_strings["Hidden"]" ToggleHandler="(state) => _showHidden = state" />
+</PageHeader>
+
+<PageContent>
+    @if (_certs == null) {
+        <LoadingIndicator />
+    } else {
+        var visibleCerts = _certs.Where(_ => _.Metadata.Hidden == _showHidden);
+        <CertInfoTable Certificates="visibleCerts" OnSelect="ExportCert" />
+    }
+</PageContent>
+
+    @code {
+    private List<CertInfo>? _certs;
+    private bool _includeKey = true;
+    private bool _showHidden = false;
+
+    protected override async Task OnInitializedAsync() {
+        _certs = await _certService.CompileAvailableServerCerts(_strings, true);
+    }
+
+    private async Task ExportCert(CertInfo cert) {
+        @if (_includeKey) {
+            var result = await _modal.PasswordPrompt(_strings["Certificate Password"], _strings["Prompt_CertificatePassword"]);
+            if (result.DialogResult != DialogResult.OK || string.IsNullOrEmpty(result.Value)) return;
+
+            var export = cert.Cert.Export(X509ContentType.Pfx, result.Value);
+            await _js.InvokeVoidAsync("downloadBytesAsFile", export, $"{cert.Metadata.Name}.pfx");
+        } else {
+            var export = Encoding.UTF8.GetBytes(cert.Cert.ExportCertificatePem());
+            await _js.InvokeVoidAsync("downloadBytesAsFile", export, $"{cert.Metadata.Name}.crt");
+        }
+    }
+}

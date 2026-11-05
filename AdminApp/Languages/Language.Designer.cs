@@ -574,6 +574,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Certificate Export.
+        /// </summary>
+        public static string Certificate_Export {
+            get {
+                return ResourceManager.GetString("Certificate Export", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Certificate Issues.
         /// </summary>
         public static string Certificate_Issues {
@@ -588,6 +597,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Certificate_Name {
             get {
                 return ResourceManager.GetString("Certificate Name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Certificate Password.
+        /// </summary>
+        public static string Certificate_Password {
+            get {
+                return ResourceManager.GetString("Certificate Password", resourceCulture);
             }
         }
         
@@ -1695,6 +1713,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Expires {
             get {
                 return ResourceManager.GetString("Expires", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export Key.
+        /// </summary>
+        public static string Export_Key {
+            get {
+                return ResourceManager.GetString("Export Key", resourceCulture);
             }
         }
         
@@ -3973,6 +4000,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Promote_To_Candidate {
             get {
                 return ResourceManager.GetString("Promote To Candidate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enter password for PFX / PKCS #12 export:.
+        /// </summary>
+        public static string Prompt_CertificatePassword {
+            get {
+                return ResourceManager.GetString("Prompt_CertificatePassword", resourceCulture);
             }
         }
         

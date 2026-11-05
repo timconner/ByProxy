@@ -28,21 +28,9 @@ fieldset {
     margin-bottom: 12px;
 }
 
-    .danger-zone .backup-restore {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .danger-zone .services {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .danger-zone .certificates {
-        display: flex;
-        flex-direction: column;
+    .danger-zone div {
+        display: grid;
+        grid-template-rows: 1fr 1fr 1fr;
         gap: 12px;
     }
 
