@@ -1,6 +1,4 @@
-﻿using ByProxy.Infrastructure.Acme;
-
-namespace ByProxy.Models {
+﻿namespace ByProxy.Models {
     public class ProxyConfig {
         public int Revision { get; set; }
         public int BasedOnRevision { get; set; }

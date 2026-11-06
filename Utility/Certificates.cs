@@ -1,5 +1,3 @@
-﻿using System.Formats.Asn1;
-
 namespace ByProxy.Utility {
     public static class Certificates {
         public static readonly ImmutableList<string> LoopbackHosts = ["localhost", IPAddress.Loopback.ToString(), IPAddress.IPv6Loopback.ToString()];

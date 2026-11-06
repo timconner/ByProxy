@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace ByProxy.Infrastructure.Acme {
+﻿namespace ByProxy.Infrastructure.Acme {
     public class AcmeOrderResponse {
         public string OrderUrl { get; init; }
         public AcmeOrder Order { get; init; }

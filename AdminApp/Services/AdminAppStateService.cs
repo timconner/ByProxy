@@ -1,6 +1,4 @@
-﻿using ByProxy.AdminApp.Components;
-
-namespace ByProxy.AdminApp.Services {
+﻿namespace ByProxy.AdminApp.Services {
     public class AdminAppStateService {
         private readonly AuthService _auth;
         private readonly IHttpContextAccessor _context;
