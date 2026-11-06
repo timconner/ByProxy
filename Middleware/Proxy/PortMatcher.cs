@@ -1,4 +1,4 @@
-﻿namespace ByProxy.Services {
+﻿namespace ByProxy.Middleware.Proxy {
     public class PortMatcher : MatcherPolicy, IEndpointSelectorPolicy {
         private readonly ILogger<PortMatcher> _logger;
         private readonly ProxyStateService _proxyState;
