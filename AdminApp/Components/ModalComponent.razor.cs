@@ -378,7 +378,7 @@
                     sniHosts.Add($"*.* ({_strings["Fallback"]})");
                 }
 
-                var cert = _certService.GetCertificate(certId);
+                var cert = _certService.GetCertificateContext(certId).TargetCertificate;
                 var subjectNames = Certificates.GetSubjectAltNames(cert);
                 string issuer = cert.Subject == cert.Issuer ? _strings["Self-Signed"] : cert.GetNameInfo(X509NameType.SimpleName, forIssuer: true); ;
 

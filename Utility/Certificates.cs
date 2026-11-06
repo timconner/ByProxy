@@ -1,4 +1,4 @@
-namespace ByProxy.Utility {
+﻿namespace ByProxy.Utility {
     public static class Certificates {
         public static readonly ImmutableList<string> LoopbackHosts = ["localhost", IPAddress.Loopback.ToString(), IPAddress.IPv6Loopback.ToString()];
 
@@ -11,7 +11,7 @@ namespace ByProxy.Utility {
             collection.Clear();
         }
 
-        public static X509Certificate2 ImportCertFromDisk(Guid certId) {
+        public static X509Certificate2 ImportLeafCertFromDisk(Guid certId) {
             var filePath = GetCertFilePath(certId);
             X509KeyStorageFlags keyFlags = X509KeyStorageFlags.Exportable;
             if (OperatingSystem.IsWindows()) {
@@ -20,6 +20,17 @@ namespace ByProxy.Utility {
                 keyFlags |= X509KeyStorageFlags.EphemeralKeySet;
             }
             return X509CertificateLoader.LoadPkcs12FromFile(filePath, (string?)null, keyFlags);
+        }
+
+        public static X509Certificate2Collection ImportCertCollectionFromDisk(Guid certId) {
+            var filePath = GetCertFilePath(certId);
+            X509KeyStorageFlags keyFlags = X509KeyStorageFlags.Exportable;
+            if (OperatingSystem.IsWindows()) {
+                keyFlags |= X509KeyStorageFlags.UserKeySet | X509KeyStorageFlags.PersistKeySet;
+            } else {
+                keyFlags |= X509KeyStorageFlags.EphemeralKeySet;
+            }
+            return X509CertificateLoader.LoadPkcs12CollectionFromFile(filePath, (string?)null, keyFlags);
         }
 
         public static void ExportCertToDisk(Guid certId, X509Certificate2 x509Cert) {
@@ -36,15 +47,14 @@ namespace ByProxy.Utility {
             File.Delete(GetCertFilePath(certId));
         }
 
-        public static X509Certificate2 FromBase64(string base64) {
+        public static X509Certificate2 GetLeafCertFromPfxBytes(byte[] bytes) {
             X509KeyStorageFlags keyFlags = X509KeyStorageFlags.Exportable;
             if (OperatingSystem.IsWindows()) {
                 keyFlags |= X509KeyStorageFlags.UserKeySet | X509KeyStorageFlags.PersistKeySet;
             } else {
                 keyFlags |= X509KeyStorageFlags.EphemeralKeySet;
             }
-            var data = Convert.FromBase64String(base64);
-            return X509CertificateLoader.LoadPkcs12(data, (string?)null, keyFlags);
+            return X509CertificateLoader.LoadPkcs12(bytes, (string?)null, keyFlags);
         }
 
         public static X509Certificate2Collection ImportPemChainAndKey(string pem, string key) {

@@ -345,12 +345,10 @@
             var newConfig = await RealizeLatestAsync(latest, includedAreas, mergeOptions, cancellationToken);
 
             progress?.Report(("RestoreStep_ImportingCertificateData", null));
-            if (latest.ServerCertificates != null && latest.ServerCertificates.Count > 0) {
-                if (includedAreas.HasFlag(ExportOptions.IncludeAllCertificates)) {
-                    await ImportAllCertificateData(latest, mergeOptions);
-                } else {
-                    await ImportReferencedCertificateData(latest, includedAreas, mergeOptions);
-                }
+            if (includedAreas.HasFlag(ExportOptions.IncludeAllCertificates)) {
+                await ImportAllCertificateData(latest, mergeOptions);
+            } else if (latest.ServerCertificates != null && latest.ServerCertificates.Count > 0) {
+                await ImportReferencedCertificateData(latest, includedAreas, mergeOptions);
             }
 
             progress?.Report(("RestoreStep_PromotingCandidateConfig", null));
@@ -420,7 +418,7 @@
 
                     case AcmeCertExportVLatest acme:
                         await ImportOrUpdateAcmeAccount(db, latest.AcmeAccounts!.Single(_ => _.Id == acme.AcmeAccountId));
-                            
+
                         foreach (var dnsHost in acme.Hosts.OfType<AcmeDnsCertHostExportVLatest>()) {
                             await ImportOrUpdateAcmeDnsProvider(db, latest.AcmeDnsProviders!.Single(_ => _.Id == dnsHost.DnsProviderId), mergeOptions);
                         }
@@ -432,15 +430,18 @@
         }
 
         private async Task ImportOrUpdateCa(ProxyDb db, CertificateAuthorityExportVLatest ca) {
-            bool caExists = await db.CertificateAuthorities.AnyAsync(_ => _.Id == ca.Id);
-            if (caExists) return; // Nothing for a CA can/should be updated.
-            
-            db.CertificateAuthorities.Add(new CACert {
-                Id = ca.Id,
-                Name = ca.Name,
-                Hidden = ca.Hidden
-            });
-            Certificates.ExportCertToDisk(ca.Id, Certificates.FromBase64(ca.Material));
+            var existingCa = await db.CertificateAuthorities.FirstOrDefaultAsync(_ => _.Id == ca.Id);
+            if (existingCa != null) {
+                existingCa.Name = ca.Name;
+                existingCa.Hidden = ca.Hidden;
+            } else {
+                db.CertificateAuthorities.Add(new CACert {
+                    Id = ca.Id,
+                    Name = ca.Name,
+                    Hidden = ca.Hidden
+                });
+            }
+            await File.WriteAllBytesAsync(Certificates.GetCertFilePath(ca.Id), Convert.FromBase64String(ca.Material));
             await db.SaveChangesAsync();
         }
 
@@ -483,12 +484,18 @@
             var existingCert = await db.ServerCerts.FirstOrDefaultAsync(_ => _.Id == cert.Id);
             if (existingCert != null) {
                 existingCert.Name = cert.Name;
-                if (!mergeOptions.HasFlag(ImportMergeOptions.IgnoreOnAcmeConflict) && existingCert is AcmeCert) {
-                    var existing = _certService.GetCertificate(existingCert.Id);
-                    var imported = Certificates.FromBase64(cert.Material);
-                    if (imported.NotAfter > existing.NotAfter) {
-                        Certificates.ExportCertToDisk(cert.Id, imported);
+                if (existingCert is AcmeCert) {
+                    if (!mergeOptions.HasFlag(ImportMergeOptions.IgnoreOnAcmeConflict)) {
+                        var existing = _certService.GetCertificateContext(existingCert.Id).TargetCertificate;
+                        var imported = Convert.FromBase64String(cert.Material);
+                        using (var leaf = Certificates.GetLeafCertFromPfxBytes(imported)) {
+                            if (leaf.NotAfter > existing.NotAfter) {
+                                await File.WriteAllBytesAsync(Certificates.GetCertFilePath(cert.Id), imported);
+                            }
+                        }
                     }
+                } else {
+                    await File.WriteAllBytesAsync(Certificates.GetCertFilePath(cert.Id), Convert.FromBase64String(cert.Material));
                 }
             } else {
                 switch (cert) {
@@ -538,7 +545,7 @@
                         db.AcmeCerts.Add(newAcme);
                         break;
                 }
-                Certificates.ExportCertToDisk(cert.Id, Certificates.FromBase64(cert.Material));
+                await File.WriteAllBytesAsync(Certificates.GetCertFilePath(cert.Id), Convert.FromBase64String(cert.Material));
             }
             await db.SaveChangesAsync();
         }
@@ -582,7 +589,7 @@
             if (export is not ProxyExportVLatest latest) throw new Exception("Upgrade export to latest version first.");
             return latest.SniMaps != null;
         }
-        
+
         public static bool HasAcmeDnsProviders(this ProxyExport export) {
             if (export is not ProxyExportVLatest latest) throw new Exception("Upgrade export to latest version first.");
             return latest.AcmeDnsProviders?.Count > 0;

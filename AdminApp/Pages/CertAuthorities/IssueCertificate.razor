@@ -47,7 +47,7 @@
         }
 
         var success = await _modal.PerformSave(async () => {
-            var caCert = _certService.GetCertificate(_ca.Id);
+            var caCert = _certService.GetCertificateContext(_ca.Id).TargetCertificate;
             using var cert = Certificates.IssueServerCertFromCA(caCert, _request.Hosts);
             using var db = _dbFactory.CreateDbContext();
             await using var transaction = await db.Database.BeginTransactionAsync();

@@ -5,7 +5,6 @@ namespace ByProxy.AdminApp.Pages.SystemSettings {
         private bool _isEncrypted = false;
         private string _password = string.Empty;
         private IBrowserFile? _selectedFile;
-        private bool _preserveExisting = false;
         private ProxyExport? _export = null;
         private ProxyConfig? _preview = null;
         private MonacoEditor? _editor = null;
@@ -41,7 +40,6 @@ namespace ByProxy.AdminApp.Pages.SystemSettings {
             _isEncrypted = false;
             _password = string.Empty;
             _selectedFile = null;
-            _preserveExisting = false;
             _export = null;
             _preview = null;
         }

@@ -38,7 +38,7 @@ public partial class SniMapsIndex {
         var enriched = new List<EnrichedSniMap>();
         foreach (var map in sniMaps.OrderByHost()) {
             var metadata = mapCerts.First(_ => _.Id == map.CertificateId);
-            var cert = _certService.GetCertificate(map.CertificateId);
+            var cert = _certService.GetCertificateContext(map.CertificateId).TargetCertificate;
             var certIssues = Certificates.GetCertIssues(metadata, cert, map.Host);
 
             enriched.Add(new EnrichedSniMap(map, metadata, cert, certIssues));

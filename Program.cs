@@ -99,7 +99,7 @@ namespace ByProxy {
                     await db.SaveChangesAsync();
                     using var newCaCert = Certificates.CreateCertificateAuthority("CA-1");
                     Certificates.ExportCertToDisk(newCa.Entity.Id, newCaCert);
-                    using var caCert = Certificates.ImportCertFromDisk(newCa.Entity.Id);
+                    using var caCert = Certificates.ImportLeafCertFromDisk(newCa.Entity.Id);
 
                     logger.LogInformation("Generating initial admin cert...");
                     var newAdminCertEntry = db.IssuedCerts.Add(new IssuedCert {
@@ -198,13 +198,13 @@ namespace ByProxy {
                 var certService = serverOptions.ApplicationServices.GetRequiredService<CertificateService>();
                 if (!disableAdminApp) {
                     if (config.AdminListenAny) {
-                        serverOptions.ListenAnyIP(config.AdminPort, listen => listen.UseHttps(httpsOptions => {
-                            httpsOptions.ServerCertificateSelector = certService.AdminCertificateSelector;
-                        }));
+                        serverOptions.ListenAnyIP(
+                            config.AdminPort,
+                            listen => listen.UseHttps(TlsHandshake.CreateCallbackOptions(certService.AdminCertificateSelector)));
                     } else {
-                        serverOptions.ListenLocalhost(config.AdminPort, listen => listen.UseHttps(httpsOptions => {
-                            httpsOptions.ServerCertificateSelector = certService.AdminCertificateSelector;
-                        }));
+                        serverOptions.ListenLocalhost(
+                            config.AdminPort,
+                            listen => listen.UseHttps(TlsHandshake.CreateCallbackOptions(certService.AdminCertificateSelector)));
                     }
                 }
                 foreach (var port in runningConfig.HttpPorts) {
@@ -212,9 +212,9 @@ namespace ByProxy {
                 }
                 if (runningConfig.HttpsPorts.Any()) {
                     foreach (var port in runningConfig.HttpsPorts) {
-                        serverOptions.ListenAnyIP(port, listen => listen.UseHttps(httpsOptions => {
-                            httpsOptions.ServerCertificateSelector = certService.CertificateSelector;
-                        }));
+                        serverOptions.ListenAnyIP(
+                            port,
+                            listen => listen.UseHttps(TlsHandshake.CreateCallbackOptions(certService.CertificateSelector)));
                     }
                 }
                 serverOptions.Limits.MaxRequestBodySize = config.MaxRequestBodySize;

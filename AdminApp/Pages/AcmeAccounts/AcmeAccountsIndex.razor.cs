@@ -29,7 +29,7 @@ public partial class AcmeAccountsIndex {
             var provider = _acmeClient.GetProvider(account.Provider);
             var certInfo = new List<CertInfo>();
             foreach (var result in certs.Where(_ => ((AcmeCert)_.Metadata).AcmeAccountId == account.Id)) {
-                var cert = _certService.GetCertificate(result.Metadata.Id);
+                var cert = _certService.GetCertificateContext(result.Metadata.Id).TargetCertificate;
                 var subjectNames = Certificates.GetSubjectAltNames(cert);
                 certInfo.Add(result);
             }

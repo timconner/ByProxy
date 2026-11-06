@@ -26,11 +26,11 @@ public partial class CertAuthoritiesIndex {
 
         var caInfo = new List<CaInfo>();
         foreach (var ca in caResults) {
-            var caCert = _certService.GetCertificate(ca.Id);
+            var caCert = _certService.GetCertificateContext(ca.Id).TargetCertificate;
 
             var certInfo = new List<CertInfo>();
             foreach (var result in certs.Where(_ => ((IssuedCert)_.Metadata).IssuingCAId == ca.Id)) {
-                var cert = _certService.GetCertificate(result.Metadata.Id);
+                var cert = _certService.GetCertificateContext(result.Metadata.Id).TargetCertificate;
                 var subjectNames = Certificates.GetSubjectAltNames(cert);
                 certInfo.Add(result);
             }

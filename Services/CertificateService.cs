@@ -1,7 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Data.Common;
-
-namespace ByProxy.Services {
+﻿namespace ByProxy.Services {
     public class CertificateService : IHostedService {
         private readonly ILogger<CertificateService> _logger;
         private readonly IDbContextFactory<ProxyDb> _dbFactory;
@@ -12,36 +9,53 @@ namespace ByProxy.Services {
         private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
         private CancellationTokenSource _cacheUpdated = new CancellationTokenSource();
 
-        private X509Certificate2 _adminCert = default!;
-        private X509Certificate2? _fallbackCert = default!;
+        private SslStreamCertificateContext _adminCert = default!;
+        private SslStreamCertificateContext? _fallbackCert = default!;
 
-        private readonly ConcurrentDictionary<Guid, X509Certificate2> _certFileCache = new();
+        private readonly ConcurrentDictionary<Guid, SslStreamCertificateContext> _certCache = new();
 
         private readonly SemaphoreSlim _signal = new(0, 1);
 
         // Guid = Cert Id
         private List<AcmeCache> _acmeCache = new();
 
-        public X509Certificate2 AdminCertificateSelector(ConnectionContext? context, string? hostname) {
+        public SslStreamCertificateContext AdminCertificateSelector(ConnectionContext? context, string? hostname) {
             return _adminCert;
         }
 
-        public X509Certificate2? CertificateSelector(ConnectionContext? context, string? hostname) {
+        public SslStreamCertificateContext? CertificateSelector(ConnectionContext? context, string? hostname) {
             if (string.IsNullOrEmpty(hostname)) return _fallbackCert;
             if (!_proxyState.RunningConfig.SniMaps.TryGetCertIdByHost(hostname, out var certId)) return _fallbackCert;
-            return GetCertificate(certId);
+            return GetCertificateContext(certId);
         }
 
+        private SslStreamCertificateContext BuildCertContext(Guid certId) {
+            var certificates = Certificates.ImportCertCollectionFromDisk(certId);
 
-        public X509Certificate2 GetCertificate(Guid certId, bool forceReload = false) {
+            X509Certificate2? leaf = null;
+            var intermediates = new X509Certificate2Collection();
+            foreach (var cert in certificates) {
+                if (cert.HasPrivateKey) {
+                    if (leaf != null) throw new Exception("Multiple certificated with private keys found in collection.");
+                    leaf = cert;
+                } else {
+                    intermediates.Add(cert);
+                }
+            }
+
+            if (leaf == null) throw new Exception("Leaf certificate not found.");
+            return SslStreamCertificateContext.Create(leaf, intermediates);
+        }
+
+        public SslStreamCertificateContext GetCertificateContext(Guid certId, bool forceReload = false) {
             if (forceReload) {
-                return _certFileCache.AddOrUpdate(
+                return _certCache.AddOrUpdate(
                     key: certId,
-                    addValue: Certificates.ImportCertFromDisk(certId),
-                    updateValueFactory: (id, oldCert) => Certificates.ImportCertFromDisk(certId)
+                    addValue: BuildCertContext(certId),
+                    updateValueFactory: (id, oldCert) => BuildCertContext(certId)
                 );
             }
-            return _certFileCache.GetOrAdd(certId, Certificates.ImportCertFromDisk);
+            return _certCache.GetOrAdd(certId, BuildCertContext);
         }
 
         public CertificateService(
@@ -94,7 +108,7 @@ namespace ByProxy.Services {
             var adminCert = await db.ServerCerts.FirstOrDefaultAsync(_ => _.Id == _proxyState.RunningConfig.AdminCert);
             if (adminCert != null) {
                 try {
-                    _adminCert = GetCertificate(adminCert.Id);
+                    _adminCert = GetCertificateContext(adminCert.Id);
                 } catch (Exception ex) {
                     adminCert = null;
                     _logger.LogError($"Failed to import admin certificate: {ex.Message}", ex);
@@ -104,18 +118,18 @@ namespace ByProxy.Services {
                 // Failsafe in case no valid certificate was found.
                 _logger.LogWarning("Valid admin certificate not found, generating ephemeral cert...");
                 using var newAdminCert = Certificates.GenerateSelfSignedCert(Certificates.LoopbackHosts);
-                _adminCert = X509CertificateLoader.LoadPkcs12(
-                    newAdminCert.Export(X509ContentType.Pfx, (string?)null),
-                    (string?)null,
-                    X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable
-                );
+                _adminCert = SslStreamCertificateContext.Create(
+                    X509CertificateLoader.LoadPkcs12(
+                        newAdminCert.Export(X509ContentType.Pfx, (string?)null),
+                        (string?)null,
+                        X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable), null, true);
             }
 
             if (_proxyState.RunningConfig.FallbackCert == null) {
                 _fallbackCert = null;
             } else {
                 try {
-                    _fallbackCert = GetCertificate(_proxyState.RunningConfig.FallbackCert.Value);
+                    _fallbackCert = GetCertificateContext(_proxyState.RunningConfig.FallbackCert.Value);
                 } catch (Exception ex) {
                     _fallbackCert = null;
                     _logger.LogError($"Failed to import fallback certificate, connections without SNI maps will fail: {ex.Message}", ex);
@@ -135,9 +149,9 @@ namespace ByProxy.Services {
             foreach (var cert in activeCerts) {
                 try {
                     if (cert is ServerCert) {
-                        var importedCert = GetCertificate(cert.Id, true);
+                        var importedCert = GetCertificateContext(cert.Id, true);
                         if (cert is AcmeCert acmeCert) {
-                            acmeCache.Add(new AcmeCache(acmeCert, importedCert));
+                            acmeCache.Add(new AcmeCache(acmeCert, importedCert.TargetCertificate));
                         }
                     }
                 } catch (Exception ex) {
@@ -146,11 +160,14 @@ namespace ByProxy.Services {
             }
             _acmeCache = acmeCache;
 
-            var certsToRemove = _certFileCache.Keys.Except(activeCertIds);
+            var certsToRemove = _certCache.Keys.Except(activeCertIds);
             foreach (var certId in certsToRemove) {
                 if (certId == _proxyState.RunningConfig.AdminCert || certId == _proxyState.RunningConfig.FallbackCert) continue;
-                if (_certFileCache.TryRemove(certId, out var staleCert)) {
-                    staleCert.Dispose();
+                if (_certCache.TryRemove(certId, out var staleCert)) {
+                    staleCert.TargetCertificate.Dispose();
+                    foreach (var cert in staleCert.IntermediateCertificates) {
+                        cert.Dispose();
+                    }
                 }
             }
         }
@@ -176,7 +193,7 @@ namespace ByProxy.Services {
                 .OfType<T>();
 
             if (!includeHidden) certQuery = certQuery.WhereIsActive();
-            
+
             var certResults = await certQuery.ToListAsync();
 
             return await CompileAvailableServerCerts(certResults.Cast<ServerCert>().ToList(), db, strings);
@@ -195,7 +212,7 @@ namespace ByProxy.Services {
 
             var availableCerts = new List<CertInfo>();
             foreach (var result in certResults) {
-                var cert = GetCertificate(result.Id);
+                var cert = GetCertificateContext(result.Id).TargetCertificate;
                 var subjectNames = Certificates.GetSubjectAltNames(cert);
 
                 string issuer = cert.Subject == cert.Issuer ? strings["Self-Signed"] : cert.GetNameInfo(X509NameType.SimpleName, forIssuer: true);
@@ -226,7 +243,7 @@ namespace ByProxy.Services {
             await db.SaveChangesAsync();
 
             Certificates.DeleteCertFromDisk(certId);
-            _certFileCache.Remove(certId, out _);
+            _certCache.Remove(certId, out _);
 
             await transaction.CommitAsync();
         }
@@ -260,7 +277,7 @@ namespace ByProxy.Services {
             await db.SaveChangesAsync();
 
             Certificates.DeleteCertFromDisk(certToPurge.Id);
-            _certFileCache.Remove(certToPurge.Id, out _);
+            _certCache.Remove(certToPurge.Id, out _);
 
             await transaction.CommitAsync();
         }

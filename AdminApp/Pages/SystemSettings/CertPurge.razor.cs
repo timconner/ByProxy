@@ -33,7 +33,7 @@ public partial class CertPurge {
 
                 var certAuths = new List<CaCertAndCount>();
                 foreach (var result in results) {
-                    var cert = _certService.GetCertificate(result.metadata.Id);
+                    var cert = _certService.GetCertificateContext(result.metadata.Id).TargetCertificate;
                     certAuths.Add(new CaCertAndCount(result.metadata, cert, result.issueCount));
                 }
                 _certAuths = certAuths;
