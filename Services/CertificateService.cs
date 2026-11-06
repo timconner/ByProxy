@@ -7,7 +7,7 @@
 
         private Task? _executeTask;
         private readonly CancellationTokenSource _stoppingCts = new CancellationTokenSource();
-        private CancellationTokenSource _cacheUpdated = new CancellationTokenSource();
+        private SemaphoreSlim _cacheRebuildSemaphore = new SemaphoreSlim(1, 1);
 
         private SslStreamCertificateContext _adminCert = default!;
         private SslStreamCertificateContext? _fallbackCert = default!;
@@ -31,28 +31,32 @@
 
         private SslStreamCertificateContext BuildCertContext(Guid certId) {
             var certificates = Certificates.ImportCertCollectionFromDisk(certId);
-
-            X509Certificate2? leaf = null;
-            var intermediates = new X509Certificate2Collection();
-            foreach (var cert in certificates) {
-                if (cert.HasPrivateKey) {
-                    if (leaf != null) throw new Exception("Multiple certificated with private keys found in collection.");
-                    leaf = cert;
-                } else {
-                    intermediates.Add(cert);
+            try {
+                X509Certificate2? leaf = null;
+                var intermediates = new X509Certificate2Collection();
+                foreach (var cert in certificates) {
+                    if (cert.HasPrivateKey) {
+                        if (leaf != null) throw new Exception("Multiple certificates with private keys found in collection.");
+                        leaf = cert;
+                    } else {
+                        intermediates.Add(cert);
+                    }
                 }
-            }
 
-            if (leaf == null) throw new Exception("Leaf certificate not found.");
-            return SslStreamCertificateContext.Create(leaf, intermediates);
+                if (leaf == null) throw new Exception("Leaf certificate not found.");
+                return SslStreamCertificateContext.Create(leaf, intermediates);
+            } catch {
+                certificates.DisposeCollection();
+                throw;
+            }
         }
 
         public SslStreamCertificateContext GetCertificateContext(Guid certId, bool forceReload = false) {
             if (forceReload) {
                 return _certCache.AddOrUpdate(
                     key: certId,
-                    addValue: BuildCertContext(certId),
-                    updateValueFactory: (id, oldCert) => BuildCertContext(certId)
+                    addValueFactory: (id) => BuildCertContext(id),
+                    updateValueFactory: (id, oldCert) => BuildCertContext(id)
                 );
             }
             return _certCache.GetOrAdd(certId, BuildCertContext);
@@ -79,7 +83,7 @@
                 var validityPeriodDays = cert.NotAfter.Subtract(cert.NotBefore).TotalDays;
                 // if short-lived, renew at half-life, else when 1/3 validity period remains
                 double renewalThresholdDays = validityPeriodDays <= 30 ? validityPeriodDays * 0.5 : validityPeriodDays * (2.0 / 3.0);
-                RenewAt = cert.NotBefore.AddDays(renewalThresholdDays);
+                RenewAt = cert.NotBefore.AddDays(renewalThresholdDays).ToUniversalTime();
             }
         }
 
@@ -99,76 +103,94 @@
         }
 
         private async void RunningConfigUpdateHandler(object? sender, EventArgs e) {
-            await RebuildCertCache();
+            try {
+                await RebuildCertCache();
+            } catch (Exception ex) {
+                _logger.LogError(ex, "Failed to rebuild certificate cache.");
+            }
         }
 
         private async Task RebuildCertCache() {
-            using var db = _dbFactory.CreateDbContext();
+            await _cacheRebuildSemaphore.WaitAsync();
+            try {
+                var runningConfig = _proxyState.RunningConfig;
+                using var db = _dbFactory.CreateDbContext();
+                var activeCertIds = new HashSet<Guid>();
+                var acmeCache = new List<AcmeCache>();
 
-            var adminCert = await db.ServerCerts.FirstOrDefaultAsync(_ => _.Id == _proxyState.RunningConfig.AdminCert);
-            if (adminCert != null) {
-                try {
-                    _adminCert = GetCertificateContext(adminCert.Id);
-                } catch (Exception ex) {
-                    adminCert = null;
-                    _logger.LogError($"Failed to import admin certificate: {ex.Message}", ex);
+                var adminCert = await db.ServerCerts.FirstOrDefaultAsync(_ => _.Id == runningConfig.AdminCert);
+                if (adminCert != null) {
+                    try {
+                        _adminCert = GetCertificateContext(adminCert.Id, true);
+                        activeCertIds.Add(adminCert.Id);
+                        if (adminCert is AcmeCert acmeCert) {
+                            acmeCache.Add(new AcmeCache(acmeCert, _adminCert.TargetCertificate));
+                        }
+                    } catch (Exception ex) {
+                        adminCert = null;
+                        _logger.LogError($"Failed to import admin certificate: {ex.Message}", ex);
+                    }
                 }
-            }
-            if (adminCert == null) {
-                // Failsafe in case no valid certificate was found.
-                _logger.LogWarning("Valid admin certificate not found, generating ephemeral cert...");
-                using var newAdminCert = Certificates.GenerateSelfSignedCert(Certificates.LoopbackHosts);
-                _adminCert = SslStreamCertificateContext.Create(
-                    X509CertificateLoader.LoadPkcs12(
-                        newAdminCert.Export(X509ContentType.Pfx, (string?)null),
-                        (string?)null,
-                        X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable), null, true);
-            }
+                if (adminCert == null) {
+                    // Failsafe in case no valid certificate was found.
+                    _logger.LogWarning("Valid admin certificate not found, generating ephemeral cert...");
+                    using var newAdminCert = Certificates.GenerateSelfSignedCert(Certificates.LoopbackHosts);
+                    _adminCert = SslStreamCertificateContext.Create(
+                        X509CertificateLoader.LoadPkcs12(
+                            newAdminCert.Export(X509ContentType.Pfx, (string?)null),
+                            (string?)null,
+                            X509KeyStorageFlags.MachineKeySet | X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.Exportable), null, true);
+                }
 
-            if (_proxyState.RunningConfig.FallbackCert == null) {
-                _fallbackCert = null;
-            } else {
-                try {
-                    _fallbackCert = GetCertificateContext(_proxyState.RunningConfig.FallbackCert.Value);
-                } catch (Exception ex) {
+                if (runningConfig.FallbackCert == null) {
                     _fallbackCert = null;
-                    _logger.LogError($"Failed to import fallback certificate, connections without SNI maps will fail: {ex.Message}", ex);
+                } else {
+                    try {
+                        var fallbackCert = await db.ServerCerts.FirstAsync(_ => _.Id == runningConfig.FallbackCert.Value);
+                        _fallbackCert = GetCertificateContext(fallbackCert.Id, true);
+                        if (activeCertIds.Add(fallbackCert.Id) && fallbackCert is AcmeCert acmeCert) {
+                            acmeCache.Add(new AcmeCache(acmeCert, _fallbackCert.TargetCertificate));
+                        }
+                    } catch (Exception ex) {
+                        _fallbackCert = null;
+                        _logger.LogError($"Failed to import fallback certificate, connections without SNI maps will fail: {ex.Message}", ex);
+                    }
                 }
-            }
 
-            var activeCerts = await db.SniMaps
-                .AsNoTracking()
-                .IgnoreQueryFilters()
-                .Where(_ => _.ConfigRevision == _proxyState.RunningConfig.Revision)
-                .Select(_ => _.Certificate)
-                .Distinct()
-                .ToListAsync();
+                var activeCerts = await db.SniMaps
+                    .AsNoTracking()
+                    .IgnoreQueryFilters()
+                    .Where(_ => _.ConfigRevision == runningConfig.Revision)
+                    .Select(_ => _.Certificate)
+                    .Distinct()
+                    .ToListAsync();
 
-            var activeCertIds = new HashSet<Guid>();
-            var acmeCache = new List<AcmeCache>();
-            foreach (var cert in activeCerts) {
-                try {
-                    if (cert is ServerCert) {
+                foreach (var cert in activeCerts) {
+                    if (activeCertIds.Contains(cert.Id)) continue;
+                    try {
                         var importedCert = GetCertificateContext(cert.Id, true);
+                        activeCertIds.Add(cert.Id);
                         if (cert is AcmeCert acmeCert) {
                             acmeCache.Add(new AcmeCache(acmeCert, importedCert.TargetCertificate));
                         }
+                    } catch (Exception ex) {
+                        _logger.LogError($"Failed to cache certificate {cert.Id}: {ex.Message}", ex);
                     }
-                } catch (Exception ex) {
-                    _logger.LogError($"Failed to cache certificate {cert.Id}: {ex.Message}", ex);
                 }
-            }
-            _acmeCache = acmeCache;
+                _acmeCache = acmeCache;
 
-            var certsToRemove = _certCache.Keys.Except(activeCertIds);
-            foreach (var certId in certsToRemove) {
-                if (certId == _proxyState.RunningConfig.AdminCert || certId == _proxyState.RunningConfig.FallbackCert) continue;
-                if (_certCache.TryRemove(certId, out var staleCert)) {
-                    staleCert.TargetCertificate.Dispose();
-                    foreach (var cert in staleCert.IntermediateCertificates) {
-                        cert.Dispose();
+                var certsToRemove = _certCache.Keys.Except(activeCertIds);
+                foreach (var certId in certsToRemove) {
+                    if (certId == runningConfig.AdminCert || certId == runningConfig.FallbackCert) continue;
+                    if (_certCache.TryRemove(certId, out var staleCert)) {
+                        staleCert.TargetCertificate.Dispose();
+                        foreach (var cert in staleCert.IntermediateCertificates) {
+                            cert.Dispose();
+                        }
                     }
                 }
+            } finally {
+                _cacheRebuildSemaphore.Release();
             }
         }
 
@@ -242,13 +264,14 @@
             db.Certificates.Remove(cert);
             await db.SaveChangesAsync();
 
+            await transaction.CommitAsync();
             Certificates.DeleteCertFromDisk(certId);
             _certCache.Remove(certId, out _);
-
-            await transaction.CommitAsync();
         }
 
         public async Task PurgeCertificate(Guid certToPurgeId, Guid replacementCertId) {
+            if (certToPurgeId == replacementCertId) throw new Exception("Replacement certificate cannot be the same as the certificate to purge.");
+
             using var db = _dbFactory.CreateDbContext();
 
             var certToPurge = await db.Certificates.FirstOrDefaultAsync(_ => _.Id == certToPurgeId);
@@ -276,10 +299,9 @@
             db.Certificates.Remove(certToPurge);
             await db.SaveChangesAsync();
 
+            await transaction.CommitAsync();
             Certificates.DeleteCertFromDisk(certToPurge.Id);
             _certCache.Remove(certToPurge.Id, out _);
-
-            await transaction.CommitAsync();
         }
 
         public void TriggerAcmeRenewalTask() {
@@ -297,6 +319,10 @@
                 dbEntry.LastAttempt = DateTime.UtcNow;
                 await db.SaveChangesAsync();
 
+                foreach (var cacheItem in _acmeCache.Where(_ => _.Metadata.Id == certId)) {
+                    cacheItem.Metadata.LastAttempt = dbEntry.LastAttempt;
+                }
+
                 var renewedCert = await _acmeClient.RequestNewCertificateAsync(dbEntry.AcmeAccount, dbEntry.Hosts, progress, cancellationToken);
                 Certificates.ExportCertToDisk(dbEntry.Id, renewedCert);
 
@@ -312,7 +338,7 @@
         protected async Task ExecuteAsync(CancellationToken stoppingToken) {
             while (!stoppingToken.IsCancellationRequested) {
                 bool certRenewed = false;
-                var certsToRenew = _acmeCache.Where(_ => _.RenewAt < DateTime.Now && (_.Metadata.LastAttempt == null || DateTime.Now.Subtract(_.Metadata.LastAttempt.Value).TotalHours > 12));
+                var certsToRenew = _acmeCache.Where(_ => _.RenewAt < DateTime.UtcNow && (_.Metadata.LastAttempt == null || DateTime.UtcNow.Subtract(_.Metadata.LastAttempt.Value).TotalHours > 12));
                 if (certsToRenew.Any()) {
                     using var db = _dbFactory.CreateDbContext();
                     foreach (var cert in certsToRenew) {
@@ -324,7 +350,13 @@
                         }
                     }
                 }
-                if (certRenewed) await RebuildCertCache();
+                if (certRenewed) {
+                    try {
+                        await RebuildCertCache();
+                    } catch (Exception ex) {
+                        _logger.LogError(ex, "Failed to rebuild certificate cache after sucessful ACME renewal.");
+                    }
+                }
                 try {
                     using (var cts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken)) {
                         await Task.WhenAny(
@@ -339,11 +371,11 @@
 
         public async Task StopAsync(CancellationToken cancellationToken) {
             _proxyState.OnConfigChange -= RunningConfigUpdateHandler;
-            _signal.Dispose();
             if (_executeTask != null) {
                 _stoppingCts.Cancel();
                 await _executeTask.WaitAsync(cancellationToken).ConfigureAwait(ConfigureAwaitOptions.SuppressThrowing);
             }
+            _signal.Dispose();
         }
     }
 }
