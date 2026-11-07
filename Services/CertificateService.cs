@@ -44,7 +44,27 @@
                 }
 
                 if (leaf == null) throw new Exception("Leaf certificate not found.");
-                return SslStreamCertificateContext.Create(leaf, intermediates);
+
+                // WORKAROUND: Force the served chain to follow the PFX chain on Linux.
+                //
+                // SslStreamCertificateContext.Create treats additionalCertificates as chain-building
+                // candidates, not as the chain to send. On Linux, if the system store trusts a
+                // self-signed root that matches a cross-signed CA in the PFX (e.g. ISRG Root X2),
+                // .NET builds the shorter path and drops the cross-signed cert (X2 signed by X1).
+                // Clients that only trust the older root (e.g. ISRG Root X1, some firewalls) then fail.
+                //
+                // Passing the PFX intermediates as the custom trust list stops system roots from
+                // Windows chain building differs and was already sending the full chain.
+                //
+                // References:
+                // - https://github.com/dotnet/runtime/discussions/114876 (trust workaround)
+                // - https://github.com/dotnet/aspnetcore/issues/66952 (Kestrel bug, open)
+                // - https://github.com/dotnet/aspnetcore/issues/70366 (API proposal: explicit chain mode)
+                //
+                // TODO: If #70366 or equivalent ships, switch to explicit chain presentation
+                // and remove this workaround.
+                var trust = SslCertificateTrust.CreateForX509Collection(intermediates);
+                return SslStreamCertificateContext.Create(leaf, intermediates, trust: trust);
             } catch {
                 certificates.DisposeCollection();
                 throw;

@@ -5,7 +5,8 @@
     [switch]$LatestOnly     # Only build latest tag
 )
 
-$dllPath = ".\ByProxy\ByProxy.dll"
+$publishDir = Join-Path $PSScriptRoot 'ByProxy'
+$dllPath = Join-Path $publishDir 'ByProxy.dll'
 $repo = "timconner/byproxy"
 
 $version = [Version](Get-Item $dllPath).VersionInfo.FileVersion

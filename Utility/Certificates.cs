@@ -5,7 +5,7 @@
         public static string GetCertFilePath(Guid certId) => Path.Combine(AppPaths.CertDir, $"{certId}.pfx");
 
         public static void DisposeCollection(this X509Certificate2Collection collection) {
-            foreach(var cert in collection) {
+            foreach (var cert in collection) {
                 cert.Dispose();
             }
             collection.Clear();
@@ -59,24 +59,39 @@
 
         public static X509Certificate2Collection ImportPemChainAndKey(string pem, string key) {
             var chain = new X509Certificate2Collection();
-            chain.ImportFromPem(pem);
-            var endPem = chain[0].ExportCertificatePem();
-            var endCert = X509Certificate2.CreateFromPem(endPem, key);
-            return ImportPemChainAndKey(chain, endCert);
+            try {
+                chain.ImportFromPem(pem);
+                var endPem = chain[0].ExportCertificatePem();
+                var endCert = X509Certificate2.CreateFromPem(endPem, key);
+                return ImportPemChainAndKey(chain, endCert);
+            } catch {
+                chain.DisposeCollection();
+                throw;
+            }
         }
 
         public static X509Certificate2Collection ImportPemChainAndKey(string pem, RSA key) {
             var chain = new X509Certificate2Collection();
-            chain.ImportFromPem(pem);
-            var endCert = chain[0].CopyWithPrivateKey(key);
-            return ImportPemChainAndKey(chain, endCert);
+            try {
+                chain.ImportFromPem(pem);
+                var endCert = chain[0].CopyWithPrivateKey(key);
+                return ImportPemChainAndKey(chain, endCert);
+            } catch {
+                chain.DisposeCollection();
+                throw;
+            }
         }
 
         public static X509Certificate2Collection ImportPemChainAndKey(string pem, ECDsa key) {
             var chain = new X509Certificate2Collection();
-            chain.ImportFromPem(pem);
-            var endCert = chain[0].CopyWithPrivateKey(key);
-            return ImportPemChainAndKey(chain, endCert);
+            try {
+                chain.ImportFromPem(pem);
+                var endCert = chain[0].CopyWithPrivateKey(key);
+                return ImportPemChainAndKey(chain, endCert);
+            } catch {
+                chain.DisposeCollection();
+                throw;
+            }
         }
 
         private static X509Certificate2Collection ImportPemChainAndKey(X509Certificate2Collection importedChain, X509Certificate2 endCertWithKey) {
@@ -278,7 +293,7 @@
         private static bool SubjectMatchesHostParts(string subject, string[] hostParts) {
             var subjectParts = SplitHostname(subject);
             if (subjectParts.Length != hostParts.Length) return false;
-            
+
             for (int i = 1; i < hostParts.Length; i++) {
                 if (!string.Equals(subjectParts[i], hostParts[i], StringComparison.OrdinalIgnoreCase)) {
                     return false;
