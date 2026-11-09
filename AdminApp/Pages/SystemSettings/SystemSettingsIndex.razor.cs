@@ -3,12 +3,9 @@ public partial class SystemSettingsIndex : IDisposable {
     private ProxyDb _db = default!;
     private ProxyConfig? _proxyConfig;
 
-    private string? _version;
+    private static readonly string _version = Utility.Functions.GetAppVersion();
 
     protected override async Task OnInitializedAsync() {
-        var version = typeof(Program).Assembly.GetName().Version!;
-        _version = $"{version.Major}.{version.Minor}.{version.Build}";
-
         _db = _dbFactory.CreateDbContext();
 
         _proxyConfig = await _db.Configurations

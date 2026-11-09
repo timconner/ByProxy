@@ -8,29 +8,29 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
-    <link rel="stylesheet" href="css/fonts.css" />
-    <link rel="stylesheet" href="css/app.css" />
+    <link rel="stylesheet" href="css/fonts.css?v=@_version" />
+    <link rel="stylesheet" href="css/app.css?v=@_version" />
 @{
 #if DEBUG
 }
-    <link rel="stylesheet" href="ByProxy.styles.css" />
+    <link rel="stylesheet" href="ByProxy.styles.css?v=@_version" />
 @{
 #else
 }
-    <link href="css/components.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/components.css?v=@_version" />
 @{
 #endif
 }    
 
     @if (_renderMode != null) {
-        <script src="js/sortable.js"></script>
+        <script src="js/sortable.js?v=@_version"></script>
         <script>
             var require = { paths: { vs: `${location.origin}/monaco/vs` } };
         </script>
-        <script src="monaco/vs/loader.js"></script>
+        <script src="monaco/vs/loader.js?v=@_version"></script>
     }    
     
-    <script src="js/app.js"></script>
+    <script src="js/app.js?v=@_version"></script>
 
     <HeadOutlet @rendermode="_renderMode" />
 </head>
@@ -39,7 +39,7 @@
     <Routes @rendermode="_renderMode" />
     <div id="reconnect-modal"></div>
     <script src="_framework/blazor.web.js" autostart="false"></script>
-    <script src="js/boot.js" data-reconnect-string="@_strings["AttemptingReconnect"]"></script>
+    <script src="js/boot.js?v=@_version" data-reconnect-string="@_strings["AttemptingReconnect"]"></script>
 </body>
 
 </html>
@@ -50,6 +50,8 @@
 
     private static string[] staticPages = ["/login", "/logout", "/reset-pw"];
     private IComponentRenderMode? _renderMode = null;
+
+    private static readonly string _version = Functions.GetAppVersion();
 
     protected override void OnInitialized() {
         _renderMode = staticPages.Contains(HttpContext.Request.Path.Value?.TrimEnd('/')) ? null : RenderMode.InteractiveServer;

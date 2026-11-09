@@ -7,5 +7,10 @@
             var exp = (int)(Math.Log(bytes) / Math.Log(unit));
             return $"{bytes / Math.Pow(unit, exp):F2} {("KMGTPE")[exp - 1]}B";
         }
+
+        public static string GetAppVersion() {
+            var version = typeof(Program).Assembly.GetName().Version!;
+            return $"{version.Major}.{version.Minor}.{version.Build}";
+        }
     }
 }

@@ -9,9 +9,7 @@
 @inject CertificateService _certService
 
 <PageHeader Title="@_strings["System Settings"]">
-    @if (_version != null) {
-        <div class="help-text">@_strings["Version"]: @_version</div>
-    }
+    <div class="help-text">@_strings["Version"]: @_version</div>
 </PageHeader>
 
 <PageContent>
