@@ -1,4 +1,5 @@
 namespace ByProxy.AdminApp.Components;
+
 public partial class RouteEditor {
     private bool ListenOnHttp {
         get => Route.HttpPort.HasValue;
@@ -49,19 +50,28 @@ public partial class RouteEditor {
 
     private List<ProxyCluster>? _clusters;
 
+    private string _newStaticResponseHeaderName = string.Empty;
+    private string _newStaticResponseHeaderValue = string.Empty;
+
     private string _newFromHttpMethod = string.Empty;
     private string _newToHttpMethod = string.Empty;
 
-    private string _newHeaderTransformOperation = HeaderTransformOperation.Set.Operation;
-    private string _newHeaderTransformHeaderName = string.Empty;
-    private string _newHeaderTransformHeaderValue = string.Empty;
+    private string _newRequestHeaderTransformOperation = RequestHeaderTransformOperation.Set.Operation;
+    private string _newRequestHeaderTransformHeaderName = string.Empty;
+    private string _newRequestHeaderTransformHeaderValue = string.Empty;
 
-    private string _newPathTransformMode = PathTransformMode.Add.Mode;
+    private string _newPathTransformMode = RequestPathTransformMode.Add.Mode;
     private string _newPathTransformString = string.Empty;
 
-    private string _newQueryTransformOperation = QueryTransformOperation.Set.Operation;
+    private string _newQueryTransformOperation = RequestQueryTransformOperation.Set.Operation;
     private string _newQueryTransformQueryKey = string.Empty;
     private string _newQueryTransformQueryValue = string.Empty;
+        
+    private string _newAllowedResponseHeader = string.Empty;
+
+    private string _newResponseHeaderTransformOperation = ResponseHeaderTransformOperation.Set.Operation;
+    private string _newResponseHeaderTransformHeaderName = string.Empty;
+    private string _newResponseHeaderTransformHeaderValue = string.Empty;
 
     protected override async Task OnInitializedAsync() {
         using var db = _dbFactory.CreateDbContext();
@@ -87,9 +97,9 @@ public partial class RouteEditor {
                 Route.HttpStatusCode = 307;
                 Route.RedirectLocation = string.Empty;
                 break;
-            case RouteResponseType.Constants.Status:
+            case RouteResponseType.Constants.Static:
                 Route.ClusterId = null;
-                Route.HttpStatusCode = 404;
+                Route.HttpStatusCode = 200;
                 Route.RedirectLocation = null;
                 break;
             case RouteResponseType.Constants.Tarpit:
@@ -220,40 +230,100 @@ public partial class RouteEditor {
         Route.MatchCriteria.Remove(match);
     }
 
+    private async Task ToggleStaticResponseBody(bool state) {
+        if (!state) {
+            Route.StaticResponseBody = null;
+        } else {
+            await EditStaticResponseBody();
+        }
+    }
+
+    private async Task EditStaticResponseBody() {
+        var result = await _modal.LargeText(
+            title: _strings["Response Body"],
+            prompt: null,
+            value: Route.StaticResponseBody ?? string.Empty,
+            readOnly: false,
+            closeOnly: false,
+            monoSpace: true
+        );
+
+        if (result.DialogResult == DialogResult.OK) {
+            Route.StaticResponseBody = result.Value;
+        }
+    }
+
+    private async Task AddStaticResponseHeader() {
+        var name = _newStaticResponseHeaderName.Trim();
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        if (!Regex.IsMatch(name, @"^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$")) {
+            await _modal.OkOnly(_strings["Invalid Header"], _strings["WARN_InvalidHeaderName"]);
+            return;
+        }
+
+        var value = _newStaticResponseHeaderValue;
+        if (!Regex.IsMatch(value, @"^[\t\x20-\x7E]*$")) {
+            await _modal.OkOnly(_strings["Invalid Header"], _strings["WARN_InvalidHeaderValue"]);
+            return;
+        }
+
+        if (Route.StaticResponseHeaders != null && Route.StaticResponseHeaders.Keys.Contains(name, StringComparer.OrdinalIgnoreCase)) {
+            await _modal.OkOnly(_strings["Duplicate Header"], _strings["WARN_DuplicateHeader"]);
+            return;
+        }
+
+        if (Route.StaticResponseHeaders == null) Route.StaticResponseHeaders = new();
+        Route.StaticResponseHeaders.Add(name, value);
+
+        _newStaticResponseHeaderName = string.Empty;
+        _newStaticResponseHeaderValue = string.Empty;
+    }
+
+    private void RemoveStaticResponseHeader(string name) {
+        if (Route.StaticResponseHeaders == null) return;
+
+        _newStaticResponseHeaderName = name;
+        _newStaticResponseHeaderValue = Route.StaticResponseHeaders[name];
+
+        Route.StaticResponseHeaders.Remove(name);
+        if (Route.StaticResponseHeaders.Count == 0) Route.StaticResponseHeaders = null;
+    }
+
     private void SetClientHeaderMode(string? mode) {
         if (mode == "False") {
             Route.PreserveClientHeaders = false;
-            Route.AllowedHeaders = null;
+            Route.AllowedRequestHeaders = null;
         } else if (mode == "Custom") {
             Route.PreserveClientHeaders = true;
-            Route.AllowedHeaders = new();
+            Route.AllowedRequestHeaders = new();
         } else {
             Route.PreserveClientHeaders = true;
-            Route.AllowedHeaders = null;
+            Route.AllowedRequestHeaders = null;
         }
     }
 
     private void AddAllowedHeader() {
         var newHeader = _newAllowedHeader.Trim();
         if (string.IsNullOrWhiteSpace(newHeader)) return;
-        if (Route.AllowedHeaders == null) Route.AllowedHeaders = new();
-        if (!Route.AllowedHeaders.Contains(newHeader, StringComparer.OrdinalIgnoreCase)) Route.AllowedHeaders.Add(newHeader);
+        if (Route.AllowedRequestHeaders == null) Route.AllowedRequestHeaders = new();
+        if (!Route.AllowedRequestHeaders.Contains(newHeader, StringComparer.OrdinalIgnoreCase)) Route.AllowedRequestHeaders.Add(newHeader);
         _newAllowedHeader = string.Empty;
     }
 
     private void RemoveAllowedHeader(string header) {
         _newAllowedHeader = header;
-        if (Route.AllowedHeaders == null) return;
-        Route.AllowedHeaders.Remove(header);
+        if (Route.AllowedRequestHeaders == null) return;
+        Route.AllowedRequestHeaders.Remove(header);
     }
 
     private void AddPathTransform() {
-        PathTransformMode? mode = PathTransformMode.FromString(_newPathTransformMode);
+        RequestPathTransformMode? mode = RequestPathTransformMode.FromString(_newPathTransformMode);
         if (mode == null) return;
         if (string.IsNullOrWhiteSpace(_newPathTransformString)) return;
         if (!_newPathTransformString.StartsWith('/')) _newPathTransformString = $"/{_newPathTransformString}";
 
-        Route.Transforms.Add(new ProxyRoutePathTransform {
+        Route.RequestTransforms.Add(new ProxyRequestPathTransform {
             Id = Guid.NewGuid(),
             ConfigRevision = Route.ConfigRevision,
             RouteId = Route.Id,
@@ -262,56 +332,66 @@ public partial class RouteEditor {
             PathString = _newPathTransformString
         });
 
-        _newPathTransformMode = PathTransformMode.Add.Mode;
+        _newPathTransformMode = RequestPathTransformMode.Add.Mode;
         _newPathTransformString = string.Empty;
     }
 
-    private void RemovePathTransform(ProxyRoutePathTransform transform) {
+    private void RemovePathTransform(ProxyRequestPathTransform transform) {
         _newPathTransformMode = transform.PathMode.Mode;
         _newPathTransformString = transform.PathString;
-        Route.Transforms.Remove(transform);
+        Route.RequestTransforms.Remove(transform);
     }
 
-    private void AddHeaderTransform() {
-        HeaderTransformOperation? operation = HeaderTransformOperation.FromString(_newHeaderTransformOperation);
+    private async Task AddRequestHeaderTransform() {
+        var operation = RequestHeaderTransformOperation.FromString(_newRequestHeaderTransformOperation);
         if (operation == null) return;
-        if (string.IsNullOrWhiteSpace(_newHeaderTransformHeaderName)) return;
 
-        string? headerValue;
-        if (operation == HeaderTransformOperation.Remove) {
-            headerValue = null;
-        } else {
-            if (string.IsNullOrWhiteSpace(_newHeaderTransformHeaderValue)) return;
-            headerValue = _newHeaderTransformHeaderValue;
+        var name = _newRequestHeaderTransformHeaderName.Trim();
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        if (!Regex.IsMatch(name, @"^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$")) {
+            await _modal.OkOnly(_strings["Invalid Header"], _strings["WARN_InvalidHeaderName"]);
+            return;
         }
 
-        Route.Transforms.Add(new ProxyRouteHeaderTransform {
+        string? value = null;
+
+        if (operation != RequestHeaderTransformOperation.Remove) {
+            value = _newRequestHeaderTransformHeaderValue;
+
+            if (!Regex.IsMatch(value, @"^[\t\x20-\x7E]*$")) {
+                await _modal.OkOnly(_strings["Invalid Header"], _strings["WARN_InvalidHeaderValue"]);
+                return;
+            }
+        }
+
+        Route.RequestTransforms.Add(new ProxyRequestHeaderTransform {
             Id = Guid.NewGuid(),
             ConfigRevision = Route.ConfigRevision,
             RouteId = Route.Id,
             RouteConfigRevision = Route.ConfigRevision,
             HeaderOperation = operation,
-            HeaderName = _newHeaderTransformHeaderName,
-            HeaderValue = headerValue
+            HeaderName = name,
+            HeaderValue = value
         });
 
-        _newHeaderTransformOperation = HeaderTransformOperation.Set.Operation;
-        _newHeaderTransformHeaderName = string.Empty;
-        _newHeaderTransformHeaderValue = string.Empty;
+        _newRequestHeaderTransformOperation = RequestHeaderTransformOperation.Set.Operation;
+        _newRequestHeaderTransformHeaderName = string.Empty;
+        _newRequestHeaderTransformHeaderValue = string.Empty;
     }
 
-    private void RemoveHeaderTransform(ProxyRouteHeaderTransform transform) {
-        _newHeaderTransformOperation = transform.HeaderOperation.Operation;
-        _newHeaderTransformHeaderName = transform.HeaderName;
-        _newHeaderTransformHeaderValue = transform.HeaderValue ?? string.Empty;
-        Route.Transforms.Remove(transform);
+    private void RemoveRequestHeaderTransform(ProxyRequestHeaderTransform transform) {
+        _newRequestHeaderTransformOperation = transform.HeaderOperation.Operation;
+        _newRequestHeaderTransformHeaderName = transform.HeaderName;
+        _newRequestHeaderTransformHeaderValue = transform.HeaderValue ?? string.Empty;
+        Route.RequestTransforms.Remove(transform);
     }
 
     private void AddMethodTransform() {
         if (string.IsNullOrWhiteSpace(_newFromHttpMethod)) return;
         if (string.IsNullOrWhiteSpace(_newToHttpMethod)) return;
-        
-        Route.Transforms.Add(new ProxyRouteMethodTransform {
+
+        Route.RequestTransforms.Add(new ProxyRequestMethodTransform {
             Id = Guid.NewGuid(),
             ConfigRevision = Route.ConfigRevision,
             RouteId = Route.Id,
@@ -324,26 +404,26 @@ public partial class RouteEditor {
         _newToHttpMethod = string.Empty;
     }
 
-    private void RemoveMethodTransform(ProxyRouteMethodTransform transform) {
+    private void RemoveMethodTransform(ProxyRequestMethodTransform transform) {
         _newFromHttpMethod = transform.FromHttpMethod;
         _newToHttpMethod = transform.ToHttpMethod;
-        Route.Transforms.Remove(transform);
+        Route.RequestTransforms.Remove(transform);
     }
 
     private void AddQueryTransform() {
-        QueryTransformOperation? operation = QueryTransformOperation.FromString(_newQueryTransformOperation);
+        RequestQueryTransformOperation? operation = RequestQueryTransformOperation.FromString(_newQueryTransformOperation);
         if (operation == null) return;
         if (string.IsNullOrWhiteSpace(_newQueryTransformQueryKey)) return;
 
         string? QueryValue;
-        if (operation == QueryTransformOperation.Remove) {
+        if (operation == RequestQueryTransformOperation.Remove) {
             QueryValue = null;
         } else {
             if (string.IsNullOrWhiteSpace(_newQueryTransformQueryValue)) return;
             QueryValue = _newQueryTransformQueryValue;
         }
 
-        Route.Transforms.Add(new ProxyRouteQueryTransform {
+        Route.RequestTransforms.Add(new ProxyRequestQueryTransform {
             Id = Guid.NewGuid(),
             ConfigRevision = Route.ConfigRevision,
             RouteId = Route.Id,
@@ -353,15 +433,97 @@ public partial class RouteEditor {
             QueryValue = QueryValue
         });
 
-        _newQueryTransformOperation = QueryTransformOperation.Set.Operation;
+        _newQueryTransformOperation = RequestQueryTransformOperation.Set.Operation;
         _newQueryTransformQueryKey = string.Empty;
         _newQueryTransformQueryValue = string.Empty;
     }
 
-    private void RemoveQueryTransform(ProxyRouteQueryTransform transform) {
+    private void RemoveQueryTransform(ProxyRequestQueryTransform transform) {
         _newQueryTransformOperation = transform.QueryOperation.Operation;
         _newQueryTransformQueryKey = transform.QueryKey;
         _newQueryTransformQueryValue = transform.QueryValue ?? string.Empty;
-        Route.Transforms.Remove(transform);
+        Route.RequestTransforms.Remove(transform);
+    }
+
+    private void SetResponseHeaderMode(string? mode) {
+        if (mode == "False") {
+            Route.PreserveResponseHeaders = false;
+            Route.AllowedResponseHeaders = null;
+        } else if (mode == "Custom") {
+            Route.PreserveResponseHeaders = true;
+            Route.AllowedResponseHeaders = new();
+        } else {
+            Route.PreserveResponseHeaders = true;
+            Route.AllowedResponseHeaders = null;
+        }
+    }
+
+    private async Task AddAllowedResponseHeader() {
+        var name = _newAllowedResponseHeader.Trim();
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        if (!Regex.IsMatch(name, @"^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$")) {
+            await _modal.OkOnly(_strings["Invalid Header"], _strings["Invalid response header name."]);
+            return;
+        }
+
+        if (Route.AllowedResponseHeaders == null) Route.AllowedResponseHeaders = new();
+
+        if (!Route.AllowedResponseHeaders.Contains(name, StringComparer.OrdinalIgnoreCase)) {
+            Route.AllowedResponseHeaders.Add(name);
+        }
+
+        _newAllowedResponseHeader = string.Empty;
+    }
+
+    private void RemoveAllowedResponseHeader(string header) {
+        _newAllowedResponseHeader = header;
+        Route.AllowedResponseHeaders?.Remove(header);
+    }
+
+    private async Task AddResponseHeaderTransform() {
+        var operation = ResponseHeaderTransformOperation.FromString(_newResponseHeaderTransformOperation);
+        if (operation == null) return;
+
+        var name = _newResponseHeaderTransformHeaderName.Trim();
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        if (!Regex.IsMatch(name, @"^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$")) {
+            await _modal.OkOnly(_strings["Invalid Header"], _strings["WARN_InvalidHeaderName"]);
+            return;
+        }
+
+        string? value = null;
+
+        if (operation != ResponseHeaderTransformOperation.Remove) {
+            value = _newResponseHeaderTransformHeaderValue;
+
+            if (!Regex.IsMatch(value, @"^[\t\x20-\x7E]*$")) {
+                await _modal.OkOnly(_strings["Invalid Header"], _strings["WARN_InvalidHeaderValue"]);
+                return;
+            }
+        }
+
+        Route.ResponseTransforms.Add(new ProxyResponseHeaderTransform {
+            Id = Guid.NewGuid(),
+            ConfigRevision = Route.ConfigRevision,
+            RouteId = Route.Id,
+            RouteConfigRevision = Route.ConfigRevision,
+            HeaderOperation = operation,
+            HeaderName = name,
+            HeaderValue = value
+        });
+
+        _newResponseHeaderTransformOperation = ResponseHeaderTransformOperation.Set.Operation;
+        _newResponseHeaderTransformHeaderName = string.Empty;
+        _newResponseHeaderTransformHeaderValue = string.Empty;
+    }
+
+    private void RemoveResponseHeaderTransform(ProxyResponseHeaderTransform transform) {
+        _newResponseHeaderTransformOperation = transform.HeaderOperation.Operation;
+        _newResponseHeaderTransformHeaderName = transform.HeaderName;
+        _newResponseHeaderTransformHeaderValue = transform.HeaderValue ?? string.Empty;
+
+        Route.ResponseTransforms.Remove(transform);
     }
 }

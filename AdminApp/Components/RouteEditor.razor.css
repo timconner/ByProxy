@@ -66,6 +66,12 @@ li {
     min-width: 140px;
 }
 
+.response-body {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .response {
     display: flex;
     flex-direction: column;
@@ -157,4 +163,8 @@ li {
 .x-forwarded {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+}
+
+.collapsed-content {
+    color: var(--disabled-text-color);
 }

@@ -1,33 +1,36 @@
 ﻿namespace ByProxy.Services {
-    using ProxyExportVLatest = ImportExportService.ProxyExportV1_20;
-    using SystemSettingsExportVLatest = ImportExportService.SystemSettingsExportV1_20;
-    using RouteExportVLatest = ImportExportService.RouteExportV1_20;
-    using RouteTransformExportVLatest = ImportExportService.RouteTransformExportV1_20;
-    using RoutePathTransformExportVLatest = ImportExportService.RoutePathTransformExportV1_20;
-    using RouteMethodTransformExportVLatest = ImportExportService.RouteMethodTransformExportV1_20;
-    using RouteHeaderTransformExportVLatest = ImportExportService.RouteHeaderTransformExportV1_20;
-    using RouteQueryTransformExportVLatest = ImportExportService.RouteQueryTransformExportV1_20;
-    using RouteMatchExportVLatest = ImportExportService.RouteMatchExportV1_20;
-    using RouteHeaderMatchExportVLatest = ImportExportService.RouteHeaderMatchExportV1_20;
-    using RouteQueryMatchExportVLatest = ImportExportService.RouteQueryMatchExportV1_20;
-    using ClusterExportVLatest = ImportExportService.ClusterExportV1_20;
-    using DestinationExportVLatest = ImportExportService.DestinationExportV1_20;
-    using SniMapExportVLatest = ImportExportService.SniMapExportV1_20;
-    using AcmeAccountExportVLatest = ImportExportService.AcmeAccountExportV1_20;
-    using AcmeDnsProviderExportVLatest = ImportExportService.AcmeDnsProviderExportV1_20;
-    using CertificateAuthorityExportVLatest = ImportExportService.CertificateAuthorityExportV1_20;
-    using ServerCertExportVLatest = ImportExportService.ServerCertExportV1_20;
-    using IssuedCertExportVLatest = ImportExportService.IssuedCertExportV1_20;
-    using AcmeCertExportVLatest = ImportExportService.AcmeCertExportV1_20;
-    using ImportedCertExportVLatest = ImportExportService.ImportedCertExportV1_20;
-    using AcmeCertHostExportVLatest = ImportExportService.AcmeCertHostExportV1_20;
-    using AcmeHttpCertHostExportVLatest = ImportExportService.AcmeHttpCertHostExportV1_20;
-    using AcmeDnsCertHostExportVLatest = ImportExportService.AcmeDnsCertHostExportV1_20;
-    using EncryptionParametersVLatest = ImportExportService.EncryptionParametersV1_20;
-    using EncryptionHeaderVLatest = ImportExportService.EncryptionHeaderV1_20;
+    using ProxyExportVLatest = ImportExportService.ProxyExportV1_24;
+    using SystemSettingsExportVLatest = ImportExportService.SystemSettingsExportV1_24;
+    using RouteExportVLatest = ImportExportService.RouteExportV1_24;
+    using RequestTransformExportVLatest = ImportExportService.RequestTransformExportV1_24;
+    using RequestPathTransformExportVLatest = ImportExportService.RequestPathTransformExportV1_24;
+    using RequestMethodTransformExportVLatest = ImportExportService.RequestMethodTransformExportV1_24;
+    using RequestHeaderTransformExportVLatest = ImportExportService.RequestHeaderTransformExportV1_24;
+    using RequestQueryTransformExportVLatest = ImportExportService.RequestQueryTransformExportV1_24;
+    using RouteMatchExportVLatest = ImportExportService.RouteMatchExportV1_24;
+    using RouteHeaderMatchExportVLatest = ImportExportService.RouteHeaderMatchExportV1_24;
+    using RouteQueryMatchExportVLatest = ImportExportService.RouteQueryMatchExportV1_24;
+    using ClusterExportVLatest = ImportExportService.ClusterExportV1_24;
+    using DestinationExportVLatest = ImportExportService.DestinationExportV1_24;
+    using SniMapExportVLatest = ImportExportService.SniMapExportV1_24;
+    using AcmeAccountExportVLatest = ImportExportService.AcmeAccountExportV1_24;
+    using AcmeDnsProviderExportVLatest = ImportExportService.AcmeDnsProviderExportV1_24;
+    using CertificateAuthorityExportVLatest = ImportExportService.CertificateAuthorityExportV1_24;
+    using ServerCertExportVLatest = ImportExportService.ServerCertExportV1_24;
+    using IssuedCertExportVLatest = ImportExportService.IssuedCertExportV1_24;
+    using AcmeCertExportVLatest = ImportExportService.AcmeCertExportV1_24;
+    using ImportedCertExportVLatest = ImportExportService.ImportedCertExportV1_24;
+    using AcmeCertHostExportVLatest = ImportExportService.AcmeCertHostExportV1_24;
+    using AcmeHttpCertHostExportVLatest = ImportExportService.AcmeHttpCertHostExportV1_24;
+    using AcmeDnsCertHostExportVLatest = ImportExportService.AcmeDnsCertHostExportV1_24;
+    using EncryptionParametersVLatest = ImportExportService.EncryptionParametersV1_24;
+    using EncryptionHeaderVLatest = ImportExportService.EncryptionHeaderV1_24;
+    using ResponseTransformExportVLatest = ImportExportService.ResponseTransformExportV1_24;
+    using ResponseHeaderTransformExportVLatest = ImportExportService.ResponseHeaderTransformExportV1_24;
 
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$version")]
     [JsonDerivedType(typeof(ImportExportService.ProxyExportV1_20), "1.20")]
+    [JsonDerivedType(typeof(ImportExportService.ProxyExportV1_24), "1.24")]
     public abstract class ProxyExport {
         public abstract ProxyExport ToNext();
     }
@@ -236,7 +239,7 @@
             }
         }
 
-        private ProxyExportVLatest UpgradeExportToLatest(ProxyExport export) {
+        public ProxyExportVLatest UpgradeExportToLatest(ProxyExport export) {
             while (true) {
                 if (export is ProxyExportVLatest latest) return latest;
                 export = export.ToNext();
@@ -560,7 +563,8 @@
             using var headerDoc = JsonDocument.Parse(headerBytes.ToArray());
             string? version = headerDoc.RootElement.GetProperty("Version").GetString();
 
-            var export = version switch {
+            ProxyExport export = version switch {
+                "1.24" => DecryptExportV1_24(headerBytes.Span, payload, password),
                 "1.20" => DecryptExportV1_20(headerBytes.Span, payload, password),
                 _ => throw new NotSupportedException($"Unsupported encryption version: {version}")
             };
@@ -648,7 +652,7 @@
                 MatchCriteria = routeExport.MatchCriteria.Select(_ => _.FromCurrent()).ToList(),
                 PreserveHostHeader = routeExport.PreserveHostHeader,
                 PreserveClientHeaders = routeExport.PreserveClientHeaders,
-                AllowedHeaders = routeExport.AllowedHeaders?.ToList(),
+                AllowedRequestHeaders = routeExport.AllowedRequestHeaders?.ToList(),
                 XForwardedPrefix = routeExport.XForwardedPrefix,
                 XForwardedForAction = routeExport.XForwardedForAction,
                 XForwardedProtoAction = routeExport.XForwardedProtoAction,
@@ -660,37 +664,55 @@
                 HttpsPort = routeExport.HttpsPort,
                 SuppressHttpsRedirect = routeExport.SuppressHttpsRedirect,
                 MaxRequestBodySize = routeExport.MaxRequestBodySize,
-                Transforms = routeExport.Transforms.Select(_ => _.FromCurrent()).ToList()
+                RequestTransforms = routeExport.RequestTransforms.Select(_ => _.FromCurrent()).ToList(),
+                StaticResponseBody = routeExport.StaticResponseBody,
+                StaticResponseHeaders = routeExport.StaticResponseHeaders?.ToDictionary(),
+                PreserveResponseHeaders = routeExport.PreserveResponseHeaders,
+                AllowedResponseHeaders = routeExport.AllowedResponseHeaders?.ToList(),
+                ResponseTransforms = routeExport.ResponseTransforms.Select(_ => _.FromCurrent()).ToList()
             };
         }
 
-        public static RouteTransformExportVLatest FromCurrent(this RouteTransformExport transformExport) {
+        public static RequestTransformExportVLatest FromCurrent(this RequestTransformExport transformExport) {
             return transformExport switch {
-                RoutePathTransformExport pathTransform => new RoutePathTransformExportVLatest {
+                RequestPathTransformExport pathTransform => new RequestPathTransformExportVLatest {
                     Id = pathTransform.Id,
                     RouteId = pathTransform.RouteId,
                     Mode = pathTransform.Mode,
                     PathString = pathTransform.PathString
                 },
-                RouteMethodTransformExport methodTransform => new RouteMethodTransformExportVLatest {
+                RequestMethodTransformExport methodTransform => new RequestMethodTransformExportVLatest {
                     Id = methodTransform.Id,
                     RouteId = methodTransform.RouteId,
                     FromHttpMethod = methodTransform.FromHttpMethod,
                     ToHttpMethod = methodTransform.ToHttpMethod
                 },
-                RouteHeaderTransformExport headerTrasnform => new RouteHeaderTransformExportVLatest {
+                RequestHeaderTransformExport headerTrasnform => new RequestHeaderTransformExportVLatest {
                     Id = headerTrasnform.Id,
                     RouteId = headerTrasnform.RouteId,
                     Operation = headerTrasnform.Operation,
                     HeaderName = headerTrasnform.HeaderName,
                     HeaderValue = headerTrasnform.HeaderValue
                 },
-                RouteQueryTransformExport queryTransform => new RouteQueryTransformExportVLatest {
+                RequestQueryTransformExport queryTransform => new RequestQueryTransformExportVLatest {
                     Id = queryTransform.Id,
                     RouteId = queryTransform.RouteId,
                     Operation = queryTransform.Operation,
                     QueryKey = queryTransform.QueryKey,
                     QueryValue = queryTransform.QueryValue
+                },
+                _ => throw new NotSupportedException($"No export mapping for {transformExport.GetType().Name}")
+            };
+        }
+
+        public static ResponseTransformExportVLatest FromCurrent(this ResponseTransformExport transformExport) {
+            return transformExport switch {
+                ResponseHeaderTransformExport headerTransform => new ResponseHeaderTransformExportVLatest {
+                    Id = headerTransform.Id,
+                    RouteId = headerTransform.RouteId,
+                    Operation = headerTransform.Operation,
+                    HeaderName = headerTransform.HeaderName,
+                    HeaderValue = headerTransform.HeaderValue
                 },
                 _ => throw new NotSupportedException($"No export mapping for {transformExport.GetType().Name}")
             };

@@ -1339,12 +1339,12 @@ example.com/api/latest =&gt; example.com/api/v2</value>
     <value>The server or series of servers to route requests to as defined in Clusters.</value>
     <comment>Used in RouteEditor</comment>
   </data>
-  <data name="Help_StatusRouteCode" xml:space="preserve">
-    <value>The status code that will be returned to the client with an empty body.</value>
+  <data name="Help_StaticResponseStatus" xml:space="preserve">
+    <value>The status code that will be returned to the client.</value>
     <comment>Used in RoutesIndex</comment>
   </data>
   <data name="Help_TarpitStatus" xml:space="preserve">
-    <value>Enables an HTTP connection tarpit that deliberately delays responses by a randomized duration between 15 and 30 seconds, slowing down abusive or unwanted clients. Note that each stalled connection still consumes server resources, which may impact overall capacity under load. The defined status code will be sent to the client after the tarpit duration with an empty body.</value>
+    <value>Enables an HTTP connection tarpit that deliberately delays responses by a randomized duration between 15 and 30 seconds, slowing down abusive or unwanted clients. Note that each stalled connection still consumes server resources, which may impact overall capacity under load. The defined response will be sent to the client after the tarpit duration.</value>
     <comment>Used in RoutesIndex</comment>
   </data>
   <data name="No Clusters" xml:space="preserve">
@@ -1379,7 +1379,7 @@ example.com/api/latest =&gt; example.com/api/v2</value>
     <value>Redirect To</value>
     <comment>Used in RoutesIndex</comment>
   </data>
-  <data name="RouteSummary_Status" xml:space="preserve">
+  <data name="RouteSummary_Static" xml:space="preserve">
     <value>Reply With Status</value>
     <comment>Used in RoutesIndex</comment>
   </data>
@@ -1726,11 +1726,11 @@ Continue editing the draft or click Discard to restore the saved version.</value
     <comment>Used in RouteEditor</comment>
   </data>
   <data name="CopyHeaders_False" xml:space="preserve">
-    <value>Discard Headers from Client</value>
+    <value>Discard All Headers</value>
     <comment>Used in RouteEditor</comment>
   </data>
   <data name="CopyHeaders_True" xml:space="preserve">
-    <value>Keep Client Headers</value>
+    <value>Keep All Headers</value>
     <comment>Used in RouteEditor</comment>
   </data>
   <data name="Headers" xml:space="preserve">
@@ -2136,8 +2136,8 @@ Continue editing the draft or click Discard to restore the saved version.</value
     <value>HTTP Redirect</value>
     <comment>Used in RouteEditor</comment>
   </data>
-  <data name="RouteResponseType_Status" xml:space="preserve">
-    <value>Return HTTP Status</value>
+  <data name="RouteResponseType_Static" xml:space="preserve">
+    <value>Static Response</value>
     <comment>Used in RouteEditor</comment>
   </data>
   <data name="RouteResponseType_Tarpit" xml:space="preserve">
@@ -2358,5 +2358,104 @@ Are you sure you wish to continue?</value>
   <data name="Export Key" xml:space="preserve">
     <value>Export Key</value>
     <comment>Used in CertExport</comment>
+  </data>
+  <data name="Request Transforms" xml:space="preserve">
+    <value>Request Transforms</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Response Transforms" xml:space="preserve">
+    <value>Response Transforms</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Request Body Size Limit" xml:space="preserve">
+    <value>Request Body Size Limit</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Response Body" xml:space="preserve">
+    <value>Response Body</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Include a Response Body" xml:space="preserve">
+    <value>Include a Response Body</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Empty Body" xml:space="preserve">
+    <value>Empty Body</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Static Text" xml:space="preserve">
+    <value>Static Text</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Body Size" xml:space="preserve">
+    <value>Body Size</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Response Headers" xml:space="preserve">
+    <value>Response Headers</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_RouteStaticResponseBody" xml:space="preserve">
+    <value>Static text returned to the client, encoded as UTF-8. The default content type is text/html. Override Content-Type in Response Headers to return another format.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_RouteStaticResponseHeaders" xml:space="preserve">
+    <value>Headers to include in the static response. Content-Length and Transfer-Encoding are managed automatically and cannot be overridden.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Upstream Headers" xml:space="preserve">
+    <value>Upstream Headers</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_CopyResponseHeaders" xml:space="preserve">
+    <value> Choose whether to keep, discard, or only allow specified response headers from the upstream server.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_ResponseHeaderTransforms" xml:space="preserve">
+    <value>Modify response headers from the upstream server or add headers before sending the response to the client.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_ResponseHeaderTransformSet" xml:space="preserve">
+    <value>Add or overwrite the specified response header.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_ResponseHeaderTransformAppend" xml:space="preserve">
+    <value>Append a value to the specified response header, or add the header if it does not exist.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_ResponseHeaderTransformRemove" xml:space="preserve">
+    <value>Remove the specified response header.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_ResponseHeaderTransformHeaderName" xml:space="preserve">
+    <value>The response header to modify (e.g. Cache-Control).</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_ResponseHeaderTransformHeaderValue" xml:space="preserve">
+    <value>The value to set or append to the response header.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Invalid Header" xml:space="preserve">
+    <value>Invalid Header</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Initial Account" xml:space="preserve">
+    <value>Initial Account</value>
+  </data>
+  <data name="WARN_InvalidHeaderName" xml:space="preserve">
+    <value>Invalid header name.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="WARN_InvalidHeaderValue" xml:space="preserve">
+    <value>Header values must contain only printable ASCII characters or tabs.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Duplicate Header" xml:space="preserve">
+    <value>Duplicate Header</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="WARN_DuplicateHeader" xml:space="preserve">
+    <value>A header with this name already exists.</value>
+    <comment>Used in RouteEditor</comment>
   </data>
 </root>

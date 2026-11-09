@@ -493,6 +493,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Body Size.
+        /// </summary>
+        public static string Body_Size {
+            get {
+                return ResourceManager.GetString("Body Size", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to CA Issued Certificates.
         /// </summary>
         public static string CA_Issued_Certificates {
@@ -943,7 +952,7 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Discard Headers from Client.
+        ///   Looks up a localized string similar to Discard All Headers.
         /// </summary>
         public static string CopyHeaders_False {
             get {
@@ -952,7 +961,7 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Keep Client Headers.
+        ///   Looks up a localized string similar to Keep All Headers.
         /// </summary>
         public static string CopyHeaders_True {
             get {
@@ -1294,6 +1303,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Duplicate Header.
+        /// </summary>
+        public static string Duplicate_Header {
+            get {
+                return ResourceManager.GetString("Duplicate Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Edit.
         /// </summary>
         public static string Edit {
@@ -1344,6 +1362,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Edit_User {
             get {
                 return ResourceManager.GetString("Edit User", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Empty Body.
+        /// </summary>
+        public static string Empty_Body {
+            get {
+                return ResourceManager.GetString("Empty Body", resourceCulture);
             }
         }
         
@@ -2164,6 +2191,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to  Choose whether to keep, discard, or only allow specified response headers from the upstream server..
+        /// </summary>
+        public static string Help_CopyResponseHeaders {
+            get {
+                return ResourceManager.GetString("Help_CopyResponseHeaders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The address for handling routed requests..
         /// </summary>
         public static string Help_DestinationAddress {
@@ -2834,6 +2870,60 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Append a value to the specified response header, or add the header if it does not exist..
+        /// </summary>
+        public static string Help_ResponseHeaderTransformAppend {
+            get {
+                return ResourceManager.GetString("Help_ResponseHeaderTransformAppend", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The response header to modify (e.g. Cache-Control)..
+        /// </summary>
+        public static string Help_ResponseHeaderTransformHeaderName {
+            get {
+                return ResourceManager.GetString("Help_ResponseHeaderTransformHeaderName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value to set or append to the response header..
+        /// </summary>
+        public static string Help_ResponseHeaderTransformHeaderValue {
+            get {
+                return ResourceManager.GetString("Help_ResponseHeaderTransformHeaderValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove the specified response header..
+        /// </summary>
+        public static string Help_ResponseHeaderTransformRemove {
+            get {
+                return ResourceManager.GetString("Help_ResponseHeaderTransformRemove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Modify response headers from the upstream server or add headers before sending the response to the client..
+        /// </summary>
+        public static string Help_ResponseHeaderTransforms {
+            get {
+                return ResourceManager.GetString("Help_ResponseHeaderTransforms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Add or overwrite the specified response header..
+        /// </summary>
+        public static string Help_ResponseHeaderTransformSet {
+            get {
+                return ResourceManager.GetString("Help_ResponseHeaderTransformSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cycles through destinations in order, giving each one a turn..
         /// </summary>
         public static string Help_RoundRobin {
@@ -2870,6 +2960,24 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Static text returned to the client, encoded as UTF-8. The default content type is text/html. Override Content-Type in Response Headers to return another format..
+        /// </summary>
+        public static string Help_RouteStaticResponseBody {
+            get {
+                return ResourceManager.GetString("Help_RouteStaticResponseBody", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Headers to include in the static response. Content-Length and Transfer-Encoding are managed automatically and cannot be overridden..
+        /// </summary>
+        public static string Help_RouteStaticResponseHeaders {
+            get {
+                return ResourceManager.GetString("Help_RouteStaticResponseHeaders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This behavior can be changed to present a fallback certificate in System settings..
         /// </summary>
         public static string Help_SniRefuse {
@@ -2879,11 +2987,11 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The status code that will be returned to the client with an empty body..
+        ///   Looks up a localized string similar to The status code that will be returned to the client..
         /// </summary>
-        public static string Help_StatusRouteCode {
+        public static string Help_StaticResponseStatus {
             get {
-                return ResourceManager.GetString("Help_StatusRouteCode", resourceCulture);
+                return ResourceManager.GetString("Help_StaticResponseStatus", resourceCulture);
             }
         }
         
@@ -2915,7 +3023,7 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Enables an HTTP connection tarpit that deliberately delays responses by a randomized duration between 15 and 30 seconds, slowing down abusive or unwanted clients. Note that each stalled connection still consumes server resources, which may impact overall capacity under load. The defined status code will be sent to the client after the tarpit duration with an empty body..
+        ///   Looks up a localized string similar to Enables an HTTP connection tarpit that deliberately delays responses by a randomized duration between 15 and 30 seconds, slowing down abusive or unwanted clients. Note that each stalled connection still consumes server resources, which may impact overall capacity under load. The defined response will be sent to the client after the tarpit duration..
         /// </summary>
         public static string Help_TarpitStatus {
             get {
@@ -3104,6 +3212,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Include a Response Body.
+        /// </summary>
+        public static string Include_a_Response_Body {
+            get {
+                return ResourceManager.GetString("Include a Response Body", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Include Routes and Clusters.
         /// </summary>
         public static string Include_Routes_and_Clusters {
@@ -3208,6 +3325,24 @@ namespace ByProxy.AdminApp.Languages {
         public static string Inherit_From_System {
             get {
                 return ResourceManager.GetString("Inherit From System", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Initial Account.
+        /// </summary>
+        public static string Initial_Account {
+            get {
+                return ResourceManager.GetString("Initial Account", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid Header.
+        /// </summary>
+        public static string Invalid_Header {
+            get {
+                return ResourceManager.GetString("Invalid Header", resourceCulture);
             }
         }
         
@@ -4478,11 +4613,56 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Request Body Size Limit.
+        /// </summary>
+        public static string Request_Body_Size_Limit {
+            get {
+                return ResourceManager.GetString("Request Body Size Limit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Request Transforms.
+        /// </summary>
+        public static string Request_Transforms {
+            get {
+                return ResourceManager.GetString("Request Transforms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Reset Password.
         /// </summary>
         public static string Reset_Password {
             get {
                 return ResourceManager.GetString("Reset Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Response Body.
+        /// </summary>
+        public static string Response_Body {
+            get {
+                return ResourceManager.GetString("Response Body", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Response Headers.
+        /// </summary>
+        public static string Response_Headers {
+            get {
+                return ResourceManager.GetString("Response Headers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Response Transforms.
+        /// </summary>
+        public static string Response_Transforms {
+            get {
+                return ResourceManager.GetString("Response Transforms", resourceCulture);
             }
         }
         
@@ -4631,11 +4811,11 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Return HTTP Status.
+        ///   Looks up a localized string similar to Static Response.
         /// </summary>
-        public static string RouteResponseType_Status {
+        public static string RouteResponseType_Static {
             get {
-                return ResourceManager.GetString("RouteResponseType_Status", resourceCulture);
+                return ResourceManager.GetString("RouteResponseType_Static", resourceCulture);
             }
         }
         
@@ -4678,9 +4858,9 @@ namespace ByProxy.AdminApp.Languages {
         /// <summary>
         ///   Looks up a localized string similar to Reply With Status.
         /// </summary>
-        public static string RouteSummary_Status {
+        public static string RouteSummary_Static {
             get {
-                return ResourceManager.GetString("RouteSummary_Status", resourceCulture);
+                return ResourceManager.GetString("RouteSummary_Static", resourceCulture);
             }
         }
         
@@ -4919,6 +5099,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Static Text.
+        /// </summary>
+        public static string Static_Text {
+            get {
+                return ResourceManager.GetString("Static Text", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Subject Names.
         /// </summary>
         public static string Subject_Names {
@@ -5086,6 +5275,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Uploading_File {
             get {
                 return ResourceManager.GetString("Uploading File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upstream Headers.
+        /// </summary>
+        public static string Upstream_Headers {
+            get {
+                return ResourceManager.GetString("Upstream Headers", resourceCulture);
             }
         }
         
@@ -5291,6 +5489,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A header with this name already exists..
+        /// </summary>
+        public static string WARN_DuplicateHeader {
+            get {
+                return ResourceManager.GetString("WARN_DuplicateHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to To make tarpit effective for HTTPS connections, set unmatched HTTPS connections to use a fallback certificate.
         ///
         ///Recommend using a self-signed certificate that gives no indication of valid hostnames..
@@ -5298,6 +5505,24 @@ namespace ByProxy.AdminApp.Languages {
         public static string WARN_EnabledTarpit {
             get {
                 return ResourceManager.GetString("WARN_EnabledTarpit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid header name..
+        /// </summary>
+        public static string WARN_InvalidHeaderName {
+            get {
+                return ResourceManager.GetString("WARN_InvalidHeaderName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Header values must contain only printable ASCII characters or tabs..
+        /// </summary>
+        public static string WARN_InvalidHeaderValue {
+            get {
+                return ResourceManager.GetString("WARN_InvalidHeaderValue", resourceCulture);
             }
         }
         

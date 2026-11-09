@@ -67,7 +67,8 @@ namespace ByProxy.AdminApp.Pages.SystemSettings {
                     }
                 } else {
                     progress.Report((_strings["Deserializing File"], null));
-                    _export = JsonSerializer.Deserialize<ProxyExport>(fileBytes) ?? throw new InvalidDataException("Invalid file contents.");
+                    var export = JsonSerializer.Deserialize<ProxyExport>(fileBytes) ?? throw new InvalidDataException("Invalid file contents.");
+                    _export = _importExport.UpgradeExportToLatest(export);
                 }
                 _preview = await _importExport.RealizeExportAsync(_export, _areasToImport, _mergeOptions);
             }, true);

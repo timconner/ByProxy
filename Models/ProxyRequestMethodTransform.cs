@@ -1,12 +1,12 @@
 ﻿namespace ByProxy.Models {
-    public class ProxyRouteMethodTransform : ProxyRouteTransform {
-        public override RouteTransformType TransformType => RouteTransformType.Method;
+    public class ProxyRequestMethodTransform : ProxyRequestTransform {
+        public override RequestTransformType TransformType => RequestTransformType.Method;
 
         public string FromHttpMethod { get; set; }
         public string ToHttpMethod { get; set; }
 
-        public override ProxyRouteTransform Clone(int newRevision) {
-            return new ProxyRouteMethodTransform {
+        public override ProxyRequestTransform Clone(int newRevision) {
+            return new ProxyRequestMethodTransform {
                 Id = Id,
                 ConfigRevision = newRevision,
                 RouteId = RouteId,
@@ -16,8 +16,8 @@
             };
         }
 
-        public override RouteTransformExport ToExport() {
-            return new RouteMethodTransformExport {
+        public override RequestTransformExport ToExport() {
+            return new RequestMethodTransformExport {
                 Id = Id,
                 RouteId = RouteId,
                 FromHttpMethod = FromHttpMethod,
@@ -26,12 +26,12 @@
         }
     }
 
-    public class RouteMethodTransformExport : RouteTransformExport {
+    public class RequestMethodTransformExport : RequestTransformExport {
         public string FromHttpMethod { get; set; }
         public string ToHttpMethod { get; set; }
 
-        public override ProxyRouteTransform Realize(int revision) {
-            return new ProxyRouteMethodTransform {
+        public override ProxyRequestTransform Realize(int revision) {
+            return new ProxyRequestMethodTransform {
                 Id = Id,
                 ConfigRevision = revision,
                 RouteId = RouteId,

@@ -29,65 +29,7 @@ public partial class RoutesIndex : IDisposable {
             .AsNoTracking()
             .ToDictionaryAsync(_ => _.Id, _ => _.Name);
     }
-
-    private List<string> GenerateSimulatedMatches(ProxyRoute route) {
-        var matches = new List<string>();
-        foreach (var method in route.Methods ?? [string.Empty]) {
-            foreach (var host in route.Hosts ?? ["*"]) {
-                var path = route.GetPathAsYarpMatch().TrimStart('/');
-                path = Regex.Replace(path, @"{\*\*.*}", "*");
-                path = path == "*" ? string.Empty : $"/{path}";
-                if (route.HttpPort.HasValue) {
-                    var port = route.HttpPort == 80 ? string.Empty : $":{route.HttpPort.ToString()}";
-                    matches.Add(($"{method} http://{host}{port}{path}").Trim());
-                }
-                if (route.HttpsPort.HasValue) {
-                    var port = route.HttpsPort == 443 ? string.Empty : $":{route.HttpsPort.ToString()}";
-                    matches.Add(($"{method} https://{host}{port}{path}").Trim());
-                }
-            }
-        }
-
-        foreach (var criteria in route.MatchCriteria) {
-            switch (criteria) {
-                case ProxyRouteHeaderMatch headerMatch:
-                    switch (headerMatch.HeaderMatchMode.Mode) {
-                        case ProxyHeaderMatchMode.Constants.Exact:
-                        case ProxyHeaderMatchMode.Constants.Prefix:
-                        case ProxyHeaderMatchMode.Constants.Contains:
-                            matches.Add($"{_strings["Header"]} '{headerMatch.Key}' {_strings["MatchSummary_Matches"]} ...");
-                            break;
-                        case ProxyHeaderMatchMode.Constants.NotContains:
-                            matches.Add($"{_strings["Header"]} '{headerMatch.Key}' {_strings["MatchSummary_NotMatch"]} ...");
-                            break;
-                        case ProxyHeaderMatchMode.Constants.Exists:
-                            matches.Add($"{_strings["Header"]} '{headerMatch.Key}' {_strings["MatchSummary_Exists"]}");
-                            break;
-                        case ProxyHeaderMatchMode.Constants.NotExists:
-                            matches.Add($"{_strings["Header"]} '{headerMatch.Key}' {_strings["MatchSummary_NotExists"]}");
-                            break;
-                    }
-                    break;
-                case ProxyRouteQueryMatch queryMatch:
-                    switch (queryMatch.QueryMatchMode.Mode) {
-                        case ProxyQueryMatchMode.Constants.Exact:
-                        case ProxyQueryMatchMode.Constants.Prefix:
-                        case ProxyQueryMatchMode.Constants.Contains:
-                            matches.Add($"{_strings["Query Parameter"]} '{queryMatch.Key}' {_strings["MatchSummary_Matches"]} ...");
-                            break;
-                        case ProxyQueryMatchMode.Constants.NotContains:
-                            matches.Add($"{_strings["Query Parameter"]} '{queryMatch.Key}' {_strings["MatchSummary_NotMatch"]} ...");
-                            break;
-                        case ProxyQueryMatchMode.Constants.Exists:
-                            matches.Add($"{_strings["Query Parameter"]} '{queryMatch.Key}' {_strings["MatchSummary_Exists"]}");
-                            break;
-                    }
-                    break;
-            }
-        }
-        return matches;
-    }
-
+        
     [JSInvokable]
     public async void SortableJsUpdate(int oldIndex, int newIndex) {
         if (_routes == null || oldIndex >= _routes.Count || newIndex > _routes.Count) return;
@@ -130,7 +72,12 @@ public partial class RoutesIndex : IDisposable {
         newRoute.Id = Guid.NewGuid();
         newRoute.Name = result.Value;
         
-        foreach (var transform in newRoute.Transforms) {
+        foreach (var transform in newRoute.RequestTransforms) {
+            transform.Id = Guid.NewGuid();
+            transform.RouteId = newRoute.Id;
+        }
+
+        foreach (var transform in newRoute.ResponseTransforms) {
             transform.Id = Guid.NewGuid();
             transform.RouteId = newRoute.Id;
         }

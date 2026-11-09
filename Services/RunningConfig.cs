@@ -6,9 +6,11 @@
         public required int RedirectStatus { get; init; }
         public required string RedirectLocation { get; init; }
     }
-    public sealed class StatusResponseRoute : NonClusterRoute {
+    public sealed class StaticResponseRoute : NonClusterRoute {
         public required int HttpStatusCode { get; init; }
         public required bool UseTarpit { get; init; }
+        public ReadOnlyMemory<byte>? ResponseBody { get; init; }
+        public IReadOnlyDictionary<string, string>? ResponseHeaders { get; init; }
     }
 
 

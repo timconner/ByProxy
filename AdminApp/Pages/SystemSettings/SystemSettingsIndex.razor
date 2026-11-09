@@ -116,7 +116,6 @@
             <button @onclick="ShutdownProxy">@_strings["Shutdown Proxy Server"]</button>
         </div>
         <div class="backup-restore">
-            <div><span></span></div>
             <LabelValuePairs>
                 <LabelValuePair Label="@_strings["Last Commit"]" Value="@_proxyState.RunningConfig.CommittedAt.ToLocalTime().ToString("g")" />
             </LabelValuePairs>

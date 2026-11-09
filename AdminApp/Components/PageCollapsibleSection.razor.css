@@ -1,0 +1,36 @@
+section {
+    margin: 24px 0;
+}
+
+.section-header {
+    display: grid;
+    grid-template-columns: auto 24px auto 1fr;
+    align-items: center;
+    cursor: pointer;
+}
+
+.section-label {
+    font-size: 20px;
+    font-weight: bold;
+    padding: 0 12px;
+}
+
+.section-divider {
+    border-top: 1px solid var(--disabled-text-color);
+}
+
+.section-content {
+    margin-top: 12px;
+}
+
+.section-collapsed {
+    cursor: pointer;
+    padding: 18px 0 12px 12px;
+    margin-top: -12px;
+    margin-left: 36px;
+    border: 1px solid var(--disabled-text-color);
+    border-top: none;
+    border-right: none;
+    border-bottom-left-radius: 6px;
+    width: fit-content;
+}

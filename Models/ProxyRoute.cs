@@ -18,6 +18,8 @@
         public ProxyCluster? Cluster { get; set; }
 
         public int? HttpStatusCode { get; set; }
+        public string? StaticResponseBody { get; set; }
+        public Dictionary<string, string>? StaticResponseHeaders { get; set; }
         public string? RedirectLocation { get; set; }
 
         public List<string>? Methods { get; set; }
@@ -28,7 +30,7 @@
 
         public bool PreserveHostHeader { get; set; }
         public bool PreserveClientHeaders { get; set; } = true;
-        public List<string>? AllowedHeaders { get; set; }
+        public List<string>? AllowedRequestHeaders { get; set; }
 
         public const string DEFAULT_XFORWARDED_PREFIX = "X-Forwarded-";
         public string? XForwardedPrefix { get; set; }
@@ -46,7 +48,10 @@
 
         public long? MaxRequestBodySize { get; set; }
 
-        public List<ProxyRouteTransform> Transforms { get; set; }
+        public List<string>? AllowedResponseHeaders { get; set; }
+        public bool PreserveResponseHeaders { get; set; } = true;
+        public List<ProxyRequestTransform> RequestTransforms { get; set; }
+        public List<ProxyResponseTransform> ResponseTransforms { get; set; }
 
         public string GetPathAsYarpMatch() {
             if (string.IsNullOrWhiteSpace(Path)) {
@@ -80,7 +85,7 @@
                         if (string.IsNullOrWhiteSpace(RedirectLocation)) errors.Add("ERR_RedirectLocationRequired");
                     }
                     break;
-                case RouteResponseType.Constants.Status:
+                case RouteResponseType.Constants.Static:
                 case RouteResponseType.Constants.Tarpit:
                     if (HttpStatusCode == null || HttpStatusCode == 0) errors.Add("ERR_HttpStatusCodeRequired");
                     break;
@@ -181,8 +186,8 @@
             if (ClusterId != null) { // Don't process transforms on Redirect routes
                 routeConfig = routeConfig.WithTransformUseOriginalHostHeader(PreserveHostHeader);
 
-                if (AllowedHeaders != null) {
-                    routeConfig = routeConfig.WithTransformRequestHeadersAllowed(AllowedHeaders.ToArray());
+                if (AllowedRequestHeaders != null) {
+                    routeConfig = routeConfig.WithTransformRequestHeadersAllowed(AllowedRequestHeaders.ToArray());
                 } else {
                     routeConfig = routeConfig.WithTransformCopyRequestHeaders(PreserveClientHeaders);
                 }
@@ -196,37 +201,56 @@
                     xPrefix: XForwardedPrefixAction?.EnumValue ?? ForwardedTransformActions.Set
                 );
 
-                foreach (var transform in Transforms) {
+                foreach (var transform in RequestTransforms) {
                     switch (transform) {
-                        case ProxyRoutePathTransform pathTransform:
+                        case ProxyRequestPathTransform pathTransform:
                             routeConfig = pathTransform.PathMode.Mode switch {
-                                PathTransformMode.Constants.Add => routeConfig.WithTransformPathPrefix(new PathString(pathTransform.PathString)),
-                                PathTransformMode.Constants.Remove => routeConfig.WithTransformPathRemovePrefix(new PathString(pathTransform.PathString)),
-                                PathTransformMode.Constants.Static => routeConfig = routeConfig.WithTransformPathSet(new PathString(pathTransform.PathString)),
-                                PathTransformMode.Constants.Pattern => routeConfig.WithTransformPathRouteValues(new PathString(pathTransform.PathString)),
+                                RequestPathTransformMode.Constants.Add => routeConfig.WithTransformPathPrefix(new PathString(pathTransform.PathString)),
+                                RequestPathTransformMode.Constants.Remove => routeConfig.WithTransformPathRemovePrefix(new PathString(pathTransform.PathString)),
+                                RequestPathTransformMode.Constants.Static => routeConfig = routeConfig.WithTransformPathSet(new PathString(pathTransform.PathString)),
+                                RequestPathTransformMode.Constants.Pattern => routeConfig.WithTransformPathRouteValues(new PathString(pathTransform.PathString)),
                                 _ => routeConfig
                             };
                             break;
-                        case ProxyRouteMethodTransform methodTransform:
+                        case ProxyRequestMethodTransform methodTransform:
                             routeConfig = routeConfig.WithTransformHttpMethodChange(methodTransform.FromHttpMethod, methodTransform.ToHttpMethod);
                             break;
-                        case ProxyRouteHeaderTransform headerTransform:
+                        case ProxyRequestHeaderTransform headerTransform:
                             routeConfig = headerTransform.HeaderOperation.Operation switch {
-                                HeaderTransformOperation.Constants.Set => routeConfig.WithTransformRequestHeader(headerTransform.HeaderName, headerTransform.HeaderValue ?? string.Empty, false),
-                                HeaderTransformOperation.Constants.Append => routeConfig.WithTransformRequestHeader(headerTransform.HeaderName, headerTransform.HeaderValue ?? string.Empty, true),
-                                HeaderTransformOperation.Constants.Remove => routeConfig.WithTransformRequestHeaderRemove(headerTransform.HeaderName),
-                                HeaderTransformOperation.Constants.RouteSet => routeConfig.WithTransformRequestHeaderRouteValue(headerTransform.HeaderName, headerTransform.HeaderValue ?? string.Empty, false),
-                                HeaderTransformOperation.Constants.RouteAppend => routeConfig.WithTransformRequestHeaderRouteValue(headerTransform.HeaderName, headerTransform.HeaderValue ?? string.Empty, true),
+                                RequestHeaderTransformOperation.Constants.Set => routeConfig.WithTransformRequestHeader(headerTransform.HeaderName, headerTransform.HeaderValue ?? string.Empty, false),
+                                RequestHeaderTransformOperation.Constants.Append => routeConfig.WithTransformRequestHeader(headerTransform.HeaderName, headerTransform.HeaderValue ?? string.Empty, true),
+                                RequestHeaderTransformOperation.Constants.Remove => routeConfig.WithTransformRequestHeaderRemove(headerTransform.HeaderName),
+                                RequestHeaderTransformOperation.Constants.RouteSet => routeConfig.WithTransformRequestHeaderRouteValue(headerTransform.HeaderName, headerTransform.HeaderValue ?? string.Empty, false),
+                                RequestHeaderTransformOperation.Constants.RouteAppend => routeConfig.WithTransformRequestHeaderRouteValue(headerTransform.HeaderName, headerTransform.HeaderValue ?? string.Empty, true),
                                 _ => routeConfig
                             };
                             break;
-                        case ProxyRouteQueryTransform queryTransform:
+                        case ProxyRequestQueryTransform queryTransform:
                             routeConfig = queryTransform.QueryOperation.Operation switch {
-                                QueryTransformOperation.Constants.Set => routeConfig.WithTransformQueryValue(queryTransform.QueryKey, queryTransform.QueryValue ?? string.Empty, false),
-                                QueryTransformOperation.Constants.Append => routeConfig.WithTransformQueryValue(queryTransform.QueryKey, queryTransform.QueryValue ?? string.Empty, true),
-                                QueryTransformOperation.Constants.Remove => routeConfig.WithTransformQueryRemoveKey(queryTransform.QueryKey),
-                                QueryTransformOperation.Constants.RouteSet => routeConfig.WithTransformQueryRouteValue(queryTransform.QueryKey, queryTransform.QueryValue ?? string.Empty, false),
-                                QueryTransformOperation.Constants.RouteAppend => routeConfig.WithTransformQueryRouteValue(queryTransform.QueryKey, queryTransform.QueryValue ?? string.Empty, true),
+                                RequestQueryTransformOperation.Constants.Set => routeConfig.WithTransformQueryValue(queryTransform.QueryKey, queryTransform.QueryValue ?? string.Empty, false),
+                                RequestQueryTransformOperation.Constants.Append => routeConfig.WithTransformQueryValue(queryTransform.QueryKey, queryTransform.QueryValue ?? string.Empty, true),
+                                RequestQueryTransformOperation.Constants.Remove => routeConfig.WithTransformQueryRemoveKey(queryTransform.QueryKey),
+                                RequestQueryTransformOperation.Constants.RouteSet => routeConfig.WithTransformQueryRouteValue(queryTransform.QueryKey, queryTransform.QueryValue ?? string.Empty, false),
+                                RequestQueryTransformOperation.Constants.RouteAppend => routeConfig.WithTransformQueryRouteValue(queryTransform.QueryKey, queryTransform.QueryValue ?? string.Empty, true),
+                                _ => routeConfig
+                            };
+                            break;
+                    }
+                }
+
+                if (AllowedResponseHeaders != null) {
+                    routeConfig = routeConfig.WithTransformResponseHeadersAllowed(AllowedResponseHeaders.ToArray());
+                } else {
+                    routeConfig = routeConfig.WithTransformCopyResponseHeaders(PreserveResponseHeaders);
+                }
+
+                foreach (var transform in ResponseTransforms) {
+                    switch (transform) {
+                        case ProxyResponseHeaderTransform headerTransform:
+                            routeConfig = headerTransform.HeaderOperation.Operation switch {
+                                ResponseHeaderTransformOperation.Constants.Set => routeConfig.WithTransformResponseHeader(headerTransform.HeaderName, headerTransform.HeaderValue ?? string.Empty, false),
+                                ResponseHeaderTransformOperation.Constants.Append => routeConfig.WithTransformResponseHeader(headerTransform.HeaderName, headerTransform.HeaderValue ?? string.Empty, true),
+                                ResponseHeaderTransformOperation.Constants.Remove => routeConfig.WithTransformResponseHeaderRemove(headerTransform.HeaderName),
                                 _ => routeConfig
                             };
                             break;
@@ -250,12 +274,14 @@
                 ClusterConfigRevision = newRevision,
                 RedirectLocation = RedirectLocation,
                 HttpStatusCode = HttpStatusCode,
+                StaticResponseBody = StaticResponseBody,
+                StaticResponseHeaders = StaticResponseHeaders?.ToDictionary(),
                 Methods = Methods?.ToList(),
                 Hosts = Hosts?.ToList(),
                 MatchCriteria = MatchCriteria.Select(_ => _.Clone(newRevision)).ToList(),
                 PreserveHostHeader = PreserveHostHeader,
                 PreserveClientHeaders = PreserveClientHeaders,
-                AllowedHeaders = AllowedHeaders?.ToList(),
+                AllowedRequestHeaders = AllowedRequestHeaders?.ToList(),
                 XForwardedPrefix = XForwardedPrefix,
                 XForwardedForAction = XForwardedForAction,
                 XForwardedProtoAction = XForwardedProtoAction,
@@ -267,7 +293,10 @@
                 HttpsPort = HttpsPort,
                 SuppressHttpsRedirect = SuppressHttpsRedirect,
                 MaxRequestBodySize = MaxRequestBodySize,
-                Transforms = Transforms.Select(_ => _.Clone(newRevision)).ToList()
+                RequestTransforms = RequestTransforms.Select(_ => _.Clone(newRevision)).ToList(),
+                PreserveResponseHeaders = PreserveResponseHeaders,
+                AllowedResponseHeaders = AllowedResponseHeaders?.ToList(),
+                ResponseTransforms = ResponseTransforms.Select(_ => _.Clone(newRevision)).ToList()
             };
         }
 
@@ -282,12 +311,14 @@
                 ClusterId = ClusterId,
                 RedirectLocation = RedirectLocation,
                 HttpStatusCode = HttpStatusCode,
+                StaticResponseBody = StaticResponseBody,
+                StaticResponseHeaders = StaticResponseHeaders,
                 Methods = Methods?.Order().ToList(),
                 Hosts = Hosts?.Order().ToList(),
                 MatchCriteria = MatchCriteria.OrderBy(_ => _.Id).Select(_ => _.ToExport()).ToList(),
                 PreserveHostHeader = PreserveHostHeader,
                 PreserveClientHeaders = PreserveClientHeaders,
-                AllowedHeaders = AllowedHeaders?.Order().ToList(),
+                AllowedRequestHeaders = AllowedRequestHeaders?.Order().ToList(),
                 XForwardedPrefix = XForwardedPrefix,
                 XForwardedForAction = XForwardedForAction?.Action,
                 XForwardedProtoAction = XForwardedProtoAction?.Action,
@@ -299,7 +330,10 @@
                 HttpsPort = HttpsPort,
                 SuppressHttpsRedirect = SuppressHttpsRedirect,
                 MaxRequestBodySize = MaxRequestBodySize,
-                Transforms = Transforms.OrderBy(_ => _.Id).Select(_ => _.ToExport()).ToList()
+                RequestTransforms = RequestTransforms.OrderBy(_ => _.Id).Select(_ => _.ToExport()).ToList(),
+                PreserveResponseHeaders = PreserveResponseHeaders,
+                AllowedResponseHeaders = AllowedResponseHeaders?.Order().ToList(),
+                ResponseTransforms = ResponseTransforms.OrderBy(_ => _.Id).Select(_ => _.ToExport()).ToList()
             };
         }
     }
@@ -313,13 +347,15 @@
         public string ResponseType { get; set; }
         public Guid? ClusterId { get; set; }
         public int? HttpStatusCode { get; set; }
+        public string? StaticResponseBody { get; set; }
+        public Dictionary<string, string>? StaticResponseHeaders { get; set; }
         public string? RedirectLocation { get; set; }
         public List<string>? Methods { get; set; }
         public List<string>? Hosts { get; set; }
         public List<RouteMatchExport> MatchCriteria { get; set; }
         public bool PreserveHostHeader { get; set; }
         public bool PreserveClientHeaders { get; set; }
-        public List<string>? AllowedHeaders { get; set; }
+        public List<string>? AllowedRequestHeaders { get; set; }
         public string? XForwardedPrefix { get; set; }
         public string? XForwardedForAction { get; set; }
         public string? XForwardedProtoAction { get; set; }
@@ -331,7 +367,10 @@
         public int? HttpsPort { get; set; }
         public bool SuppressHttpsRedirect { get; set; }
         public long? MaxRequestBodySize { get; set; }
-        public List<RouteTransformExport> Transforms { get; set; }
+        public List<RequestTransformExport> RequestTransforms { get; set; }
+        public bool PreserveResponseHeaders { get; set; }
+        public List<string>? AllowedResponseHeaders { get; set; }
+        public List<ResponseTransformExport> ResponseTransforms { get; set; }
 
         public ProxyRoute Realize(int revision) {
             return new ProxyRoute {
@@ -346,12 +385,14 @@
                 ClusterConfigRevision = revision,
                 RedirectLocation = RedirectLocation,
                 HttpStatusCode = HttpStatusCode,
+                StaticResponseBody = StaticResponseBody,
+                StaticResponseHeaders = StaticResponseHeaders,
                 Methods = Methods?.ToList(),
                 Hosts = Hosts?.ToList(),
                 MatchCriteria = MatchCriteria.Select(_ => _.Realize(revision)).ToList(),
                 PreserveHostHeader = PreserveHostHeader,
                 PreserveClientHeaders = PreserveClientHeaders,
-                AllowedHeaders = AllowedHeaders?.ToList(),
+                AllowedRequestHeaders = AllowedRequestHeaders?.ToList(),
                 XForwardedPrefix = XForwardedPrefix,
                 XForwardedForAction = XForwardedForAction == null ? null : (ForwardedTransformAction.FromString(XForwardedForAction) ?? throw new NotImplementedException($"Unknown X-Forwarded Action: {XForwardedForAction}")),
                 XForwardedProtoAction = XForwardedProtoAction == null ? null : (ForwardedTransformAction.FromString(XForwardedProtoAction) ?? throw new NotImplementedException($"Unknown X-Forwarded Action: {XForwardedProtoAction}")),
@@ -363,30 +404,33 @@
                 HttpsPort = HttpsPort,
                 SuppressHttpsRedirect = SuppressHttpsRedirect,
                 MaxRequestBodySize = MaxRequestBodySize,
-                Transforms = Transforms.Select(_ => _.Realize(revision)).ToList()
+                RequestTransforms = RequestTransforms.Select(_ => _.Realize(revision)).ToList(),
+                PreserveResponseHeaders = PreserveResponseHeaders,
+                AllowedResponseHeaders = AllowedResponseHeaders?.ToList(),
+                ResponseTransforms = ResponseTransforms.Select(_ => _.Realize(revision)).ToList(),
             };
         }
     }
 
-    public record RouteResponseType(string Type, string Display) {
+    public record RouteResponseType(string Type) {
         public static class Constants {
             public const string Cluster = "Cluster";
             public const string Redirect = "Redirect";
-            public const string Status = "Status";
+            public const string Static = "Static";
             public const string Tarpit = "Tarpit";
         }
 
-        public static readonly RouteResponseType Cluster = new(Constants.Cluster, "Forward to Cluster");
-        public static readonly RouteResponseType Redirect = new(Constants.Redirect, "HTTP Redirect");
-        public static readonly RouteResponseType Status = new(Constants.Status, "Return HTTP Status");
-        public static readonly RouteResponseType Tarpit = new(Constants.Tarpit, "Tarpit");
+        public static readonly RouteResponseType Cluster = new(Constants.Cluster);
+        public static readonly RouteResponseType Redirect = new(Constants.Redirect);
+        public static readonly RouteResponseType Static = new(Constants.Static);
+        public static readonly RouteResponseType Tarpit = new(Constants.Tarpit);
 
-        public static ImmutableArray<RouteResponseType> RouteResponseTypes = [Cluster, Redirect, Status, Tarpit];
+        public static ImmutableArray<RouteResponseType> RouteResponseTypes = [Cluster, Redirect, Static, Tarpit];
 
         public static RouteResponseType FromString(string? value) => value switch {
             Constants.Cluster => Cluster,
             Constants.Redirect => Redirect,
-            Constants.Status => Status,
+            Constants.Static => Static,
             Constants.Tarpit => Tarpit,
             _ => throw new Exception($"Invalid RouteResponseType Type: {value}")
         };

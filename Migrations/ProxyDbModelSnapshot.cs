@@ -290,6 +290,70 @@ namespace ByProxy.Migrations
                     b.ToTable("Destinations");
                 });
 
+            modelBuilder.Entity("ByProxy.Models.ProxyRequestTransform", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ConfigRevision")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RouteConfigRevision")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("RouteId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id", "ConfigRevision");
+
+                    b.HasIndex("ConfigRevision");
+
+                    b.HasIndex("RouteId", "RouteConfigRevision");
+
+                    b.ToTable("RequestTransforms");
+
+                    b.HasDiscriminator<string>("Type").HasValue("ProxyRequestTransform");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("ByProxy.Models.ProxyResponseTransform", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ConfigRevision")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RouteConfigRevision")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("RouteId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(34)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id", "ConfigRevision");
+
+                    b.HasIndex("ConfigRevision");
+
+                    b.HasIndex("RouteId", "RouteConfigRevision");
+
+                    b.ToTable("ResponseTransforms");
+
+                    b.HasDiscriminator<string>("Type").HasValue("ProxyResponseTransform");
+
+                    b.UseTphMappingStrategy();
+                });
+
             modelBuilder.Entity("ByProxy.Models.ProxyRoute", b =>
                 {
                     b.Property<Guid>("Id")
@@ -298,7 +362,10 @@ namespace ByProxy.Migrations
                     b.Property<int>("ConfigRevision")
                         .HasColumnType("INTEGER");
 
-                    b.PrimitiveCollection<string>("AllowedHeaders")
+                    b.PrimitiveCollection<string>("AllowedRequestHeaders")
+                        .HasColumnType("TEXT");
+
+                    b.PrimitiveCollection<string>("AllowedResponseHeaders")
                         .HasColumnType("TEXT");
 
                     b.Property<int?>("ClusterConfigRevision")
@@ -351,11 +418,20 @@ namespace ByProxy.Migrations
                     b.Property<bool>("PreserveHostHeader")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("PreserveResponseHeaders")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("RedirectLocation")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ResponseType")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("StaticResponseBody")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("StaticResponseHeaders")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("SuppressHttpsRedirect")
@@ -423,38 +499,6 @@ namespace ByProxy.Migrations
                     b.ToTable("MatchCriteria");
 
                     b.HasDiscriminator<string>("Type").HasValue("ProxyRouteMatch");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("ByProxy.Models.ProxyRouteTransform", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ConfigRevision")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("RouteConfigRevision")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<Guid>("RouteId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id", "ConfigRevision");
-
-                    b.HasIndex("ConfigRevision");
-
-                    b.HasIndex("RouteId", "RouteConfigRevision");
-
-                    b.ToTable("RouteTransforms");
-
-                    b.HasDiscriminator<string>("Type").HasValue("ProxyRouteTransform");
 
                     b.UseTphMappingStrategy();
                 });
@@ -571,6 +615,90 @@ namespace ByProxy.Migrations
                     b.HasDiscriminator().HasValue("ServerCert");
                 });
 
+            modelBuilder.Entity("ByProxy.Models.ProxyRequestHeaderTransform", b =>
+                {
+                    b.HasBaseType("ByProxy.Models.ProxyRequestTransform");
+
+                    b.Property<string>("HeaderName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("HeaderOperation")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("HeaderValue")
+                        .HasColumnType("TEXT");
+
+                    b.HasDiscriminator().HasValue("Header");
+                });
+
+            modelBuilder.Entity("ByProxy.Models.ProxyRequestMethodTransform", b =>
+                {
+                    b.HasBaseType("ByProxy.Models.ProxyRequestTransform");
+
+                    b.Property<string>("FromHttpMethod")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ToHttpMethod")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasDiscriminator().HasValue("Method");
+                });
+
+            modelBuilder.Entity("ByProxy.Models.ProxyRequestPathTransform", b =>
+                {
+                    b.HasBaseType("ByProxy.Models.ProxyRequestTransform");
+
+                    b.Property<string>("PathMode")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PathString")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasDiscriminator().HasValue("Path");
+                });
+
+            modelBuilder.Entity("ByProxy.Models.ProxyRequestQueryTransform", b =>
+                {
+                    b.HasBaseType("ByProxy.Models.ProxyRequestTransform");
+
+                    b.Property<string>("QueryKey")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("QueryOperation")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("QueryValue")
+                        .HasColumnType("TEXT");
+
+                    b.HasDiscriminator().HasValue("Query");
+                });
+
+            modelBuilder.Entity("ByProxy.Models.ProxyResponseHeaderTransform", b =>
+                {
+                    b.HasBaseType("ByProxy.Models.ProxyResponseTransform");
+
+                    b.Property<string>("HeaderName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("HeaderOperation")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("HeaderValue")
+                        .HasColumnType("TEXT");
+
+                    b.HasDiscriminator().HasValue("Header");
+                });
+
             modelBuilder.Entity("ByProxy.Models.ProxyRouteHeaderMatch", b =>
                 {
                     b.HasBaseType("ByProxy.Models.ProxyRouteMatch");
@@ -588,72 +716,6 @@ namespace ByProxy.Migrations
 
                     b.Property<string>("QueryMatchMode")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasDiscriminator().HasValue("Query");
-                });
-
-            modelBuilder.Entity("ByProxy.Models.ProxyRouteHeaderTransform", b =>
-                {
-                    b.HasBaseType("ByProxy.Models.ProxyRouteTransform");
-
-                    b.Property<string>("HeaderName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("HeaderOperation")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("HeaderValue")
-                        .HasColumnType("TEXT");
-
-                    b.HasDiscriminator().HasValue("Header");
-                });
-
-            modelBuilder.Entity("ByProxy.Models.ProxyRouteMethodTransform", b =>
-                {
-                    b.HasBaseType("ByProxy.Models.ProxyRouteTransform");
-
-                    b.Property<string>("FromHttpMethod")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ToHttpMethod")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasDiscriminator().HasValue("Method");
-                });
-
-            modelBuilder.Entity("ByProxy.Models.ProxyRoutePathTransform", b =>
-                {
-                    b.HasBaseType("ByProxy.Models.ProxyRouteTransform");
-
-                    b.Property<string>("PathMode")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PathString")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasDiscriminator().HasValue("Path");
-                });
-
-            modelBuilder.Entity("ByProxy.Models.ProxyRouteQueryTransform", b =>
-                {
-                    b.HasBaseType("ByProxy.Models.ProxyRouteTransform");
-
-                    b.Property<string>("QueryKey")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("QueryOperation")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("QueryValue")
                         .HasColumnType("TEXT");
 
                     b.HasDiscriminator().HasValue("Query");
@@ -776,6 +838,44 @@ namespace ByProxy.Migrations
                     b.Navigation("Config");
                 });
 
+            modelBuilder.Entity("ByProxy.Models.ProxyRequestTransform", b =>
+                {
+                    b.HasOne("ByProxy.Models.ProxyConfig", "Config")
+                        .WithMany()
+                        .HasForeignKey("ConfigRevision")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ByProxy.Models.ProxyRoute", "Route")
+                        .WithMany("RequestTransforms")
+                        .HasForeignKey("RouteId", "RouteConfigRevision")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Config");
+
+                    b.Navigation("Route");
+                });
+
+            modelBuilder.Entity("ByProxy.Models.ProxyResponseTransform", b =>
+                {
+                    b.HasOne("ByProxy.Models.ProxyConfig", "Config")
+                        .WithMany()
+                        .HasForeignKey("ConfigRevision")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ByProxy.Models.ProxyRoute", "Route")
+                        .WithMany("ResponseTransforms")
+                        .HasForeignKey("RouteId", "RouteConfigRevision")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Config");
+
+                    b.Navigation("Route");
+                });
+
             modelBuilder.Entity("ByProxy.Models.ProxyRoute", b =>
                 {
                     b.HasOne("ByProxy.Models.ProxyConfig", "Config")
@@ -804,25 +904,6 @@ namespace ByProxy.Migrations
 
                     b.HasOne("ByProxy.Models.ProxyRoute", "Route")
                         .WithMany("MatchCriteria")
-                        .HasForeignKey("RouteId", "RouteConfigRevision")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Config");
-
-                    b.Navigation("Route");
-                });
-
-            modelBuilder.Entity("ByProxy.Models.ProxyRouteTransform", b =>
-                {
-                    b.HasOne("ByProxy.Models.ProxyConfig", "Config")
-                        .WithMany()
-                        .HasForeignKey("ConfigRevision")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ByProxy.Models.ProxyRoute", "Route")
-                        .WithMany("Transforms")
                         .HasForeignKey("RouteId", "RouteConfigRevision")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -902,7 +983,9 @@ namespace ByProxy.Migrations
                 {
                     b.Navigation("MatchCriteria");
 
-                    b.Navigation("Transforms");
+                    b.Navigation("RequestTransforms");
+
+                    b.Navigation("ResponseTransforms");
                 });
 
             modelBuilder.Entity("ByProxy.Models.AcmeCert", b =>

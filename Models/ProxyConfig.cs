@@ -74,20 +74,35 @@
                             });
                         }
                         break;
-                    case RouteResponseType.Constants.Status:
+                    case RouteResponseType.Constants.Static:
                     case RouteResponseType.Constants.Tarpit:
                         if (route.HttpStatusCode == null) {
-                            errors.Add($"Route {route.Name} ejected. Missing required properties for a redirect route.");
+                            errors.Add($"Route {route.Name} ejected. Missing required properties for a static or tarpit response route.");
                             error = true;
                         } else {
-                            nonClusterRoutes.Add(route.Id.ToString(), new StatusResponseRoute {
+                            Dictionary<string, string>? staticResponseHeaders = null;
+                            if (route.StaticResponseHeaders != null) {
+                                staticResponseHeaders = new(StringComparer.OrdinalIgnoreCase);
+                                foreach (var header in route.StaticResponseHeaders) {
+                                    if (
+                                        string.Equals(header.Key, "Content-Length", StringComparison.OrdinalIgnoreCase) ||
+                                        string.Equals(header.Key, "Transfer-Encoding", StringComparison.OrdinalIgnoreCase)
+                                    ) {
+                                        warnings.Add($"Ignoring server-managed response header: {header.Key}");
+                                        continue;
+                                    }
+                                    staticResponseHeaders[header.Key] = header.Value;
+                                }
+                            }
+                            nonClusterRoutes.Add(route.Id.ToString(), new StaticResponseRoute {
                                 HttpStatusCode = route.HttpStatusCode.Value,
-                                UseTarpit = route.ResponseType == RouteResponseType.Tarpit
+                                UseTarpit = route.ResponseType == RouteResponseType.Tarpit,
+                                ResponseBody = route.StaticResponseBody == null ? null : Encoding.UTF8.GetBytes(route.StaticResponseBody),
+                                ResponseHeaders = staticResponseHeaders
                             });
                         }
                         break;
                 }
-
                 if (!error) validRoutes.Add(route);
             }
 

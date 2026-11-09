@@ -59,7 +59,183 @@
             public List<AcmeDnsProviderExportV1_20>? AcmeDnsProviders { get; set; }
             public List<CertificateAuthorityExportV1_20>? CertificateAuthorities { get; set; }
             public List<ServerCertExportV1_20>? ServerCertificates { get; set; }
-            public override ProxyExport ToNext() => throw new InvalidOperationException("1.20 is the latest export version.");
+            public override ProxyExport ToNext() {
+                return new ProxyExportV1_24 {
+                    SystemSettings = SystemSettings == null ? null : new SystemSettingsExportV1_24 {
+                        AdminListenAny = SystemSettings.AdminListenAny,
+                        AdminPort = SystemSettings.AdminPort,
+                        AdminCertId = SystemSettings.AdminCertId,
+                        FallbackCertId = SystemSettings.FallbackCertId,
+                        MaxRequestBodySize = SystemSettings.MaxRequestBodySize,
+                        UnmatchedStatus = SystemSettings.UnmatchedStatus,
+                        Tarpit = SystemSettings.Tarpit
+                    },
+
+                    Routes = Routes?.Select(route => new RouteExportV1_24 {
+                        Id = route.Id,
+                        Name = route.Name,
+                        Description = route.Description,
+                        Disabled = route.Disabled,
+                        Order = route.Order,
+                        ResponseType = route.ResponseType == "Status" ? "Static" : route.ResponseType,
+                        ClusterId = route.ClusterId,
+                        HttpStatusCode = route.HttpStatusCode,
+                        RedirectLocation = route.RedirectLocation,
+                        Methods = route.Methods?.ToList(),
+                        Hosts = route.Hosts?.ToList(),
+
+                        MatchCriteria = route.MatchCriteria.Select(match => match switch {
+                            RouteHeaderMatchExportV1_20 header => (RouteMatchExportV1_24)new RouteHeaderMatchExportV1_24 {
+                                Id = header.Id,
+                                RouteId = header.RouteId,
+                                Key = header.Key,
+                                Values = header.Values?.ToList(),
+                                CaseSensitiveValues = header.CaseSensitiveValues,
+                                Mode = header.Mode
+                            },
+                            RouteQueryMatchExportV1_20 query => new RouteQueryMatchExportV1_24 {
+                                Id = query.Id,
+                                RouteId = query.RouteId,
+                                Key = query.Key,
+                                Values = query.Values?.ToList(),
+                                CaseSensitiveValues = query.CaseSensitiveValues,
+                                Mode = query.Mode
+                            },
+                            _ => throw new NotSupportedException($"No upgrade mapping for {match.GetType().Name}")
+                        }).ToList(),
+
+                        PreserveHostHeader = route.PreserveHostHeader,
+                        PreserveClientHeaders = route.PreserveClientHeaders,
+                        AllowedRequestHeaders = route.AllowedHeaders?.ToList(),
+                        XForwardedPrefix = route.XForwardedPrefix,
+                        XForwardedForAction = route.XForwardedForAction,
+                        XForwardedProtoAction = route.XForwardedProtoAction,
+                        XForwardedHostAction = route.XForwardedHostAction,
+                        XForwardedPrefixAction = route.XForwardedPrefixAction,
+                        Path = route.Path,
+                        PathIsPrefix = route.PathIsPrefix,
+                        HttpPort = route.HttpPort,
+                        HttpsPort = route.HttpsPort,
+                        SuppressHttpsRedirect = route.SuppressHttpsRedirect,
+                        MaxRequestBodySize = route.MaxRequestBodySize,
+
+                        RequestTransforms = route.Transforms.Select(transform => transform switch {
+                            RoutePathTransformExportV1_20 path => (RequestTransformExportV1_24)new RequestPathTransformExportV1_24 {
+                                Id = path.Id,
+                                RouteId = path.RouteId,
+                                Mode = path.Mode,
+                                PathString = path.PathString
+                            },
+                            RouteMethodTransformExportV1_20 method => new RequestMethodTransformExportV1_24 {
+                                Id = method.Id,
+                                RouteId = method.RouteId,
+                                FromHttpMethod = method.FromHttpMethod,
+                                ToHttpMethod = method.ToHttpMethod
+                            },
+                            RouteHeaderTransformExportV1_20 header => new RequestHeaderTransformExportV1_24 {
+                                Id = header.Id,
+                                RouteId = header.RouteId,
+                                Operation = header.Operation,
+                                HeaderName = header.HeaderName,
+                                HeaderValue = header.HeaderValue
+                            },
+                            RouteQueryTransformExportV1_20 query => new RequestQueryTransformExportV1_24 {
+                                Id = query.Id,
+                                RouteId = query.RouteId,
+                                Operation = query.Operation,
+                                QueryKey = query.QueryKey,
+                                QueryValue = query.QueryValue
+                            },
+                            _ => throw new NotSupportedException($"No upgrade mapping for {transform.GetType().Name}")
+                        }).ToList(),
+
+                        StaticResponseBody = null,
+                        StaticResponseHeaders = null,
+                        PreserveResponseHeaders = true,
+                        AllowedResponseHeaders = null,
+                        ResponseTransforms = new()
+                    }).ToList(),
+
+                    Clusters = Clusters?.Select(cluster => new ClusterExportV1_24 {
+                        Id = cluster.Id,
+                        Name = cluster.Name,
+                        Description = cluster.Description,
+                        Destinations = cluster.Destinations.Select(destination => new DestinationExportV1_24 {
+                            Id = destination.Id,
+                            Name = destination.Name,
+                            ClusterId = destination.ClusterId,
+                            Order = destination.Order,
+                            Address = destination.Address,
+                            Health = destination.Health
+                        }).ToList(),
+                        LoadBalancing = cluster.LoadBalancing,
+                        StickySessions = cluster.StickySessions,
+                        AcceptAnyCert = cluster.AcceptAnyCert
+                    }).ToList(),
+
+                    SniMaps = SniMaps?.Select(map => new SniMapExportV1_24 {
+                        Host = map.Host,
+                        CertificateId = map.CertificateId
+                    }).ToList(),
+
+                    AcmeAccounts = AcmeAccounts?.Select(account => new AcmeAccountExportV1_24 {
+                        Id = account.Id,
+                        Name = account.Name,
+                        Provider = account.Provider,
+                        Url = account.Url,
+                        Hidden = account.Hidden,
+                        Key = account.Key
+                    }).ToList(),
+
+                    AcmeDnsProviders = AcmeDnsProviders?.Select(provider => new AcmeDnsProviderExportV1_24 {
+                        Id = provider.Id,
+                        Name = provider.Name,
+                        Script = provider.Script
+                    }).ToList(),
+
+                    CertificateAuthorities = CertificateAuthorities?.Select(ca => new CertificateAuthorityExportV1_24 {
+                        Id = ca.Id,
+                        Name = ca.Name,
+                        Hidden = ca.Hidden,
+                        Material = ca.Material
+                    }).ToList(),
+
+                    ServerCertificates = ServerCertificates?.Select(cert => cert switch {
+                        IssuedCertExportV1_20 issued => (ServerCertExportV1_24)new IssuedCertExportV1_24 {
+                            Id = issued.Id,
+                            Name = issued.Name,
+                            Hidden = issued.Hidden,
+                            Material = issued.Material,
+                            IssuingCAId = issued.IssuingCAId
+                        },
+                        AcmeCertExportV1_20 acme => new AcmeCertExportV1_24 {
+                            Id = acme.Id,
+                            Name = acme.Name,
+                            Hidden = acme.Hidden,
+                            Material = acme.Material,
+                            AcmeAccountId = acme.AcmeAccountId,
+                            LastAttempt = acme.LastAttempt,
+                            Hosts = acme.Hosts.Select(host => host switch {
+                                AcmeHttpCertHostExportV1_20 http => (AcmeCertHostExportV1_24)new AcmeHttpCertHostExportV1_24 {
+                                    Host = http.Host
+                                },
+                                AcmeDnsCertHostExportV1_20 dns => new AcmeDnsCertHostExportV1_24 {
+                                    Host = dns.Host,
+                                    DnsProviderId = dns.DnsProviderId
+                                },
+                                _ => throw new NotSupportedException($"No upgrade mapping for {host.GetType().Name}")
+                            }).ToList()
+                        },
+                        ImportedCertExportV1_20 imported => new ImportedCertExportV1_24 {
+                            Id = imported.Id,
+                            Name = imported.Name,
+                            Hidden = imported.Hidden,
+                            Material = imported.Material
+                        },
+                        _ => throw new NotSupportedException($"No upgrade mapping for {cert.GetType().Name}")
+                    }).ToList()
+                };
+            }
         }
 
         public class SystemSettingsExportV1_20 {
@@ -70,33 +246,21 @@
             public long? MaxRequestBodySize { get; set; }
             public int UnmatchedStatus { get; set; }
             public bool Tarpit { get; set; }
-
-            public SystemSettingsExport ToCurrent() {
-                return new SystemSettingsExport {
-                    AdminListenAny = AdminListenAny,
-                    AdminPort = AdminPort,
-                    AdminCertId = AdminCertId,
-                    FallbackCertId = FallbackCertId,
-                    MaxRequestBodySize = MaxRequestBodySize,
-                    UnmatchedStatus = UnmatchedStatus,
-                    Tarpit = Tarpit,
-                };
-            }
         }
 
         public class RouteExportV1_20 {
             public Guid Id { get; set; }
-            public string Name { get; set; }
-            public string Description { get; set; }
+            public required string Name { get; set; }
+            public required string Description { get; set; }
             public bool Disabled { get; set; }
             public int Order { get; set; }
-            public string ResponseType { get; set; }
+            public required string ResponseType { get; set; }
             public Guid? ClusterId { get; set; }
             public int? HttpStatusCode { get; set; }
             public string? RedirectLocation { get; set; }
             public List<string>? Methods { get; set; }
             public List<string>? Hosts { get; set; }
-            public List<RouteMatchExportV1_20> MatchCriteria { get; set; }
+            public required List<RouteMatchExportV1_20> MatchCriteria { get; set; }
             public bool PreserveHostHeader { get; set; }
             public bool PreserveClientHeaders { get; set; }
             public List<string>? AllowedHeaders { get; set; }
@@ -111,39 +275,7 @@
             public int? HttpsPort { get; set; }
             public bool SuppressHttpsRedirect { get; set; }
             public long? MaxRequestBodySize { get; set; }
-            public List<RouteTransformExportV1_20> Transforms { get; set; }
-
-            public RouteExport ToCurrent() {
-                return new RouteExport {
-                    Id = Id,
-                    Name = Name,
-                    Description = Description,
-                    Disabled = Disabled,
-                    Order = Order,
-                    ResponseType = ResponseType,
-                    ClusterId = ClusterId,
-                    RedirectLocation = RedirectLocation,
-                    HttpStatusCode = HttpStatusCode,
-                    Methods = Methods?.ToList(),
-                    Hosts = Hosts?.ToList(),
-                    MatchCriteria = MatchCriteria.Select(_ => _.ToCurrent()).ToList(),
-                    PreserveHostHeader = PreserveHostHeader,
-                    PreserveClientHeaders = PreserveClientHeaders,
-                    AllowedHeaders = AllowedHeaders?.ToList(),
-                    XForwardedPrefix = XForwardedPrefix,
-                    XForwardedForAction = XForwardedForAction,
-                    XForwardedProtoAction = XForwardedProtoAction,
-                    XForwardedHostAction = XForwardedHostAction,
-                    XForwardedPrefixAction = XForwardedPrefixAction,
-                    Path = Path,
-                    PathIsPrefix = PathIsPrefix,
-                    HttpPort = HttpPort,
-                    HttpsPort = HttpsPort,
-                    SuppressHttpsRedirect = SuppressHttpsRedirect,
-                    MaxRequestBodySize = MaxRequestBodySize,
-                    Transforms = Transforms.Select(_ => _.ToCurrent()).ToList()
-                };
-            }
+            public required List<RouteTransformExportV1_20> Transforms { get; set; }
         }
 
         [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
@@ -154,59 +286,28 @@
         public abstract class RouteTransformExportV1_20 {
             public Guid Id { get; set; }
             public Guid RouteId { get; set; }
-            public abstract RouteTransformExport ToCurrent();
         }
 
         public class RoutePathTransformExportV1_20 : RouteTransformExportV1_20 {
-            public string Mode { get; set; }
-            public string PathString { get; set; }
-
-            public override RouteTransformExport ToCurrent() => new RoutePathTransformExport {
-                Id = Id,
-                RouteId = RouteId,
-                Mode = Mode,
-                PathString = PathString
-            };
+            public required string Mode { get; set; }
+            public required string PathString { get; set; }
         }
 
         public class RouteMethodTransformExportV1_20 : RouteTransformExportV1_20 {
-            public string FromHttpMethod { get; set; }
-            public string ToHttpMethod { get; set; }
-
-            public override RouteTransformExport ToCurrent() => new RouteMethodTransformExport {
-                Id = Id,
-                RouteId = RouteId,
-                FromHttpMethod = FromHttpMethod,
-                ToHttpMethod = ToHttpMethod
-            };
+            public required string FromHttpMethod { get; set; }
+            public required string ToHttpMethod { get; set; }
         }
 
         public class RouteHeaderTransformExportV1_20 : RouteTransformExportV1_20 {
-            public string Operation { get; set; }
-            public string HeaderName { get; set; }
+            public required string Operation { get; set; }
+            public required string HeaderName { get; set; }
             public string? HeaderValue { get; set; }
-
-            public override RouteTransformExport ToCurrent() => new RouteHeaderTransformExport {
-                Id = Id,
-                RouteId = RouteId,
-                Operation = Operation,
-                HeaderName = HeaderName,
-                HeaderValue = HeaderValue
-            };
         }
 
         public class RouteQueryTransformExportV1_20 : RouteTransformExportV1_20 {
-            public string Operation { get; set; }
-            public string QueryKey { get; set; }
+            public required string Operation { get; set; }
+            public required string QueryKey { get; set; }
             public string? QueryValue { get; set; }
-
-            public override RouteTransformExport ToCurrent() => new RouteQueryTransformExport {
-                Id = Id,
-                RouteId = RouteId,
-                Operation = Operation,
-                QueryKey = QueryKey,
-                QueryValue = QueryValue
-            };
         }
 
         [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
@@ -215,136 +316,61 @@
         public abstract class RouteMatchExportV1_20 {
             public Guid Id { get; set; }
             public Guid RouteId { get; set; }
-            public string Key { get; set; }
+            public required string Key { get; set; }
             public List<string>? Values { get; set; }
             public bool? CaseSensitiveValues { get; set; }
-            public abstract RouteMatchExport ToCurrent();
         }
         public class RouteHeaderMatchExportV1_20 : RouteMatchExportV1_20 {
-            public string Mode { get; set; }
-            public override RouteMatchExport ToCurrent() => new RouteHeaderMatchExport {
-                Id = Id,
-                RouteId = RouteId,
-                Key = Key,
-                Values = Values?.ToList(),
-                CaseSensitiveValues = CaseSensitiveValues,
-                Mode = Mode
-            };
+            public required string Mode { get; set; }
         }
         public class RouteQueryMatchExportV1_20 : RouteMatchExportV1_20 {
-            public string Mode { get; set; }
-            public override RouteMatchExport ToCurrent() => new RouteQueryMatchExport {
-                Id = Id,
-                RouteId = RouteId,
-                Key = Key,
-                Values = Values?.ToList(),
-                CaseSensitiveValues = CaseSensitiveValues,
-                Mode = Mode
-            };
+            public required string Mode { get; set; }
         }
 
         public class ClusterExportV1_20 {
             public Guid Id { get; set; }
-            public string Name { get; set; }
-            public string Description { get; set; }
-            public List<DestinationExportV1_20> Destinations { get; set; }
+            public required string Name { get; set; }
+            public required string Description { get; set; }
+            public required List<DestinationExportV1_20> Destinations { get; set; }
             public string? LoadBalancing { get; set; }
             public bool StickySessions { get; set; }
             public bool AcceptAnyCert { get; set; }
-
-            public ClusterExport ToCurrent() {
-                return new ClusterExport {
-                    Id = Id,
-                    Name = Name,
-                    Description = Description,
-                    Destinations = Destinations.Select(_ => _.ToCurrent()).ToList(),
-                    LoadBalancing = LoadBalancing,
-                    StickySessions = StickySessions,
-                    AcceptAnyCert = AcceptAnyCert
-                };
-            }
         }
 
         public class DestinationExportV1_20 {
             public Guid Id { get; set; }
-            public string Name { get; set; }
+            public required string Name { get; set; }
             public Guid ClusterId { get; set; }
             public int Order { get; set; }
-            public string Address { get; set; }
+            public required string Address { get; set; }
             public string? Health { get; set; }
-
-            public DestinationExport ToCurrent() {
-                return new DestinationExport {
-                    Id = Id,
-                    Name = Name,
-                    ClusterId = ClusterId,
-                    Order = Order,
-                    Address = Address,
-                    Health = Health
-                };
-            }
         }
 
         public class SniMapExportV1_20 {
-            public string Host { get; set; }
+            public required string Host { get; set; }
             public Guid CertificateId { get; set; }
-
-            public SniMapExport ToCurrent() {
-                return new SniMapExport {
-                    Host = Host,
-                    CertificateId = CertificateId
-                };
-            }
         }
 
         public class AcmeAccountExportV1_20 {
             public Guid Id { get; set; }
-            public string Name { get; set; }
-            public string Provider { get; set; }
-            public string Url { get; set; }
+            public required string Name { get; set; }
+            public required string Provider { get; set; }
+            public required string Url { get; set; }
             public bool Hidden { get; set; }
-            public string Key { get; set; }
-
-            public AcmeAccountExport ToCurrent() {
-                return new AcmeAccountExport {
-                    Id = Id,
-                    Name = Name,
-                    Provider = Provider,
-                    Url = Url,
-                    Hidden = Hidden,
-                    Key = Key
-                };
-            }
+            public required string Key { get; set; }
         }
 
         public class AcmeDnsProviderExportV1_20 {
             public Guid Id { get; set; }
-            public string Name { get; set; }
+            public required string Name { get; set; }
             public string? Script { get; set; }
-
-            public AcmeDnsProviderExport ToCurrent() {
-                return new AcmeDnsProviderExport {
-                    Id = Id,
-                    Name = Name,
-                    Script = Script
-                };
-            }
         }
 
         public class CertificateAuthorityExportV1_20 {
             public Guid Id { get; set; }
-            public string Name { get; set; }
+            public required string Name { get; set; }
             public bool Hidden { get; set; }
-            public string Material { get; set; }
-
-            public CertificateAuthorityExport ToCurrent() {
-                return new CertificateAuthorityExport {
-                    Id = Id,
-                    Name = Name,
-                    Hidden = Hidden,
-                    Material = Material
-                };
-            }
+            public required string Material { get; set; }
         }
 
         [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
@@ -353,78 +379,34 @@
         [JsonDerivedType(typeof(ImportedCertExportV1_20), "Imported")]
         public abstract class ServerCertExportV1_20 {
             public Guid Id { get; set; }
-            public string Name { get; set; }
+            public required string Name { get; set; }
             public bool Hidden { get; set; }
-            public string Material { get; set; }
-            public abstract ServerCertExport ToCurrent();
+            public required string Material { get; set; }
         }
 
         public class IssuedCertExportV1_20 : ServerCertExportV1_20 {
             public Guid IssuingCAId { get; set; }
-            public override ServerCertExport ToCurrent() {
-                return new IssuedCertExport {
-                    Id = Id,
-                    Name = Name,
-                    Hidden = Hidden,
-                    IssuingCAId = IssuingCAId,
-                    Material = Material
-                };
-            }
         }
 
         public class AcmeCertExportV1_20 : ServerCertExportV1_20 {
             public Guid AcmeAccountId { get; set; }
             public DateTime? LastAttempt { get; set; }
-            public List<AcmeCertHostExportV1_20> Hosts { get; set; }
-            public override ServerCertExport ToCurrent() {
-                return new AcmeCertExport {
-                    Id = Id,
-                    Name = Name,
-                    Hidden = Hidden,
-                    AcmeAccountId = AcmeAccountId,
-                    LastAttempt = LastAttempt,
-                    Hosts = Hosts.Select(_ => _.ToCurrent()).ToList(),
-                    Material = Material
-                };
-            }
+            public required List<AcmeCertHostExportV1_20> Hosts { get; set; }
         }
 
-        public class ImportedCertExportV1_20 : ServerCertExportV1_20 {
-            public override ServerCertExport ToCurrent() {
-                return new ImportedCertExport {
-                    Id = Id,
-                    Name = Name,
-                    Hidden = Hidden,
-                    Material = Material
-                };
-            }
-        }
+        public class ImportedCertExportV1_20 : ServerCertExportV1_20 { }
 
         [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
         [JsonDerivedType(typeof(AcmeHttpCertHostExportV1_20), AcmeChallengeType.HTTP_01)]
         [JsonDerivedType(typeof(AcmeDnsCertHostExportV1_20), AcmeChallengeType.DNS_01)]
         public abstract class AcmeCertHostExportV1_20 {
-            public string Host { get; set; }
-            public abstract AcmeCertHostExport ToCurrent();
+            public required string Host { get; set; }
         }
 
-        public class AcmeHttpCertHostExportV1_20 : AcmeCertHostExportV1_20 {
-            public override AcmeCertHostExport ToCurrent() {
-                return new AcmeHttpCertHostExport {
-                    Host = Host
-                };
-            }
-        }
+        public class AcmeHttpCertHostExportV1_20 : AcmeCertHostExportV1_20 { }
 
         public class AcmeDnsCertHostExportV1_20 : AcmeCertHostExportV1_20 {
             public Guid DnsProviderId { get; set; }
-
-            public override AcmeCertHostExport ToCurrent() {
-                return new AcmeDnsCertHostExport {
-                    Host = Host,
-                    DnsProviderId = DnsProviderId
-                };
-            }
         }
     }
 }

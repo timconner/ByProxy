@@ -10,7 +10,8 @@
         public DbSet<ProxyDestination> Destinations => Set<ProxyDestination>();
         public DbSet<ProxyRoute> Routes  => Set<ProxyRoute>();
         public DbSet<ProxyRouteMatch> MatchCriteria => Set<ProxyRouteMatch>();
-        public DbSet<ProxyRouteTransform> RouteTransforms => Set<ProxyRouteTransform>();
+        public DbSet<ProxyRequestTransform> RequestTransforms => Set<ProxyRequestTransform>();
+        public DbSet<ProxyResponseTransform> ResponseTransforms => Set<ProxyResponseTransform>();
         public DbSet<ProxySniMap> SniMaps => Set<ProxySniMap>();
 
         public DbSet<AuthSession> AuthSessions => Set<AuthSession>();
@@ -44,7 +45,10 @@
             modelBuilder.Entity<ProxyRouteMatch>()
                 .HasKey(_ => new { _.Id, _.ConfigRevision });
 
-            modelBuilder.Entity<ProxyRouteTransform>()
+            modelBuilder.Entity<ProxyRequestTransform>()
+                .HasKey(_ => new { _.Id, _.ConfigRevision });
+            
+            modelBuilder.Entity<ProxyResponseTransform>()
                 .HasKey(_ => new { _.Id, _.ConfigRevision });
 
             modelBuilder.Entity<ProxyCluster>()
@@ -87,7 +91,11 @@
                 .AutoInclude();
 
             modelBuilder.Entity<ProxyRoute>()
-                .Navigation(_ => _.Transforms)
+                .Navigation(_ => _.RequestTransforms)
+                .AutoInclude();
+
+            modelBuilder.Entity<ProxyRoute>()
+                .Navigation(_ => _.ResponseTransforms)
                 .AutoInclude();
 
             modelBuilder.Entity<ProxyConfig>()
@@ -114,12 +122,16 @@
                 .HasValue<ProxyRouteHeaderMatch>(RouteMatchType.Header.Type)
                 .HasValue<ProxyRouteQueryMatch>(RouteMatchType.Query.Type);
 
-            modelBuilder.Entity<ProxyRouteTransform>()
-                .HasDiscriminator<string>(RouteTransformType.Constants.Discriminator)
-                .HasValue<ProxyRouteMethodTransform>(RouteTransformType.Method.Type)
-                .HasValue<ProxyRouteHeaderTransform>(RouteTransformType.Header.Type)
-                .HasValue<ProxyRoutePathTransform>(RouteTransformType.Path.Type)
-                .HasValue<ProxyRouteQueryTransform>(RouteTransformType.Query.Type);
+            modelBuilder.Entity<ProxyRequestTransform>()
+                .HasDiscriminator<string>(RequestTransformType.Constants.Discriminator)
+                .HasValue<ProxyRequestMethodTransform>(RequestTransformType.Method.Type)
+                .HasValue<ProxyRequestHeaderTransform>(RequestTransformType.Header.Type)
+                .HasValue<ProxyRequestPathTransform>(RequestTransformType.Path.Type)
+                .HasValue<ProxyRequestQueryTransform>(RequestTransformType.Query.Type);
+
+            modelBuilder.Entity<ProxyResponseTransform>()
+                .HasDiscriminator<string>(ResponseTransformType.Constants.Discriminator)
+                .HasValue<ProxyResponseHeaderTransform>(ResponseTransformType.Header.Type);
 
             modelBuilder.Entity<ProxyCert>()
                 .HasDiscriminator<string>(CertType.Constants.Discriminator)
@@ -137,6 +149,10 @@
             modelBuilder.Entity<ProxyRoute>()
                 .Property(_ => _.ResponseType)
                 .HasConversion<RouteResponseType.RouteResponseTypeConverter>();
+
+            modelBuilder.Entity<ProxyRoute>()
+                .Property(_ => _.StaticResponseHeaders)
+                .HasConversion<DictionaryConverter<string, string>, DictionaryComparer<string, string>>();
 
             modelBuilder.Entity<ProxyRoute>()
                 .Property(_ => _.XForwardedForAction)
@@ -166,17 +182,21 @@
                 .Property(_ => _.QueryMatchMode)
                 .HasConversion<ProxyQueryMatchMode.QueryMatchModeConverter>();
 
-            modelBuilder.Entity<ProxyRouteHeaderTransform>()
+            modelBuilder.Entity<ProxyRequestHeaderTransform>()
                 .Property(_ => _.HeaderOperation)
-                .HasConversion<HeaderTransformOperation.HeaderTransformOperationConverter>();
+                .HasConversion<RequestHeaderTransformOperation.HeaderTransformOperationConverter>();
 
-            modelBuilder.Entity<ProxyRoutePathTransform>()
+            modelBuilder.Entity<ProxyRequestPathTransform>()
                 .Property(_ => _.PathMode)
-                .HasConversion<PathTransformMode.PathTransformModeConverter>();
+                .HasConversion<RequestPathTransformMode.PathTransformModeConverter>();
 
-            modelBuilder.Entity<ProxyRouteQueryTransform>()
+            modelBuilder.Entity<ProxyRequestQueryTransform>()
                 .Property(_ => _.QueryOperation)
-                .HasConversion<QueryTransformOperation.QueryTransformOperationConverter>();
+                .HasConversion<RequestQueryTransformOperation.QueryTransformOperationConverter>();
+
+            modelBuilder.Entity<ProxyResponseHeaderTransform>()
+                .Property(_ => _.HeaderOperation)
+                .HasConversion<ResponseHeaderTransformOperation.HeaderTransformOperationConverter>();
 
             modelBuilder.Entity<AcmeCert>()
                 .Property(_ => _.LastAttempt)
@@ -189,7 +209,10 @@
             modelBuilder.Entity<ProxyRouteMatch>()
                 .HasQueryFilter(_ => _.ConfigRevision == _proxyState.CandidateConfigRevision);
 
-            modelBuilder.Entity<ProxyRouteTransform>()
+            modelBuilder.Entity<ProxyRequestTransform>()
+                .HasQueryFilter(_ => _.ConfigRevision == _proxyState.CandidateConfigRevision);
+
+            modelBuilder.Entity<ProxyResponseTransform>()
                 .HasQueryFilter(_ => _.ConfigRevision == _proxyState.CandidateConfigRevision);
 
             modelBuilder.Entity<ProxyCluster>()

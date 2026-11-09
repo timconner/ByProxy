@@ -142,9 +142,6 @@
   <data name="LanguageSelect" xml:space="preserve">
     <value>Sprache</value>
   </data>
-  <data name="Initial Account" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
-  </data>
   <data name="Create Initial Account" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
