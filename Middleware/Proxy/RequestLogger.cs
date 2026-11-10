@@ -37,9 +37,11 @@
                 var url = $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}{context.Request.QueryString}";
                 var protocol = context.Request.Protocol;
                 var method = context.Request.Method;
-                var statusCode = context.Response.StatusCode;
                 var contentLength = context.Response.ContentLength;
                 var contentType = context.Response.ContentType;
+
+                var wasAborted = context.RequestAborted.IsCancellationRequested && !context.Response.HasStarted;
+                var statusCode = wasAborted ? 499 : context.Response.StatusCode;
 
                 _logger.LogInformation(
                     "{RemoteIp} {Protocol} {Method} {Url} - {StatusCode} {ContentLength} {ContentType} {ElapsedMs}ms",
