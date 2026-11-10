@@ -2481,12 +2481,12 @@ Overwrite?</value>
     <value>No active health check configured for this destination, but one or more of it's peers does.</value>
     <comment>Used in ClustersIndex</comment>
   </data>
-  <data name="Downstream Certificate Validation Disabled" xml:space="preserve">
-    <value>Downstream Certificate Validation Disabled</value>
+  <data name="Upstream Certificate Validation Disabled" xml:space="preserve">
+    <value>Upstream Certificate Validation Disabled</value>
     <comment>Used in ClustersIndex</comment>
   </data>
-  <data name="Downstream Certificate Validation Enabled" xml:space="preserve">
-    <value>Downstream Certificate Validation Enabled</value>
+  <data name="Upstream Certificate Validation Enabled" xml:space="preserve">
+    <value>Upstream Certificate Validation Enabled</value>
     <comment>Used in ClustersIndex</comment>
   </data>
   <data name="Sticky Sessions" xml:space="preserve">

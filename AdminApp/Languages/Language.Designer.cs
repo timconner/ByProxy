@@ -1285,24 +1285,6 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Downstream Certificate Validation Disabled.
-        /// </summary>
-        public static string Downstream_Certificate_Validation_Disabled {
-            get {
-                return ResourceManager.GetString("Downstream Certificate Validation Disabled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Downstream Certificate Validation Enabled.
-        /// </summary>
-        public static string Downstream_Certificate_Validation_Enabled {
-            get {
-                return ResourceManager.GetString("Downstream Certificate Validation Enabled", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Draft Loaded.
         /// </summary>
         public static string Draft_Loaded {
@@ -5358,6 +5340,24 @@ namespace ByProxy.AdminApp.Languages {
         public static string Uploading_File {
             get {
                 return ResourceManager.GetString("Uploading File", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upstream Certificate Validation Disabled.
+        /// </summary>
+        public static string Upstream_Certificate_Validation_Disabled {
+            get {
+                return ResourceManager.GetString("Upstream Certificate Validation Disabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upstream Certificate Validation Enabled.
+        /// </summary>
+        public static string Upstream_Certificate_Validation_Enabled {
+            get {
+                return ResourceManager.GetString("Upstream Certificate Validation Enabled", resourceCulture);
             }
         }
         

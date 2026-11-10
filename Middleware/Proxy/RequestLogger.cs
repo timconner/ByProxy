@@ -39,21 +39,25 @@
                         }
                     }
                 }
+                
                 ips.Add(NormalizeIP(context.Connection.RemoteIpAddress));
+                
                 var remoteIps = string.Join('|', ips);
-
-                var url = $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}{context.Request.QueryString}";
                 var protocol = context.Request.Protocol ?? UNKNOWN_VALUE;
                 var method = context.Request.Method ?? UNKNOWN_VALUE;
-                var contentType = context.Response.ContentType?.Split(';',2)[0].Trim() ?? UNKNOWN_VALUE;
+                var url = $"{context.Request.Scheme}://{context.Request.Host}{context.Request.Path}{context.Request.QueryString}";
+
+                var proxyFeature = context.Features.Get<IReverseProxyFeature>();
+                var upstreamServer = proxyFeature?.ProxiedDestination?.Model.Config.Address ?? UNKNOWN_VALUE;
 
                 var abortedBeforeResponse = context.RequestAborted.IsCancellationRequested && !context.Response.HasStarted;
                 var statusCode = abortedBeforeResponse ? 499 : context.Response.StatusCode;
                 var responseBytes = abortedBeforeResponse ? UNKNOWN_VALUE : streamCounter.BytesWritten.ToString();
+                var contentType = context.Response.ContentType?.Split(';',2)[0].Trim() ?? UNKNOWN_VALUE;
 
                 _logger.LogInformation(
-                    "{RemoteIp} {Protocol} {Method} {Url} - {StatusCode} {ResponseBytes} {ContentType} {ElapsedMs}ms",
-                     remoteIps,  protocol,  method,  url,    statusCode,  responseBytes,  contentType,  stopwatch.Elapsed.TotalMilliseconds
+                    "{RemoteIp} {Protocol} {Method} {Url} - {UpstreamServer} - {StatusCode} {ResponseBytes} {ContentType} {ElapsedMs}ms",
+                     remoteIps,  protocol,  method,  url,    upstreamServer,    statusCode,  responseBytes,  contentType,  stopwatch.Elapsed.TotalMilliseconds
                 );
             }
         }

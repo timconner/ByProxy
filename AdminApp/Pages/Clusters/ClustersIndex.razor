@@ -96,11 +96,11 @@
                     <td class="validate">
                         @if (cluster.Destinations.Any(_ => _.Address.StartsWith("https", StringComparison.OrdinalIgnoreCase))) {
                             @if (cluster.AcceptAnyCert) {
-                                <div class="validate-icon" title="@_strings["Downstream Certificate Validation Disabled"]">
+                                <div class="validate-icon" title="@_strings["Upstream Certificate Validation Disabled"]">
                                     <Icon Name="alert-triangle" />
                                 </div>
                             } else {
-                                <div class="validate-icon" title="@_strings["Downstream Certificate Validation Enabled"]">
+                                <div class="validate-icon" title="@_strings["Upstream Certificate Validation Enabled"]">
                                     <Icon Name="circle-check-filled" />
                                 </div>
                             }
