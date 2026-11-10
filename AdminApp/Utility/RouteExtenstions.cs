@@ -10,11 +10,15 @@
 
                     if (route.HttpPort.HasValue) {
                         var port = route.HttpPort == 80 ? string.Empty : $":{route.HttpPort.ToString()}";
-                        matches.Add(($"{method} http://{host}{port}{path}").Trim());
+                        var target = $"{host}{port}{path}";
+                        if (target == "*/*") target = "*";
+                        matches.Add(($"{method} http://{target}").Trim());
                     }
                     if (route.HttpsPort.HasValue) {
                         var port = route.HttpsPort == 443 ? string.Empty : $":{route.HttpsPort.ToString()}";
-                        matches.Add(($"{method} https://{host}{port}{path}").Trim());
+                        var target = $"{host}{port}{path}";
+                        if (target == "*/*") target = "*";
+                        matches.Add(($"{method} https://{target}").Trim());
                     }
                 }
             }
