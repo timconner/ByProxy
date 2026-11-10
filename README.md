@@ -33,7 +33,7 @@ services:
 - **Port-based filtering/routing**
 - **Route outcomes:**
   - Forward to a cluster
-  - Return an HTTP status
+  - Return a static response
   - Issue an HTTP redirect
   - Tarpit when required
 - **Optional HTTP → HTTPS redirection** (per-route)
@@ -50,7 +50,7 @@ services:
 - **Full admin Web UI** built with hosted Blazor Server
 - **Commit/confirm model for configuration changes**
 - **Internal user management**
-- **Supports most YARP request transforms**
+- **Supports most YARP transforms**
 
 ---
 
@@ -78,13 +78,17 @@ ByProxy uses YARP as the underlying proxy engine while layering on:
 
 ## Ideas for Future Enhancements
 
+### Near-Term
+- Basic Auth
+
 ### Mid-Term
-- Rate Limiting
 - Statistics / Status Pages
+- Rate Limiting
 - Output Caching
 - Route-based pre-forwarding authentication / authorization
 
 ### Long-Term
+- C# Script Responses
 - C# Script Transforms
 - Clustering support
 
