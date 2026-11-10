@@ -82,8 +82,8 @@ public partial class RouteEditor {
         _clusters = await db.Clusters
             .AsNoTracking()
             .Include(_ => _.Destinations.OrderBy(d => d.Order))
-            .OrderBy(_ => _.Name)
             .ToListAsync();
+        _clusters.ApplySort();
     }
 
     private void ChangeRouteResponseType(string? responseType) {

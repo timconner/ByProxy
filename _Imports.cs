@@ -78,3 +78,4 @@ global using ByProxy.AdminApp.Components;
 global using ByProxy.AdminApp.Enums;
 global using ByProxy.AdminApp.Languages;
 global using ByProxy.AdminApp.Services;
+global using ByProxy.AdminApp.Utility;
