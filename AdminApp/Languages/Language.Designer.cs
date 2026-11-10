@@ -376,6 +376,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Active Health Checks Configured.
+        /// </summary>
+        public static string Active_Health_Checks_Configured {
+            get {
+                return ResourceManager.GetString("Active Health Checks Configured", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add.
         /// </summary>
         public static string Add {
@@ -1272,6 +1281,24 @@ namespace ByProxy.AdminApp.Languages {
         public static string Download_Backup {
             get {
                 return ResourceManager.GetString("Download Backup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downstream Certificate Validation Disabled.
+        /// </summary>
+        public static string Downstream_Certificate_Validation_Disabled {
+            get {
+                return ResourceManager.GetString("Downstream Certificate Validation Disabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Downstream Certificate Validation Enabled.
+        /// </summary>
+        public static string Downstream_Certificate_Validation_Enabled {
+            get {
+                return ResourceManager.GetString("Downstream Certificate Validation Enabled", resourceCulture);
             }
         }
         
@@ -3302,6 +3329,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No active health check configured for this destination, but one or more of it&apos;s peers does..
+        /// </summary>
+        public static string Info_NoActiveHealthCheck {
+            get {
+                return ResourceManager.GetString("Info_NoActiveHealthCheck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Every request this route matches is already handled by &apos;{0}&apos;. Consider moving this route higher..
         /// </summary>
         public static string Info_RouteHiddenBy {
@@ -5137,6 +5173,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sticky Sessions.
+        /// </summary>
+        public static string Sticky_Sessions {
+            get {
+                return ResourceManager.GetString("Sticky Sessions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Subject Names.
         /// </summary>
         public static string Subject_Names {
@@ -5358,6 +5403,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Users {
             get {
                 return ResourceManager.GetString("Users", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Validate HTTPS.
+        /// </summary>
+        public static string Validate_HTTPS {
+            get {
+                return ResourceManager.GetString("Validate HTTPS", resourceCulture);
             }
         }
         

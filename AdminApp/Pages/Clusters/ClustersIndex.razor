@@ -39,6 +39,8 @@
                 <th>@_strings["Name"]</th>
                 <th>@_strings["Description"]</th>
                 <th>@_strings["Destinations"]</th>
+                <th>@_strings["Load Balancing Policy"]</th>
+                <th>@_strings["Validate HTTPS"]</th>
                 <AuthorizeView Roles="@AuthRoles.Editor">
                     <th class="action"></th>
                     <th class="action"></th>
@@ -51,35 +53,80 @@
                 <tr>
                     <td>@cluster.Name</td>
                     <td>@cluster.Description</td>
-                    <td class="monospace">
-                        @foreach (var destination in cluster.Destinations) {
-                            <div>
-                                @destination.Address
-                                @if (!string.IsNullOrWhiteSpace(destination.Name)) {
-                                    <span class="destination-name"> (@destination.Name)</span>
+                    <td>
+                        <div class="destinations">
+                            @{
+                                bool anyActiveHealthChecks = cluster.Destinations.Any(_ => !string.IsNullOrWhiteSpace(_.Health));
+                            }
+                            @foreach (var destination in cluster.Destinations) {
+                                <span class="monospace">@destination.Address</span>
+                                <span class="destination-name">
+                                    @if (!string.IsNullOrWhiteSpace(destination.Name)) {
+                                        <text>(@destination.Name)</text>
+                                    }
+                                </span>
+                                @if (!string.IsNullOrWhiteSpace(destination.Health)) {
+                                    <div title="@_strings["Active Health Checks Configured"]">
+                                        <Icon Name="activity-heartbeat" Size="19px" />
+                                    </div>
+                                } else if (anyActiveHealthChecks) {
+                                    <div title="@_strings["Info_NoActiveHealthCheck"]">
+                                        <Icon Name="activity-heartbeat" Size="19px" Color="var(--disabled-text-color)" />
+                                    </div>
+                                } else {
+                                    <div></div>
+                                }
+                            }
+                        </div>
+                    </td>
+                    <td>
+                        @if (cluster.LoadBalancing != null) {
+                            <div class="balancing">
+                                <span>@_strings[$"LBP_{cluster.LoadBalancing.Policy}"]</span>
+                                @if (cluster.StickySessions) {
+                                    <div Title="@_strings["Sticky Sessions"]">
+                                        <Icon Name="pin" Size="19px" />
+                                    </div>
                                 }
                             </div>
+                        } else {
+                            <span class="not-applicable">--</span>
                         }
                     </td>
-                    <AuthorizeView Roles="@AuthRoles.Editor">
-                        <td class="action">
-                            <button class="action" title="@_strings["Edit"]" @onclick="() => EditCluster(cluster)">
-                                <Icon Name="pencil" Size="18px" />
-                            </button>
-                        </td>
-                        <td class="action">
-                            <button class="action" title="@_strings["Clone"]" @onclick="() => CloneCluster(cluster)">
-                                <Icon Name="copy" Size="18px" />
-                            </button>
-                        </td>
-                        <td class="action">
-                            <button class="delete" title="@_strings["Delete"]" @onclick="() => DeleteCluster(cluster)">
-                                <Icon Name="trash" Size="18px" />
-                            </button>
-                        </td>
-                    </AuthorizeView>
-                </tr>
-            }
-        </tbody>
-    </table>
+                    <td class="validate">
+                        @if (cluster.Destinations.Any(_ => _.Address.StartsWith("https", StringComparison.OrdinalIgnoreCase))) {
+                            @if (cluster.AcceptAnyCert) {
+                                <div class="validate-icon" title="@_strings["Downstream Certificate Validation Disabled"]">
+                                    <Icon Name="alert-triangle" />
+                                </div>
+                            } else {
+                                <div class="validate-icon" title="@_strings["Downstream Certificate Validation Enabled"]">
+                                    <Icon Name="circle-check-filled" />
+                                </div>
+                            }
+                    } else {
+                        <span class="not-applicable">--</span>
+                    }
+                </td>
+                <AuthorizeView Roles="@AuthRoles.Editor">
+                    <td class="action">
+                        <button class="action" title="@_strings["Edit"]" @onclick="() => EditCluster(cluster)">
+                            <Icon Name="pencil" Size="18px" />
+                        </button>
+                    </td>
+                    <td class="action">
+                        <button class="action" title="@_strings["Clone"]" @onclick="() => CloneCluster(cluster)">
+                            <Icon Name="copy" Size="18px" />
+                        </button>
+                    </td>
+                    <td class="action">
+                        <button class="delete" title="@_strings["Delete"]" @onclick="() => DeleteCluster(cluster)">
+                            <Icon Name="trash" Size="18px" />
+                        </button>
+                    </td>
+                </AuthorizeView>
+            </tr>
+        }
+    </tbody>
+</table>
 </PageContent>

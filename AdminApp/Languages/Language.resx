@@ -2469,4 +2469,27 @@ Are you sure you wish to continue?</value>
 Overwrite?</value>
     <comment>Used in RouteEditor</comment>
   </data>
+  <data name="Validate HTTPS" xml:space="preserve">
+    <value>Validate HTTPS</value>
+    <comment>Used in ClustersIndex</comment>
+  </data>
+  <data name="Active Health Checks Configured" xml:space="preserve">
+    <value>Active Health Checks Configured</value>
+    <comment>Used in ClustersIndex</comment>
+  </data>
+  <data name="Info_NoActiveHealthCheck" xml:space="preserve">
+    <value>No active health check configured for this destination, but one or more of it's peers does.</value>
+    <comment>Used in ClustersIndex</comment>
+  </data>
+  <data name="Downstream Certificate Validation Disabled" xml:space="preserve">
+    <value>Downstream Certificate Validation Disabled</value>
+    <comment>Used in ClustersIndex</comment>
+  </data>
+  <data name="Downstream Certificate Validation Enabled" xml:space="preserve">
+    <value>Downstream Certificate Validation Enabled</value>
+    <comment>Used in ClustersIndex</comment>
+  </data>
+  <data name="Sticky Sessions" xml:space="preserve">
+    <value>Sticky Sessions</value>
+  </data>
 </root>

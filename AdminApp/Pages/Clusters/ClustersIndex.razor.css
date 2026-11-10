@@ -8,7 +8,32 @@
     color: var(--disabled-text-color);
 }
 
+.not-applicable {
+    color: var(--disabled-text-color);
+}
+
+.destinations {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    grid-column-gap: 6px;
+}
+
 .destination-name {
     font-size: 12px;
     color: var(--disabled-text-color);
+}
+
+.balancing {
+    display: flex;
+    gap: 3px;
+}
+
+.validate {
+    text-align: center;
+}
+
+.validate-icon {
+    display: flex;
+    justify-content: center;
+    align-content: center;
 }
