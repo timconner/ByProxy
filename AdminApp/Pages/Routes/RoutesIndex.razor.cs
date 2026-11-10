@@ -106,11 +106,13 @@ public partial class RoutesIndex : IDisposable {
     }
 
     private async Task DeleteRoute(ProxyRoute route) {
+        if (_routes == null) return;
         var result = await _modal.YesNo(_strings["Delete Route"], $"{_strings["Delete"]}: {route.Name}\n\n{_strings["WARN_Delete"]}");
         if (result != DialogResult.Yes) return;
 
         var success = await _modal.PerformProcessing(async () => {
             _db.Routes.Remove(route);
+            _routes.RemoveOrderable(route);
             await _db.SaveChangesAsync();
         });
 

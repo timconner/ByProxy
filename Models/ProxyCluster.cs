@@ -21,10 +21,11 @@
                     { "Null", new DestinationConfig() { Address = "http://127.0.0.1:0" } } }
         };
 
-        public List<string> GetValidationErrors() {
+        public List<string> NormalizeAndReturnValidationErrors() {
             var errors = new List<string>();
             if (Destinations.Count == 0) errors.Add("ERR_DestinationsEmpty");
             if (string.IsNullOrWhiteSpace(Name)) errors.Add("ERR_NameEmpty");
+            if (Destinations.Count == 1) LoadBalancing = null;
             return errors;
         }
 

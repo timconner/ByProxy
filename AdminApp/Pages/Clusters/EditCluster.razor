@@ -34,7 +34,7 @@
     private async Task PerformSave() {
         if (_cluster == null) return;
 
-        var errors = _cluster.GetValidationErrors();
+        var errors = _cluster.NormalizeAndReturnValidationErrors();
         if (errors.Count > 0) {
             await _modal.OkOnly(_strings["Error"], $"{_strings["Validation Errors"]}:\n\n{string.Join("\n- ", errors.Select(e => _strings[e]))}");
             return;
