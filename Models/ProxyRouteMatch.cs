@@ -21,6 +21,15 @@
         public abstract RouteMatchExport ToExport();
     }
 
+    public static class ProxyRouteMatchModes {
+        public const string Exact = "Exact";
+        public const string Prefix = "Prefix";
+        public const string Contains = "Contains";
+        public const string NotContains = "NotContains";
+        public const string Exists = "Exists";
+        public const string NotExists = "NotExists";
+    }
+
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
     [JsonDerivedType(typeof(RouteHeaderMatchExport), "Header")]
     [JsonDerivedType(typeof(RouteQueryMatchExport), "Query")]

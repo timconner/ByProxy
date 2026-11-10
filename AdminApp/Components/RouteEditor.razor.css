@@ -168,3 +168,20 @@ li {
 .collapsed-content {
     color: var(--disabled-text-color);
 }
+
+.method-options {
+    display: flex;
+}
+
+.method-options label {
+    cursor: pointer;
+    border-left: 1px solid var(--disabled-text-color);
+    margin-left: 9px;
+    padding-left: 6px;
+}
+
+.method-options label:first-child {
+    border: none;
+    margin: 0;
+    padding: 0;
+}

@@ -29,7 +29,13 @@ public partial class RoutesIndex : IDisposable {
             .AsNoTracking()
             .ToDictionaryAsync(_ => _.Id, _ => _.Name);
     }
-        
+
+    private string? GetRouteClass(bool isDisabled, List<ProxyRoute> hiddenBy) {
+        if (isDisabled) return "disabled"; // Disabled routes are never 'hidden'
+        if (hiddenBy.Count > 0) return "hidden";
+        return null;
+    }
+    
     [JSInvokable]
     public async void SortableJsUpdate(int oldIndex, int newIndex) {
         if (_routes == null || oldIndex >= _routes.Count || newIndex > _routes.Count) return;

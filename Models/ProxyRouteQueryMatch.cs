@@ -57,11 +57,11 @@
 
     public record ProxyQueryMatchMode(string Mode, QueryParameterMatchMode Enum, bool HasValues) {
         public static class Constants {
-            public const string Exact = "Exact";
-            public const string Prefix = "Prefix";
-            public const string Contains = "Contains";
-            public const string NotContains = "NotContains";
-            public const string Exists = "Exists";
+            public const string Exact = ProxyRouteMatchModes.Exact;
+            public const string Prefix = ProxyRouteMatchModes.Prefix;
+            public const string Contains = ProxyRouteMatchModes.Contains;
+            public const string NotContains = ProxyRouteMatchModes.NotContains;
+            public const string Exists = ProxyRouteMatchModes.Exists;
         }
 
         public static readonly ProxyQueryMatchMode Exact = new(Constants.Exact, QueryParameterMatchMode.Exact, true);

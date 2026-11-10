@@ -127,6 +127,12 @@
                 if (MaxRequestBodySize < -1) MaxRequestBodySize = -1;
             }
 
+            if (Methods == null || Methods.Count == 0) {
+                Methods = null;
+            } else {
+                Methods = Methods.Select(_ => _.ToUpperInvariant()).ToList();
+            }
+
             foreach (var criteria in MatchCriteria) {
                 switch (criteria) {
                     case ProxyRouteHeaderMatch headerMatch:

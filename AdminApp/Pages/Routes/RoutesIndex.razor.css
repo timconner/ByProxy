@@ -6,6 +6,10 @@ tr.disabled {
     color: var(--disabled-text-color);
 }
 
+tr.hidden {
+    color: var(--caption-text-color);
+}
+
 .empty {
     display: flex;
     align-items: center;
@@ -14,6 +18,22 @@ tr.disabled {
     padding: 24px;
     font-size: 18px;
     color: var(--disabled-text-color);
+}
+
+.match {
+    white-space: nowrap;
+}
+
+.match-warning {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    border-bottom: 1px solid var(--alert-bg-color);
+    width: fit-content;
+    cursor: help;
+    color: var(--alert-bg-color);
+    margin-bottom: 3px;
+    font-size: 14px;
 }
 
 .response-detail {

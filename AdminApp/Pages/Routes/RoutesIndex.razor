@@ -51,15 +51,24 @@
         <tbody @ref="_tbody">
             @if (_routes != null && _clusterNames != null) {
                 @foreach (var route in _routes) {
-                    <tr class="@(route.Disabled ? "disabled" : null)">
+                    var hiddenBy = route.GetHiddenByRoutes(_routes);
+                    <tr class="@GetRouteClass(route.Disabled, hiddenBy)">
                         <AuthorizeView Roles="@AuthRoles.Editor">
                             <td class="drag-handle">
                                 <Icon Name="grip-vertical" Size="16px" />
                             </td>
                         </AuthorizeView>
-                        <td>@route.Name</td>
+                        <td>
+                            <div>@route.Name</div>
+                            @if (hiddenBy.Count > 0) {
+                                <div class="match-warning" title="@string.Format(_strings["Info_RouteHiddenBy"].Value, string.Join("', '", hiddenBy.Select(_ => _.Name)))">
+                                    <Icon Name="alert-triangle" Size="14px" />
+                                    @_strings["Unreachable"]
+                                </div>
+                            }
+                        </td>
                         <td>@route.Description</td>
-                        <td class="monospace">
+                        <td class="match monospace">
                             @foreach (var simMatch in route.SimulateRouteMatches(_strings)) {
                                 <div>@simMatch</div>
                             }

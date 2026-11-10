@@ -1,12 +1,13 @@
 ﻿namespace ByProxy.AdminApp.Utility {
-    public static class Extenstions {
+    public static class RouteExtenstions {
         public static List<string> SimulateRouteMatches(this ProxyRoute route, IStringLocalizer localizer) {
             var matches = new List<string>();
             foreach (var method in route.Methods ?? [string.Empty]) {
                 foreach (var host in route.Hosts ?? ["*"]) {
                     var path = route.GetPathAsYarpMatch().TrimStart('/');
                     path = Regex.Replace(path, @"{\*\*.*}", "*");
-                    path = path == "*" ? string.Empty : $"/{path}";
+                    path = path == "*" ? "/*" : $"/{path}";
+
                     if (route.HttpPort.HasValue) {
                         var port = route.HttpPort == 80 ? string.Empty : $":{route.HttpPort.ToString()}";
                         matches.Add(($"{method} http://{host}{port}{path}").Trim());
@@ -181,6 +182,186 @@
             }
 
             return details;
+        }
+
+        public static List<ProxyRoute> GetHiddenByRoutes(this ProxyRoute route, IReadOnlyList<ProxyRoute> allRoutes) {
+            var hiddenBy = new List<ProxyRoute>();
+            if (route.Disabled) return hiddenBy;
+
+            foreach (var preceding in allRoutes.Ordered()) {
+                if (preceding.Id == route.Id) break;
+                if (preceding.Disabled) continue;
+
+                if (
+                    preceding.MethodRouteMatchShadows(route)
+                    && preceding.SchemeRouteMatchShadows(route)
+                    && preceding.HostRouteMatchShadows(route)
+                    && preceding.PathRouteMatchShadows(route)
+                    && preceding.HeaderRouteMatchShadows(route)
+                    && preceding.QueryRouteMatchShadows(route)
+                ) {
+                    hiddenBy.Add(preceding);
+                }
+            }
+            return hiddenBy;
+        }
+
+        private static bool MethodRouteMatchShadows(this ProxyRoute hidingRoute, ProxyRoute targetRoute) {
+            if (hidingRoute.Methods == null) return true;
+            if (targetRoute.Methods == null) return false;
+            if (targetRoute.Methods.Count > hidingRoute.Methods.Count) return false;
+            return targetRoute.Methods.ToHashSet().IsSubsetOf(hidingRoute.Methods.ToHashSet());
+        }
+
+        private static bool SchemeRouteMatchShadows(this ProxyRoute hidingRoute, ProxyRoute targetRoute) {
+            if (targetRoute.HttpPort is int targetHttpPort && hidingRoute.HttpPort != targetHttpPort) return false;
+            if (targetRoute.HttpsPort is int targetHttpsPort && hidingRoute.HttpsPort != targetHttpsPort) return false;
+            return true;
+        }
+
+        private static bool HostRouteMatchShadows(this ProxyRoute hidingRoute, ProxyRoute targetRoute) {
+            if (hidingRoute.Hosts == null) return true;
+            if (targetRoute.Hosts == null) return false;
+            return targetRoute.Hosts.All(target => hidingRoute.Hosts.Any(hider => HostShadows(hider, target)));
+        }
+
+        private static bool HostShadows(string hidingHost, string targetHost) {
+            if (hidingHost == "*") return true;
+            if (targetHost == "*") return false;
+            if (hidingHost.StartsWith("*.")) {
+                if (targetHost.StartsWith("*.")) {
+                    return string.Equals(hidingHost, targetHost, StringComparison.OrdinalIgnoreCase);
+                }
+                return targetHost.EndsWith(hidingHost.Substring(1), StringComparison.OrdinalIgnoreCase);
+            }
+            if (targetHost.StartsWith("*.")) return false;
+            return string.Equals(hidingHost, targetHost, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool PathRouteMatchShadows(this ProxyRoute hidingRoute, ProxyRoute targetRoute) {
+            if (PathMatchesAll(hidingRoute.Path, hidingRoute.PathIsPrefix)) return true;
+            if (PathMatchesAll(targetRoute.Path, targetRoute.PathIsPrefix)) return false;
+
+            // Parameter Matching Detected
+            if (hidingRoute.Path.Contains('{') || targetRoute.Path.Contains('{')) return false;
+
+            var hidingSegments = GetSegments(hidingRoute.Path);
+            var targetSegments = GetSegments(targetRoute.Path);
+
+            if (hidingRoute.PathIsPrefix) {
+                if (targetSegments.Count < hidingSegments.Count) return false;
+                return AllSegmentsEqual(hidingSegments, targetSegments);
+            }
+
+            if (targetRoute.PathIsPrefix) return false;
+            return hidingSegments.Count == targetSegments.Count && AllSegmentsEqual(hidingSegments, targetSegments);
+        }
+
+        private static bool PathMatchesAll([NotNullWhen(false)] string? path, bool isPrefix) {
+            if (string.IsNullOrWhiteSpace(path)) return true;
+            return isPrefix && GetSegments(path).Count == 0;
+        }
+
+        private static List<string> GetSegments(string path) {
+            return path.Trim().Trim('/').Split('/', StringSplitOptions.RemoveEmptyEntries)
+                .Select(_ => _.ToLowerInvariant())
+                .ToList();
+        }
+
+        private static bool AllSegmentsEqual(List<string> hiding, List<string> target) {
+            for (var i = 0; i < hiding.Count; i++) {
+                if (hiding[i] != target[i]) return false;
+            }
+            return true;
+        }
+
+        private static bool HeaderRouteMatchShadows(this ProxyRoute hidingRoute, ProxyRoute targetRoute) {
+            return CriteriaRouteMatchShadows<ProxyRouteHeaderMatch>(hidingRoute, targetRoute, match => match.HeaderMatchMode.Mode);
+        }
+
+        private static bool QueryRouteMatchShadows(this ProxyRoute hidingRoute, ProxyRoute targetRoute) {
+            return CriteriaRouteMatchShadows<ProxyRouteQueryMatch>(hidingRoute, targetRoute, match => match.QueryMatchMode.Mode);
+        }
+
+        private static bool CriteriaRouteMatchShadows<T>(ProxyRoute hidingRoute, ProxyRoute targetRoute, Func<T, string> getMode) where T : ProxyRouteMatch {
+            var targetByKey = targetRoute.MatchCriteria
+                .OfType<T>()
+                .ToLookup(match => match.Key, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var hidingMatch in hidingRoute.MatchCriteria.OfType<T>()) {
+                var hidingMode = getMode(hidingMatch);
+                var targetMatches = targetByKey[hidingMatch.Key];
+
+                var hidingMatchIsGuaranteed = targetMatches.Any(targetMatch =>
+                    CriterionShadows(hidingMatch, targetMatch, hidingMode, getMode(targetMatch)));
+
+                if (!hidingMatchIsGuaranteed) return false;
+            }
+
+            return true;
+        }
+
+        private static bool CriterionShadows(ProxyRouteMatch hidingMatch, ProxyRouteMatch targetMatch, string hidingMode, string targetMode) {
+            if (hidingMode == ProxyRouteMatchModes.Exists) {
+                return targetMode is not (ProxyRouteMatchModes.NotExists or ProxyRouteMatchModes.NotContains);
+            }
+
+            if (hidingMode == ProxyRouteMatchModes.NotExists) {
+                return targetMode == ProxyRouteMatchModes.NotExists;
+            }
+
+            // Mode is Exact, Prefix, Contains, or NotContains
+            if (hidingMatch.Values == null || hidingMatch.Values.Count == 0) return false;
+            if (targetMatch.Values == null || targetMatch.Values.Count == 0) return false;
+
+            if (hidingMode == ProxyRouteMatchModes.NotContains) {
+                return NotContainsCriterionShadows(
+                    hidingMatch.Values, targetMatch.Values, targetMode,
+                    hidingMatch.CaseSensitiveValues ?? false, targetMatch.CaseSensitiveValues ?? false);
+            }
+
+            return PositiveCriterionShadows(
+                hidingMatch.Values, targetMatch.Values, hidingMode, targetMode,
+                hidingMatch.CaseSensitiveValues ?? false, targetMatch.CaseSensitiveValues ?? false);
+        }
+
+        private static bool PositiveCriterionShadows(IReadOnlyList<string> hidingValues, IReadOnlyList<string> targetValues, string hidingMode, string targetMode, bool hidingCaseSensitive, bool targetCaseSensitive) {
+            if (hidingCaseSensitive && !targetCaseSensitive) return false;
+
+            var comparison = hidingCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+
+            switch (hidingMode) {
+                case ProxyRouteMatchModes.Exact:
+                    if (targetMode != ProxyRouteMatchModes.Exact) return false;
+                    return targetValues.All(targetValue =>
+                        hidingValues.Any(hidingValue =>
+                            string.Equals(targetValue, hidingValue, comparison)));
+
+                case ProxyRouteMatchModes.Prefix:
+                    if (targetMode != ProxyRouteMatchModes.Exact && targetMode != ProxyRouteMatchModes.Prefix) return false;
+                    return targetValues.All(targetValue =>
+                        hidingValues.Any(hidingPrefix =>
+                            targetValue.StartsWith(hidingPrefix, comparison)));
+
+                case ProxyRouteMatchModes.Contains:
+                    if (targetMode is ProxyRouteMatchModes.Exact or ProxyRouteMatchModes.Prefix or ProxyRouteMatchModes.Contains) {
+                        return targetValues.All(targetValue =>
+                            hidingValues.Any(hidingSubstring => targetValue.Contains(hidingSubstring, comparison)));
+                    }
+                    return false;
+
+                default:
+                    return false;
+            }
+        }
+
+        private static bool NotContainsCriterionShadows(IReadOnlyList<string> hidingValues, IReadOnlyList<string> targetValues, string targetMode, bool hidingCaseSensitive, bool targetCaseSensitive) {
+            if (targetMode != ProxyRouteMatchModes.NotContains) return false;
+            if (!hidingCaseSensitive && targetCaseSensitive) return false;
+
+            var comparison = targetCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+            return hidingValues.All(hidingSubstring =>
+                targetValues.Any(targetSubstring => hidingSubstring.Contains(targetSubstring, comparison)));
         }
     }
 }

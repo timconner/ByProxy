@@ -132,25 +132,23 @@
         <fieldset class="methods">
             <legend>@_strings["HTTP Methods"]</legend>
             <div class="help-text">@_strings["Help_HTTPMethodsMatch"]</div>
-            <form @onsubmit="AddMethod">
-                <div class="new-value">
-                    <InputText @bind-Value="_newMethod" placeholder="GET" />
-                    <button type="submit">@_strings["Add"]</button>
-                </div>
-            </form>
-            @if (Route.Methods == null || Route.Methods.Count == 0) {
-                <ul><li>@_strings["MatchAllMethods"]</li></ul>
-            } else {
-                <ul>
-                    @foreach (var method in Route.Methods) {
-                        <li>
+            <Toggle FieldLabel="@_strings["Match Mode"]"
+                    OffLabel="@_strings["Match All"]"
+                    OnLabel="@_strings["Match Selected"]"
+                    IsOn="@(Route.Methods != null)"
+                    ToggleHandler="(state) => Route.Methods = state ? new() : null"
+                    DisableToggleStateManagement />
+            @if (Route.Methods != null) {
+                <div class="method-options">
+                    @foreach (var method in SupportedMethods) {
+                        <label>
+                            <input type="checkbox"
+                                   checked="@(Route.Methods.Contains(method))"
+                                   @onchange="@(e => ToggleMethod(method, Convert.ToBoolean(e.Value)))" />
                             @method
-                            <button @onclick="() => RemoveMethod(method)">
-                                <Icon Name="x" Size="18px" />
-                            </button>
-                        </li>
+                        </label>
                     }
-                </ul>
+                </div>
             }
         </fieldset>
 

@@ -538,15 +538,6 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Case Sensitive Method.
-        /// </summary>
-        public static string Case_Sensitive_Method {
-            get {
-                return ResourceManager.GetString("Case Sensitive Method", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Case Senstive Values.
         /// </summary>
         public static string Case_Sensitive_Values {
@@ -1308,6 +1299,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Duplicate_Header {
             get {
                 return ResourceManager.GetString("Duplicate Header", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Duplicate Method.
+        /// </summary>
+        public static string Duplicate_Method {
+            get {
+                return ResourceManager.GetString("Duplicate Method", resourceCulture);
             }
         }
         
@@ -2498,7 +2498,7 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to The HTTP request method (e.g. GET, POST, PUT). These are case sensitive!.
+        ///   Looks up a localized string similar to The HTTP request methods (e.g. GET, POST, PUT) to match..
         /// </summary>
         public static string Help_HTTPMethodsMatch {
             get {
@@ -3302,6 +3302,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Every request this route matches is already handled by &apos;{0}&apos;. Consider moving this route higher..
+        /// </summary>
+        public static string Info_RouteHiddenBy {
+            get {
+                return ResourceManager.GetString("Info_RouteHiddenBy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Routes determine how requests are handled. Conflicting routes are resolved from top to bottom. Drag and drop routes to change priority/order..
         /// </summary>
         public static string INFO_Routes {
@@ -3590,6 +3599,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Match All.
+        /// </summary>
+        public static string Match_All {
+            get {
+                return ResourceManager.GetString("Match All", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Match Criteria.
         /// </summary>
         public static string Match_Criteria {
@@ -3608,6 +3626,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Match Selected.
+        /// </summary>
+        public static string Match_Selected {
+            get {
+                return ResourceManager.GetString("Match Selected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Values To Match.
         /// </summary>
         public static string Match_Values {
@@ -3622,15 +3649,6 @@ namespace ByProxy.AdminApp.Languages {
         public static string MatchAllHosts {
             get {
                 return ResourceManager.GetString("MatchAllHosts", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Matching all HTTP methods. Add a method to limit matching..
-        /// </summary>
-        public static string MatchAllMethods {
-            get {
-                return ResourceManager.GetString("MatchAllMethods", resourceCulture);
             }
         }
         
@@ -4276,6 +4294,17 @@ namespace ByProxy.AdminApp.Languages {
         public static string Prompt_NewMatchValue {
             get {
                 return ResourceManager.GetString("Prompt_NewMatchValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A transform with this method already exists.
+        ///
+        ///Overwrite?.
+        /// </summary>
+        public static string Prompt_OverwriteMethodTransform {
+            get {
+                return ResourceManager.GetString("Prompt_OverwriteMethodTransform", resourceCulture);
             }
         }
         
@@ -5270,6 +5299,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unreachable.
+        /// </summary>
+        public static string Unreachable {
+            get {
+                return ResourceManager.GetString("Unreachable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Uploading File.
         /// </summary>
         public static string Uploading_File {
@@ -5374,17 +5412,6 @@ namespace ByProxy.AdminApp.Languages {
         public static string WARN_CaCertInUse {
             get {
                 return ResourceManager.GetString("WARN_CaCertInUse", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to HTTP Methods are case sensitive and most require all upper case (e.g. GET, PUT, POST, etc).
-        ///
-        ///Are you sure you want to add a method with lower case letters?.
-        /// </summary>
-        public static string WARN_CaseSensitiveMethod {
-            get {
-                return ResourceManager.GetString("WARN_CaseSensitiveMethod", resourceCulture);
             }
         }
         

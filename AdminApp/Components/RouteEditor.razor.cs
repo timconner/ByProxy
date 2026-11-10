@@ -24,7 +24,6 @@ public partial class RouteEditor {
 
     private string _newAllowedHeader = string.Empty;
     private string _newHost = string.Empty;
-    private string _newMethod = string.Empty;
 
     private string _pathMatchInput = string.Empty;
     private string PathMatch {
@@ -72,6 +71,11 @@ public partial class RouteEditor {
     private string _newResponseHeaderTransformOperation = ResponseHeaderTransformOperation.Set.Operation;
     private string _newResponseHeaderTransformHeaderName = string.Empty;
     private string _newResponseHeaderTransformHeaderValue = string.Empty;
+
+    private static readonly string[] SupportedMethods = [
+        "GET", "POST", "PUT", "PATCH", "DELETE",
+        "HEAD", "OPTIONS", "TRACE"
+    ];
 
     protected override async Task OnInitializedAsync() {
         using var db = _dbFactory.CreateDbContext();
@@ -146,24 +150,16 @@ public partial class RouteEditor {
         if (Route.Hosts.Count == 0) Route.Hosts = null;
     }
 
-    private async Task AddMethod() {
-        var newMethod = _newMethod.Trim();
-        if (newMethod != newMethod.ToUpperInvariant()) {
-            var result = await _modal.YesNo(_strings["Case Sensitive Method"], _strings["WARN_CaseSensitiveMethod"]);
-            if (result != DialogResult.Yes) return;
+    private void ToggleMethod(string method, bool enabled) {
+        Route.Methods ??= new();
+        if (enabled) {
+            if (!Route.Methods.Contains(method)) {
+                Route.Methods.Add(method);
+            }
+        } else {
+            Route.Methods.Remove(method);
+            if (Route.Methods.Count == 0) Route.Methods = null;
         }
-        if (string.IsNullOrWhiteSpace(newMethod)) return;
-        if (Route.Methods == null) Route.Methods = new();
-        if (!Route.Methods.Contains(newMethod)) Route.Methods.Add(newMethod);
-        _newMethod = string.Empty;
-        await InvokeAsync(StateHasChanged);
-    }
-
-    private void RemoveMethod(string method) {
-        _newMethod = method;
-        if (Route.Methods == null) return;
-        Route.Methods.Remove(method);
-        if (Route.Methods.Count == 0) Route.Methods = null;
     }
 
     private async Task AddNewHeaderMatchValue() {
@@ -387,18 +383,32 @@ public partial class RouteEditor {
         Route.RequestTransforms.Remove(transform);
     }
 
-    private void AddMethodTransform() {
+    private async Task AddMethodTransform() {
         if (string.IsNullOrWhiteSpace(_newFromHttpMethod)) return;
         if (string.IsNullOrWhiteSpace(_newToHttpMethod)) return;
 
-        Route.RequestTransforms.Add(new ProxyRequestMethodTransform {
-            Id = Guid.NewGuid(),
-            ConfigRevision = Route.ConfigRevision,
-            RouteId = Route.Id,
-            RouteConfigRevision = Route.ConfigRevision,
-            FromHttpMethod = _newFromHttpMethod,
-            ToHttpMethod = _newToHttpMethod
-        });
+        var existingFrom = Route.RequestTransforms
+            .OfType<ProxyRequestMethodTransform>()
+            .FirstOrDefault(_ => _.FromHttpMethod == _newFromHttpMethod);
+
+        if (existingFrom != null) {
+            if (
+                await _modal.YesNo(_strings["Duplicate Method"], _strings["Prompt_OverwriteMethodTransform"])
+                != DialogResult.Yes
+            ) {
+                return;
+            }
+            existingFrom.ToHttpMethod = _newToHttpMethod;
+        } else {
+            Route.RequestTransforms.Add(new ProxyRequestMethodTransform {
+                Id = Guid.NewGuid(),
+                ConfigRevision = Route.ConfigRevision,
+                RouteId = Route.Id,
+                RouteConfigRevision = Route.ConfigRevision,
+                FromHttpMethod = _newFromHttpMethod,
+                ToHttpMethod = _newToHttpMethod
+            });
+        }
 
         _newFromHttpMethod = string.Empty;
         _newToHttpMethod = string.Empty;

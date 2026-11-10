@@ -160,10 +160,6 @@
   <data name="Cancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
-  <data name="Case Sensitive Method" xml:space="preserve">
-    <value>Case Sensitive Method</value>
-    <comment>Used in RouteEditor</comment>
-  </data>
   <data name="Certificates" xml:space="preserve">
     <value>Certificates</value>
   </data>
@@ -321,12 +317,6 @@
   <data name="Warning" xml:space="preserve">
     <value>Warning</value>
   </data>
-  <data name="WARN_CaseSensitiveMethod" xml:space="preserve">
-    <value>HTTP Methods are case sensitive and most require all upper case (e.g. GET, PUT, POST, etc).
-
-Are you sure you want to add a method with lower case letters?</value>
-    <comment>Used in RouteEditor</comment>
-  </data>
   <data name="WARN_Delete" xml:space="preserve">
     <value>Are you sure you want to continue with deletion?</value>
   </data>
@@ -442,7 +432,7 @@ Are you sure you want to add a method with lower case letters?</value>
     <comment>Used in RouteEditor</comment>
   </data>
   <data name="Help_HTTPMethodsMatch" xml:space="preserve">
-    <value>The HTTP request method (e.g. GET, POST, PUT). These are case sensitive!</value>
+    <value>The HTTP request methods (e.g. GET, POST, PUT) to match.</value>
     <comment>Used in RouteEditor</comment>
   </data>
   <data name="Help_PathMatch" xml:space="preserve">
@@ -478,9 +468,6 @@ Are you sure you want to add a method with lower case letters?</value>
   <data name="MatchAllHosts" xml:space="preserve">
     <value>Matching all hosts. Add a host to limit matching.</value>
     <comment>Used in RouteEditor</comment>
-  </data>
-  <data name="MatchAllMethods" xml:space="preserve">
-    <value>Matching all HTTP methods. Add a method to limit matching.</value>
   </data>
   <data name="Matching" xml:space="preserve">
     <value>Matching</value>
@@ -2456,6 +2443,30 @@ Are you sure you wish to continue?</value>
   </data>
   <data name="WARN_DuplicateHeader" xml:space="preserve">
     <value>A header with this name already exists.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Unreachable" xml:space="preserve">
+    <value>Unreachable</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="Info_RouteHiddenBy" xml:space="preserve">
+    <value>Every request this route matches is already handled by '{0}'. Consider moving this route higher.</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="Match All" xml:space="preserve">
+    <value>Match All</value>
+  </data>
+  <data name="Match Selected" xml:space="preserve">
+    <value>Match Selected</value>
+  </data>
+  <data name="Duplicate Method" xml:space="preserve">
+    <value>Duplicate Method</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Prompt_OverwriteMethodTransform" xml:space="preserve">
+    <value>A transform with this method already exists.
+
+Overwrite?</value>
     <comment>Used in RouteEditor</comment>
   </data>
 </root>
