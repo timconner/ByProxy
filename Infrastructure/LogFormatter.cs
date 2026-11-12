@@ -15,14 +15,17 @@
 
             textWriter.Write(DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss "));
 
-            if (logEntry.LogLevel != LogLevel.Information) {
-                switch (logEntry.LogLevel) {
-                    case LogLevel.Trace: textWriter.Write("TRACE: "); break;
-                    case LogLevel.Debug: textWriter.Write("DEBUG: "); break;
-                    case LogLevel.Warning: textWriter.Write("WARN: "); break;
-                    case LogLevel.Error: textWriter.Write("ERROR: "); break;
-                    case LogLevel.Critical: textWriter.Write("CRIT: "); break;
-                }
+            switch (logEntry.LogLevel) {
+                case LogLevel.Information:
+                    if (logEntry.EventId.Id != LogEventIds.RequestLog.Id) {
+                        textWriter.Write("INFO: ");
+                    }
+                    break;
+                case LogLevel.Trace: textWriter.Write("TRACE: "); break;
+                case LogLevel.Debug: textWriter.Write("DEBUG: "); break;
+                case LogLevel.Warning: textWriter.Write("WARN: "); break;
+                case LogLevel.Error: textWriter.Write("ERROR: "); break;
+                case LogLevel.Critical: textWriter.Write("CRIT: "); break;
             }
 
             if (_formatterOptions.IncludeCategory) textWriter.Write($"[{logEntry.Category}] ");
@@ -35,6 +38,10 @@
 
     public class LogFormatterOptions : ConsoleFormatterOptions {
         public bool IncludeCategory { get; set; } = false;
+    }
+
+    public static class LogEventIds {
+        public static readonly EventId RequestLog = new EventId(1000, nameof(RequestLog));
     }
 
     public static class LogFormatterExtensions {

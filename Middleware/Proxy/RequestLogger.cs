@@ -54,8 +54,9 @@
                 var statusCode = abortedBeforeResponse ? 499 : context.Response.StatusCode;
                 var responseBytes = abortedBeforeResponse ? UNKNOWN_VALUE : streamCounter.BytesWritten.ToString();
                 var contentType = context.Response.ContentType?.Split(';',2)[0].Trim() ?? UNKNOWN_VALUE;
-
+                
                 _logger.LogInformation(
+                    1000,
                     "{RemoteIp} {Protocol} {Method} {Url} - {UpstreamServer} - {StatusCode} {ResponseBytes} {ContentType} {ElapsedMs}ms",
                      remoteIps,  protocol,  method,  url,    upstreamServer,    statusCode,  responseBytes,  contentType,  stopwatch.Elapsed.TotalMilliseconds
                 );
