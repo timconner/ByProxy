@@ -2592,4 +2592,12 @@ Inclusive start-end range (e.g. 192.168.2.10-192.168.2.20)</value>
   <data name="ERR_IpRestrictionMappedPrefix" xml:space="preserve">
     <value>IPv4-mapped IPv6 CIDRs require a prefix length between 96 and 128.</value>
   </data>
+  <data name="If Client IP Allowed" xml:space="preserve">
+    <value>If Client IP Allowed</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="If Client IP Not Blocked" xml:space="preserve">
+    <value>If Client IP Not Blocked</value>
+    <comment>Used in RoutesIndex</comment>
+  </data>
 </root>

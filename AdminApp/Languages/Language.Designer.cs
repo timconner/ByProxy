@@ -3296,6 +3296,24 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to If Client IP Allowed.
+        /// </summary>
+        public static string If_Client_IP_Allowed {
+            get {
+                return ResourceManager.GetString("If Client IP Allowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If Client IP Not Blocked.
+        /// </summary>
+        public static string If_Client_IP_Not_Blocked {
+            get {
+                return ResourceManager.GetString("If Client IP Not Blocked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Import.
         /// </summary>
         public static string Import {

@@ -80,6 +80,11 @@
                             @foreach (var responseDetail in route.SimulateRouteResponse(_strings, clusterName)) {
                                 <div class="response-detail">@responseDetail</div>
                             }
+                            @if (route.IpRestrictionMode == IpRestrictionMode.AllowList) {
+                                <div class="response-detail">@_strings["If Client IP Allowed"]</div>
+                            } else if (route.IpRestrictionMode == IpRestrictionMode.BlockList) {
+                                <div class="response-detail">@_strings["If Client IP Not Blocked"]</div>
+                            }
                         </td>
                         <AuthorizeView Roles="@AuthRoles.Editor">
                             <td class="action">
