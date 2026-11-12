@@ -1,3 +1,5 @@
+using ByProxy.Infrastructure.Proxy;
+
 namespace ByProxy {
     internal class Program {
 
@@ -123,7 +125,7 @@ namespace ByProxy {
                     AdminListenAny = adminListenAny,
                     AdminPort = adminPort,
                     AdminCertId = adminCertId,
-                    UnmatchedStatus = 404,
+                    UnmatchedResponse = StaticResponse.CreateDefault(404),
                     MaxRequestBodySize = 30_000_000
                 };
                 proxyConfig.Committed = true;
@@ -186,6 +188,7 @@ namespace ByProxy {
             builder.Services.AddSingleton<AcmeChallengeIntercept>();
 
             builder.Services.AddSingleton<RequestLogger>();
+            builder.Services.AddSingleton<ClientIpRestrictions>();
             builder.Services.AddSingleton<ConditionalHttpsRedirect>();
             builder.Services.AddSingleton<NonClusterRouteHandler>();
 
@@ -283,23 +286,14 @@ namespace ByProxy {
 
                 proxy.UseEndpoints(endpoints => {
                     endpoints.MapReverseProxy(pipeline => {
+                        pipeline.UseMiddleware<ClientIpRestrictions>();
                         pipeline.UseMiddleware<ConditionalHttpsRedirect>();
                         pipeline.UseMiddleware<NonClusterRouteHandler>();
                     });
                 });
 
                 var proxyState = proxy.ApplicationServices.GetRequiredService<ProxyStateService>();
-                proxy.Run(async (context) => {
-                    if (proxyState.RunningConfig.Tarpit) {
-                        var tarpitTime = Random.Shared.Next(15_000, 30_000);
-                        try {
-                            await Task.Delay(tarpitTime, context.RequestAborted);
-                        } catch { return; }
-                    }
-                    context.Response.StatusCode = proxyState.RunningConfig.UnmatchedStatus;
-                    context.Response.ContentLength = 0;
-                    return;
-                });
+                proxy.Run(context => proxyState.RunningConfig.UnmatchedResponse.WriteResponseAsync(context));
             });
 
             if (!disableAdminApp) {

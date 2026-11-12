@@ -34,46 +34,6 @@
     </fieldset>
 
     <fieldset>
-        <legend>@_strings["Unmatched Traffic Handling"]</legend>
-
-
-        <div>
-            <Toggle FieldLabel="@_strings["Tarpit"]" IsOn="_proxyConfig.Tarpit" ToggleHandler="TarpitToggled" />
-            <div class="help-text">@_strings["Help_Tarpit"]</div>
-        </div>
-
-        <div>
-            <label>
-                @_strings["HTTP Status"]:
-                <select @bind="_proxyConfig.UnmatchedStatus" @bind:after="SaveChanges">
-                    @foreach (var status in Enum.GetValues<HttpStatusCode>()) {
-                        int statusCode = (int)status;
-                        <option value="@statusCode">@($"{statusCode} - {Enum.GetName<HttpStatusCode>(status)}")</option>
-                    }
-                </select>
-            </label>
-            <div class="help-text">@_strings["Help_UnmatchedStatus"]</div>
-        </div>
-
-        <div class="fallback">
-            <Toggle FieldLabel="@_strings["NoSniMatch"]" OffLabel="@_strings["Refuse Connection"]" IsOn="_proxyConfig.FallbackCert != null" OnLabel="@_strings["Use Fallback Certificate"]" ToggleHandler="FallbackCertToggled" />
-            @if (_proxyConfig.FallbackCert != null) {
-                <div class="cert-select">
-                    <span>@_strings["Fallback Certificate"]:</span>
-                    <span>@_proxyConfig.FallbackCert.Name</span>
-                    <button class="action" @onclick="ViewFallbackCertDetails">
-                        <Icon Name="zoom" />
-                    </button>
-                    <button class="change" @onclick="ChangeFallbackCert">
-                        @_strings["Change"]
-                    </button>
-                </div>
-            }
-            <div class="help-text">@_strings["Help_FallbackCert"]</div>
-        </div>
-
-    </fieldset>
-    <fieldset>
         <legend>@_strings["Management Site Settings"]</legend>
 
         <div>
@@ -103,6 +63,44 @@
             <div class="help-text">@_strings["Help_AdminCert"]</div>
         </div>
     </fieldset>
+
+    <PageCollapsibleSection Label="@_strings["Unmatched Traffic Handling"]">
+        <Content>
+            <StaticResponseEditor Response="_proxyConfig.UnmatchedResponse" ShowTarpit OnChanged="SaveChanges" />
+
+            <fieldset>
+                <legend>@_strings["NoSniMatch"]</legend>
+
+                <div class="fallback">
+                    <Toggle FieldLabel="@_strings["NoSniMatch"]"
+                            OffLabel="@_strings["Refuse Connection"]"
+                            IsOn="_proxyConfig.FallbackCert != null"
+                            OnLabel="@_strings["Use Fallback Certificate"]"
+                            ToggleHandler="FallbackCertToggled" />
+                    @if (_proxyConfig.FallbackCert != null) {
+                        <div class="cert-select">
+                            <span>@_strings["Fallback Certificate"]:</span>
+                            <span>@_proxyConfig.FallbackCert.Name</span>
+                            <button class="action" @onclick="ViewFallbackCertDetails">
+                                <Icon Name="zoom" />
+                            </button>
+                            <button class="change" @onclick="ChangeFallbackCert">
+                                @_strings["Change"]
+                            </button>
+                        </div>
+                    }
+                    <div class="help-text">@_strings["Help_FallbackCert"]</div>
+                </div>
+            </fieldset>
+        </Content>
+        <CollapsedContent>
+            <div class="collapsed-content">
+                @foreach (var detail in _proxyConfig.UnmatchedResponse.SimulateResponse(_strings)) {
+                    <div>@detail</div>
+                }
+            </div>
+        </CollapsedContent>
+    </PageCollapsibleSection>
 
     <PageDivider Label="@_strings["Danger Zone"]" MarginTop="24px" />
     <div class="danger-zone">

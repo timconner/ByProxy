@@ -1,4 +1,6 @@
-﻿namespace ByProxy.Services {
+﻿using ByProxy.Infrastructure.Proxy;
+
+namespace ByProxy.Services {
     public interface IProxyStateService { public int CandidateConfigRevision { get; } }
 
     public class BootstrapProxyStateService : IProxyStateService {
@@ -44,7 +46,7 @@
 
         public void UpdateRunningConfig(RunningConfig newRunningConfig) {
             if (CheckUpdateRequiresRestart(RunningConfig, newRunningConfig)) {
-                _logger.LogWarning("Port changes were detected. Restarting services.");
+                _logger.LogWarning("Configuration changes require a restart. Restarting services.");
                 _restartKestrel.Cancel();
                 return;
             }

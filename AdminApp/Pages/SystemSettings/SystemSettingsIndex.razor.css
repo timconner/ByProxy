@@ -19,6 +19,10 @@ fieldset {
     padding: 1px 12px;
 }
 
+.collapsed-content {
+    color: var(--disabled-text-color);
+}
+
 .danger-zone {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;

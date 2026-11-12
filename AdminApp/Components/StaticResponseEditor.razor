@@ -1,0 +1,195 @@
+﻿@inject IStringLocalizer<Language> _strings
+@inject ModalService _modal
+
+<fieldset>
+    <legend>@_strings["Response"]</legend>
+    @if (ShowTarpit) {
+        <div>
+            <Toggle FieldLabel="@_strings["Tarpit"]"
+                    IsOn="Response.UseTarpit"
+                    ToggleHandler="ToggleTarpit" />
+            <div class="help-text">@_strings["Help_Tarpit"]</div>
+        </div>
+    }
+    <div>
+        <label>
+            @_strings["HTTP Status"]:
+            <select @bind="Response.HttpStatusCode" @bind:after="OnChanged.InvokeAsync">
+                @foreach (var status in Enum.GetValues<HttpStatusCode>()) {
+                    int statusCode = (int)status;
+                    <option value="@statusCode">@($"{statusCode} - {status}")</option>
+                }
+            </select>
+        </label>
+        <div class="help-text">
+            @if (Response.UseTarpit) {
+                <div class="help-text">@_strings["Help_TarpitStatus"]</div>
+            } else {
+                <div class="help-text">@_strings["Help_StaticResponseStatus"]</div>
+            }
+        </div>
+    </div>
+</fieldset>
+
+<fieldset>
+    <legend>@_strings["Response Body"]</legend>
+
+    <Toggle FieldLabel="@_strings["Include a Response Body"]"
+            OffLabel="@_strings["Empty Body"]"
+            OnLabel="@_strings["Static Text"]"
+            IsOn="Response.Body != null"
+            ToggleHandler="ToggleBody"
+            DisableToggleStateManagement />
+
+    @if (Response.Body != null) {
+        <div class="response-body">
+            <span>
+                @_strings["Body Size"]:
+                @Functions.GetHumanReadableBytes(Encoding.UTF8.GetByteCount(Response.Body))
+            </span>
+            <button type="button" @onclick="EditBody">
+                @_strings["Edit"]
+            </button>
+        </div>
+        <div class="help-text">
+            @_strings["Help_RouteStaticResponseBody"]
+        </div>
+    }
+</fieldset>
+
+<fieldset>
+    <legend>@_strings["Response Headers"]</legend>
+
+    <div class="help-text">
+        @_strings["Help_RouteStaticResponseHeaders"]
+    </div>
+
+    <form @onsubmit="AddHeader">
+        <div class="new-header">
+            <div>
+                <label>
+                    @_strings["Header Name"]:
+                    <input type="text" placeholder="Content-Type" @bind="_newHeaderName" />
+                </label>
+            </div>
+            <div>
+                <label>
+                    @_strings["Header Value"]:
+                    <input type="text" placeholder="application/json" @bind="_newHeaderValue" />
+                </label>
+            </div>
+            <button type="submit">@_strings["Add"]</button>
+        </div>
+    </form>
+
+    @if (Response.Headers == null || Response.Headers.Count == 0) {
+        <div class="empty">@_strings["None"]</div>
+    } else {
+        <table>
+            <thead>
+                <tr>
+                    <th>@_strings["Header Name"]</th>
+                    <th>@_strings["Header Value"]</th>
+                    <th class="action">@_strings["Remove"]</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var header in Response.Headers) {
+                    <tr @key="header.Key">
+                        <td class="monospace">@header.Key</td>
+                        <td class="monospace">@header.Value</td>
+                        <td class="action">
+                            <button type="button"
+                                    class="delete"
+                                    @onclick="() => RemoveHeader(header.Key)">
+                                <Icon Name="x" Size="18px" />
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</fieldset>
+
+@code {
+    [Parameter, EditorRequired]
+    public StaticResponse Response { get; set; } = default!;
+
+    [Parameter]
+    public bool ShowTarpit { get; set; }
+
+    [Parameter]
+    public EventCallback OnChanged { get; set; }
+
+    private string _newHeaderName = string.Empty;
+    private string _newHeaderValue = string.Empty;
+
+    private async Task ToggleTarpit(bool state) {
+        Response.UseTarpit = state;
+        await OnChanged.InvokeAsync();
+    }
+
+    private async Task ToggleBody(bool state) {
+        if (!state) {
+            Response.Body = null;
+            await OnChanged.InvokeAsync();
+        } else {
+            await EditBody();
+        }
+    }
+
+    private async Task EditBody() {
+        var result = await _modal.LargeText(
+            title: _strings["Response Body"],
+            prompt: null,
+            value: Response.Body ?? string.Empty,
+            readOnly: false,
+            closeOnly: false,
+            monoSpace: true
+        );
+
+        if (result.DialogResult != DialogResult.OK) return;
+        Response.Body = result.Value;
+        await OnChanged.InvokeAsync();
+    }
+
+    private async Task AddHeader() {
+        var name = _newHeaderName.Trim();
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        if (!Regex.IsMatch(name, @"^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$")) {
+            await _modal.OkOnly(_strings["Invalid Header"], _strings["WARN_InvalidHeaderName"]);
+            return;
+        }
+
+        var value = _newHeaderValue;
+        if (!Regex.IsMatch(value, @"^[\t\x20-\x7E]*$")) {
+            await _modal.OkOnly(_strings["Invalid Header"], _strings["WARN_InvalidHeaderValue"]);
+            return;
+        }
+
+        if (Response.Headers != null && Response.Headers.Keys.Contains(name, StringComparer.OrdinalIgnoreCase)) {
+            await _modal.OkOnly(_strings["Duplicate Header"], _strings["WARN_DuplicateHeader"]);
+            return;
+        }
+
+        Response.Headers ??= new();
+        Response.Headers.Add(name, value);
+
+        _newHeaderName = string.Empty;
+        _newHeaderValue = string.Empty;
+        await OnChanged.InvokeAsync();
+    }
+
+    private async Task RemoveHeader(string name) {
+        if (Response.Headers == null || !Response.Headers.TryGetValue(name, out var value)) return;
+
+        _newHeaderName = name;
+        _newHeaderValue = value;
+
+        Response.Headers.Remove(name);
+        if (Response.Headers.Count == 0) Response.Headers = null;
+        await OnChanged.InvokeAsync();
+    }
+}

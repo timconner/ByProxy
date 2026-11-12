@@ -439,6 +439,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Allowed IPs.
+        /// </summary>
+        public static string Allowed_IPs {
+            get {
+                return ResourceManager.GetString("Allowed IPs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Any IP.
         /// </summary>
         public static string Any_IP {
@@ -498,6 +507,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Authorities {
             get {
                 return ResourceManager.GetString("Authorities", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Blocked IPs.
+        /// </summary>
+        public static string Blocked_IPs {
+            get {
+                return ResourceManager.GetString("Blocked IPs", resourceCulture);
             }
         }
         
@@ -1213,6 +1231,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Disabled.
+        /// </summary>
+        public static string Disabled {
+            get {
+                return ResourceManager.GetString("Disabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Discard.
         /// </summary>
         public static string Discard {
@@ -1560,6 +1587,60 @@ namespace ByProxy.AdminApp.Languages {
         public static string ERR_InvalidServerCert {
             get {
                 return ResourceManager.GetString("ERR_InvalidServerCert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid IP address..
+        /// </summary>
+        public static string ERR_IpRestrictionInvalidAddress {
+            get {
+                return ResourceManager.GetString("ERR_IpRestrictionInvalidAddress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid CIDR. Use an IP address followed by /prefix-length, such as 192.168.2.0/24 or 2001:db8::/32..
+        /// </summary>
+        public static string ERR_IpRestrictionInvalidCidr {
+            get {
+                return ResourceManager.GetString("ERR_IpRestrictionInvalidCidr", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Prefix length must be between 0 and 32 for IPv4, or 0 and 128 for IPv6..
+        /// </summary>
+        public static string ERR_IpRestrictionInvalidPrefix {
+            get {
+                return ResourceManager.GetString("ERR_IpRestrictionInvalidPrefix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid IP range. Separate the start and end addresses with a hyphen, such as 192.168.2.10-192.168.2.20..
+        /// </summary>
+        public static string ERR_IpRestrictionInvalidRange {
+            get {
+                return ResourceManager.GetString("ERR_IpRestrictionInvalidRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Range endpoints must both be IPv4 or both be IPv6. IPv4-mapped IPv6 addresses are treated as IPv4..
+        /// </summary>
+        public static string ERR_IpRestrictionRangeFamilyMismatch {
+            get {
+                return ResourceManager.GetString("ERR_IpRestrictionRangeFamilyMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The range start address must be less than or equal to the end address..
+        /// </summary>
+        public static string ERR_IpRestrictionRangeOrder {
+            get {
+                return ResourceManager.GetString("ERR_IpRestrictionRangeOrder", resourceCulture);
             }
         }
         
@@ -2516,6 +2597,27 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to One entry per line. Accepts both IPv4 and IPv6. Valid entries include:
+        ///Single IP addresses (e.g. 192.168.1.10)
+        ///CIDR ranges (e.g. 192.168.2.0/24)
+        ///Inclusive start-end range (e.g. 192.168.2.10-192.168.2.20).
+        /// </summary>
+        public static string Help_IpRestrictionEntries {
+            get {
+                return ResourceManager.GetString("Help_IpRestrictionEntries", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Restrict access to this route by client IP address. Allow lists deny unlisted addresses; block lists deny listed addresses..
+        /// </summary>
+        public static string Help_IpRestrictions {
+            get {
+                return ResourceManager.GetString("Help_IpRestrictions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Routes requests to the destination currently handling the fewest active requests..
         /// </summary>
         public static string Help_LeastRequests {
@@ -3383,6 +3485,51 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to IP Address Entries.
+        /// </summary>
+        public static string IP_Address_Entries {
+            get {
+                return ResourceManager.GetString("IP Address Entries", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IP Denial Response.
+        /// </summary>
+        public static string IP_Denial_Response {
+            get {
+                return ResourceManager.GetString("IP Denial Response", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IP Restrictions.
+        /// </summary>
+        public static string IP_Restrictions {
+            get {
+                return ResourceManager.GetString("IP Restrictions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Allow List.
+        /// </summary>
+        public static string IpRestrictionMode_AllowList {
+            get {
+                return ResourceManager.GetString("IpRestrictionMode_AllowList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Block List.
+        /// </summary>
+        public static string IpRestrictionMode_BlockList {
+            get {
+                return ResourceManager.GetString("IpRestrictionMode_BlockList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Issue.
         /// </summary>
         public static string Issue {
@@ -3532,6 +3679,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Limited {
             get {
                 return ResourceManager.GetString("Limited", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Line.
+        /// </summary>
+        public static string Line {
+            get {
+                return ResourceManager.GetString("Line", resourceCulture);
             }
         }
         
@@ -5613,6 +5769,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string WARN_InvalidState {
             get {
                 return ResourceManager.GetString("WARN_InvalidState", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No IP addresses, networks, or ranges have been configured..
+        /// </summary>
+        public static string WARN_IpRestrictionEntriesEmpty {
+            get {
+                return ResourceManager.GetString("WARN_IpRestrictionEntriesEmpty", resourceCulture);
             }
         }
         

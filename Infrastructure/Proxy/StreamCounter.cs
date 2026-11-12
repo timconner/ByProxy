@@ -1,4 +1,4 @@
-﻿namespace ByProxy.Infrastructure {
+﻿namespace ByProxy.Infrastructure.Proxy {
     public sealed class StreamCounter : Stream {
         private readonly Stream _stream;
         public StreamCounter(Stream stream) => _stream = stream;

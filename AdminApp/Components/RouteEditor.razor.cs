@@ -37,6 +37,24 @@ public partial class RouteEditor {
         }
     }
 
+    private string RedirectLocation {
+        get {
+            if (
+                Route.StaticResponse?.Headers != null
+                && Route.StaticResponse.Headers.TryGetValue("Location", out var location)
+            ) {
+                return location;
+            }
+
+            return string.Empty;
+        }
+        set {
+            if (Route.StaticResponse == null) return;
+            Route.StaticResponse.Headers ??= new();
+            Route.StaticResponse.Headers["Location"] = value;
+        }
+    }
+
     private string _newHeaderMatchKey = string.Empty;
     private ProxyHeaderMatchMode _newHeaderMatchMode = ProxyHeaderMatchMode.Exact;
     private List<string> _newHeaderMatchValues = new();
@@ -48,9 +66,6 @@ public partial class RouteEditor {
     private bool _newQueryMatchCaseSensitivity;
 
     private List<ProxyCluster>? _clusters;
-
-    private string _newStaticResponseHeaderName = string.Empty;
-    private string _newStaticResponseHeaderValue = string.Empty;
 
     private string _newFromHttpMethod = string.Empty;
     private string _newToHttpMethod = string.Empty;
@@ -65,7 +80,7 @@ public partial class RouteEditor {
     private string _newQueryTransformOperation = RequestQueryTransformOperation.Set.Operation;
     private string _newQueryTransformQueryKey = string.Empty;
     private string _newQueryTransformQueryValue = string.Empty;
-        
+
     private string _newAllowedResponseHeader = string.Empty;
 
     private string _newResponseHeaderTransformOperation = ResponseHeaderTransformOperation.Set.Operation;
@@ -86,6 +101,57 @@ public partial class RouteEditor {
         _clusters.ApplySort();
     }
 
+    private void ChangeIpRestrictionMode(string? mode) {
+        Route.IpRestrictionMode = IpRestrictionMode.FromString(mode);
+
+        if (Route.IpRestrictionMode != null) {
+            Route.IpRestrictionEntries ??= new();
+            Route.IpDenyResponse ??= StaticResponse.CreateDefault(403);
+        }
+    }
+
+    private async Task EditIpRestrictionEntries() {
+        var draft = string.Join("\n", Route.IpRestrictionEntries ?? new List<string>());
+
+        while (true) {
+            var result = await _modal.LargeText(
+                title: _strings["IP Address Entries"],
+                prompt: _strings["Help_IpRestrictionEntries"],
+                value: draft,
+                readOnly: false,
+                closeOnly: false,
+                monoSpace: true
+            );
+
+            if (result.DialogResult != DialogResult.OK) return;
+
+            draft = result.Value ?? string.Empty;
+
+            var lines = draft.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
+            var entries = new List<string>();
+            var errors = new List<string>();
+
+            for (var i = 0; i < lines.Length; i++) {
+                var entry = lines[i].Trim();
+                if (string.IsNullOrWhiteSpace(entry)) continue;
+
+                try {
+                    RunningIpRange.Parse(entry);
+                    entries.Add(entry);
+                } catch (IpRangeParseException ex) {
+                    errors.Add($"{_strings["Line"]} {i + 1}: {_strings[ex.ErrorKey]}\n{entry}");
+                }
+            }
+
+            if (errors.Count == 0) {
+                Route.IpRestrictionEntries = entries;
+                return;
+            }
+
+            await _modal.OkOnly(_strings["Validation Errors"], string.Join("\n\n", errors));
+        }
+    }
+
     private void ChangeRouteResponseType(string? responseType) {
         if (string.IsNullOrEmpty(responseType) || responseType == Route.ResponseType.Type) return;
 
@@ -93,23 +159,19 @@ public partial class RouteEditor {
         switch (responseType) {
             case RouteResponseType.Constants.Cluster:
                 Route.ClusterId = Guid.Empty;
-                Route.HttpStatusCode = null;
-                Route.RedirectLocation = null;
+                Route.StaticResponse = null;
                 break;
             case RouteResponseType.Constants.Redirect:
                 Route.ClusterId = null;
-                Route.HttpStatusCode = 307;
-                Route.RedirectLocation = string.Empty;
+                Route.StaticResponse = StaticResponse.CreateRedirect(307, string.Empty);
                 break;
             case RouteResponseType.Constants.Static:
                 Route.ClusterId = null;
-                Route.HttpStatusCode = 200;
-                Route.RedirectLocation = null;
+                Route.StaticResponse = StaticResponse.CreateDefault(200);
                 break;
             case RouteResponseType.Constants.Tarpit:
                 Route.ClusterId = null;
-                Route.HttpStatusCode = 500;
-                Route.RedirectLocation = null;
+                Route.StaticResponse = StaticResponse.CreateTarpit(500);
                 break;
         }
     }
@@ -224,66 +286,6 @@ public partial class RouteEditor {
         _newQueryMatchValues = match.Values ?? new();
         _newQueryMatchCaseSensitivity = match.CaseSensitiveValues ?? false;
         Route.MatchCriteria.Remove(match);
-    }
-
-    private async Task ToggleStaticResponseBody(bool state) {
-        if (!state) {
-            Route.StaticResponseBody = null;
-        } else {
-            await EditStaticResponseBody();
-        }
-    }
-
-    private async Task EditStaticResponseBody() {
-        var result = await _modal.LargeText(
-            title: _strings["Response Body"],
-            prompt: null,
-            value: Route.StaticResponseBody ?? string.Empty,
-            readOnly: false,
-            closeOnly: false,
-            monoSpace: true
-        );
-
-        if (result.DialogResult == DialogResult.OK) {
-            Route.StaticResponseBody = result.Value;
-        }
-    }
-
-    private async Task AddStaticResponseHeader() {
-        var name = _newStaticResponseHeaderName.Trim();
-        if (string.IsNullOrWhiteSpace(name)) return;
-
-        if (!Regex.IsMatch(name, @"^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$")) {
-            await _modal.OkOnly(_strings["Invalid Header"], _strings["WARN_InvalidHeaderName"]);
-            return;
-        }
-
-        var value = _newStaticResponseHeaderValue;
-        if (!Regex.IsMatch(value, @"^[\t\x20-\x7E]*$")) {
-            await _modal.OkOnly(_strings["Invalid Header"], _strings["WARN_InvalidHeaderValue"]);
-            return;
-        }
-
-        if (Route.StaticResponseHeaders != null && Route.StaticResponseHeaders.Keys.Contains(name, StringComparer.OrdinalIgnoreCase)) {
-            await _modal.OkOnly(_strings["Duplicate Header"], _strings["WARN_DuplicateHeader"]);
-            return;
-        }
-
-        if (Route.StaticResponseHeaders == null) Route.StaticResponseHeaders = new();
-        Route.StaticResponseHeaders.Add(name, value);
-
-        _newStaticResponseHeaderName = string.Empty;
-        _newStaticResponseHeaderValue = string.Empty;
-    }
-
-    private void RemoveStaticResponseHeader(string name) {
-        if (Route.StaticResponseHeaders == null) return;
-
-        _newStaticResponseHeaderName = name;
-        _newStaticResponseHeaderValue = Route.StaticResponseHeaders[name];
-
-        Route.StaticResponseHeaders.Remove(name);
-        if (Route.StaticResponseHeaders.Count == 0) Route.StaticResponseHeaders = null;
     }
 
     private void SetClientHeaderMode(string? mode) {

@@ -79,8 +79,33 @@
             modelBuilder.Entity<ProxyCluster>()
                 .HasMany<ProxyRoute>()
                 .WithOne(_ => _.Cluster)
-                .OnDelete(DeleteBehavior.ClientNoAction);                
-            
+                .OnDelete(DeleteBehavior.ClientNoAction);
+
+
+            // Complex Properties
+            modelBuilder.Entity<ProxyConfig>()
+                .ComplexProperty(_ => _.UnmatchedResponse, entity => {
+                    entity.Property(_ => _.Headers)
+                        .HasConversion<DictionaryConverter<string, string>, DictionaryComparer<string, string>>();
+                });
+
+            modelBuilder.Entity<ProxyRoute>()
+                .ComplexProperty(_ => _.StaticResponse, entity => {
+                    entity.IsRequired(false);
+                    
+                    entity.Property(_ => _.Headers)
+                        .HasConversion<DictionaryConverter<string, string>, DictionaryComparer<string, string>>();
+                });
+
+            modelBuilder.Entity<ProxyRoute>()
+                .ComplexProperty(_ => _.IpDenyResponse, entity => {
+                    entity.IsRequired(false);
+
+                    entity.Property(_ => _.Headers)
+                        .HasConversion<DictionaryConverter<string, string>, DictionaryComparer<string, string>>();
+                });
+
+
             // AutoIncludes
             modelBuilder.Entity<ProxyConfig>()
                 .Navigation(_ => _.Routes)
@@ -145,14 +170,15 @@
                 .HasValue<AcmeHttpCertHost>(AcmeChallengeType.HTTP_01)
                 .HasValue<AcmeDnsCertHost>(AcmeChallengeType.DNS_01);
 
+            
             // Converters
             modelBuilder.Entity<ProxyRoute>()
                 .Property(_ => _.ResponseType)
                 .HasConversion<RouteResponseType.RouteResponseTypeConverter>();
 
             modelBuilder.Entity<ProxyRoute>()
-                .Property(_ => _.StaticResponseHeaders)
-                .HasConversion<DictionaryConverter<string, string>, DictionaryComparer<string, string>>();
+                .Property(_ => _.IpRestrictionMode)
+                .HasConversion<IpRestrictionMode.IpRestrictionModeConverter>();
 
             modelBuilder.Entity<ProxyRoute>()
                 .Property(_ => _.XForwardedForAction)

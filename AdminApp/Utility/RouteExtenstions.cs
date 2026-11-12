@@ -77,24 +77,12 @@
                     }
                     break;
                 case RouteResponseType.Constants.Redirect:
-                    responseDetails.Add($"{localizer["RouteSummary_Redirect"]}: {route.RedirectLocation}");
+                    responseDetails.Add($"{localizer["RouteSummary_Redirect"]}: {route.StaticResponse?.Headers?.GetValueOrDefault("Location")}");
                     break;
                 case RouteResponseType.Constants.Static:
                 case RouteResponseType.Constants.Tarpit:
-                    if (route.ResponseType == RouteResponseType.Tarpit) {
-                        responseDetails.Add($"{localizer["RouteSummary_Tarpit"]}: {route.HttpStatusCode}");
-                    } else {
-                        responseDetails.Add($"{localizer["RouteSummary_Static"]}: {route.HttpStatusCode}");
-                    }
-                    if (route.StaticResponseBody != null) {
-                        responseDetails.Add($"{localizer["With Body"]}: {Functions.GetHumanReadableBytes(Encoding.UTF8.GetByteCount(route.StaticResponseBody))}");
-                    }
-                    if (route.StaticResponseHeaders != null) {
-                        if (route.StaticResponseHeaders.Count == 1) {
-                            responseDetails.Add($"{localizer["With Header"]}: {route.StaticResponseHeaders.Keys.First()}");
-                        } else {
-                            responseDetails.Add(localizer["With Multiple Headers"]);
-                        }
+                    if (route.StaticResponse != null) {
+                        responseDetails.AddRange(route.StaticResponse.SimulateResponse(localizer));
                     }
                     break;
             }

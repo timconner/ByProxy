@@ -17,10 +17,7 @@
         public int? ClusterConfigRevision { get; set; }
         public ProxyCluster? Cluster { get; set; }
 
-        public int? HttpStatusCode { get; set; }
-        public string? StaticResponseBody { get; set; }
-        public Dictionary<string, string>? StaticResponseHeaders { get; set; }
-        public string? RedirectLocation { get; set; }
+        public StaticResponse? StaticResponse { get; set; }
 
         public List<string>? Methods { get; set; }
 
@@ -53,6 +50,10 @@
         public List<ProxyRequestTransform> RequestTransforms { get; set; }
         public List<ProxyResponseTransform> ResponseTransforms { get; set; }
 
+        public IpRestrictionMode? IpRestrictionMode { get; set; }
+        public List<string>? IpRestrictionEntries { get; set; }
+        public StaticResponse? IpDenyResponse { get; set; }
+
         public string GetPathAsYarpMatch() {
             if (string.IsNullOrWhiteSpace(Path)) {
                 return "{**catch-all}";
@@ -75,19 +76,35 @@
             var errors = new List<string>();
             if (string.IsNullOrWhiteSpace(Name)) errors.Add("ERR_NameEmpty");
 
+            if (IpRestrictionMode != null && IpRestrictionEntries != null) {
+                foreach (var entry in IpRestrictionEntries) {
+                    try {
+                        RunningIpRange.Parse(entry);
+                    } catch (IpRangeParseException ex) {
+                        if (!errors.Contains(ex.ErrorKey)) {
+                            errors.Add(ex.ErrorKey);
+                        }
+                    }
+                }
+            }
+
             switch (ResponseType.Type) {
                 case RouteResponseType.Constants.Cluster:
                     if (ClusterId == null || ClusterId == Guid.Empty) errors.Add("ERR_NoClusterSelected");
                     break;
                 case RouteResponseType.Constants.Redirect:
-                    if (HttpStatusCode != null || RedirectLocation != null) {
-                        if (HttpStatusCode is not (301 or 302 or 307 or 308)) errors.Add("ERR_InvalidRedirectStatus");
-                        if (string.IsNullOrWhiteSpace(RedirectLocation)) errors.Add("ERR_RedirectLocationRequired");
+                    if (StaticResponse?.HttpStatusCode is not (301 or 302 or 307 or 308)) errors.Add("ERR_InvalidRedirectStatus");
+                    if (
+                        StaticResponse?.Headers == null
+                        || !StaticResponse.Headers.TryGetValue("Location", out var location)
+                        || string.IsNullOrWhiteSpace(location))
+                    {
+                        errors.Add("ERR_RedirectLocationRequired");
                     }
                     break;
                 case RouteResponseType.Constants.Static:
                 case RouteResponseType.Constants.Tarpit:
-                    if (HttpStatusCode == null || HttpStatusCode == 0) errors.Add("ERR_HttpStatusCodeRequired");
+                    if (StaticResponse == null || StaticResponse.HttpStatusCode == 0) errors.Add("ERR_HttpStatusCodeRequired");
                     break;
             }
 
@@ -278,10 +295,7 @@
                 ResponseType = ResponseType,
                 ClusterId = ClusterId,
                 ClusterConfigRevision = newRevision,
-                RedirectLocation = RedirectLocation,
-                HttpStatusCode = HttpStatusCode,
-                StaticResponseBody = StaticResponseBody,
-                StaticResponseHeaders = StaticResponseHeaders?.ToDictionary(),
+                StaticResponse = StaticResponse?.Clone(),
                 Methods = Methods?.ToList(),
                 Hosts = Hosts?.ToList(),
                 MatchCriteria = MatchCriteria.Select(_ => _.Clone(newRevision)).ToList(),
@@ -302,7 +316,10 @@
                 RequestTransforms = RequestTransforms.Select(_ => _.Clone(newRevision)).ToList(),
                 PreserveResponseHeaders = PreserveResponseHeaders,
                 AllowedResponseHeaders = AllowedResponseHeaders?.ToList(),
-                ResponseTransforms = ResponseTransforms.Select(_ => _.Clone(newRevision)).ToList()
+                ResponseTransforms = ResponseTransforms.Select(_ => _.Clone(newRevision)).ToList(),
+                IpRestrictionMode = IpRestrictionMode,
+                IpRestrictionEntries = IpRestrictionEntries?.ToList(),
+                IpDenyResponse = IpDenyResponse?.Clone(),
             };
         }
 
@@ -315,10 +332,7 @@
                 Order = Order,
                 ResponseType = ResponseType.Type,
                 ClusterId = ClusterId,
-                RedirectLocation = RedirectLocation,
-                HttpStatusCode = HttpStatusCode,
-                StaticResponseBody = StaticResponseBody,
-                StaticResponseHeaders = StaticResponseHeaders,
+                StaticResponse = StaticResponse?.ToExport(),
                 Methods = Methods?.Order().ToList(),
                 Hosts = Hosts?.Order().ToList(),
                 MatchCriteria = MatchCriteria.OrderBy(_ => _.Id).Select(_ => _.ToExport()).ToList(),
@@ -339,7 +353,10 @@
                 RequestTransforms = RequestTransforms.OrderBy(_ => _.Id).Select(_ => _.ToExport()).ToList(),
                 PreserveResponseHeaders = PreserveResponseHeaders,
                 AllowedResponseHeaders = AllowedResponseHeaders?.Order().ToList(),
-                ResponseTransforms = ResponseTransforms.OrderBy(_ => _.Id).Select(_ => _.ToExport()).ToList()
+                ResponseTransforms = ResponseTransforms.OrderBy(_ => _.Id).Select(_ => _.ToExport()).ToList(),
+                IpRestrictionMode = IpRestrictionMode?.Mode,
+                IpRestrictionEntries = IpRestrictionEntries?.Order(StringComparer.Ordinal).ToList(),
+                IpDenyResponse = IpDenyResponse?.ToExport(),
             };
         }
     }
@@ -352,10 +369,7 @@
         public int Order { get; set; }
         public string ResponseType { get; set; }
         public Guid? ClusterId { get; set; }
-        public int? HttpStatusCode { get; set; }
-        public string? StaticResponseBody { get; set; }
-        public Dictionary<string, string>? StaticResponseHeaders { get; set; }
-        public string? RedirectLocation { get; set; }
+        public StaticResponseExport? StaticResponse { get; set; }
         public List<string>? Methods { get; set; }
         public List<string>? Hosts { get; set; }
         public List<RouteMatchExport> MatchCriteria { get; set; }
@@ -377,6 +391,9 @@
         public bool PreserveResponseHeaders { get; set; }
         public List<string>? AllowedResponseHeaders { get; set; }
         public List<ResponseTransformExport> ResponseTransforms { get; set; }
+        public string? IpRestrictionMode { get; set; }
+        public List<string>? IpRestrictionEntries { get; set; }
+        public StaticResponseExport? IpDenyResponse { get; set; }
 
         public ProxyRoute Realize(int revision) {
             return new ProxyRoute {
@@ -389,10 +406,7 @@
                 ResponseType = RouteResponseType.FromString(ResponseType) ?? throw new NotImplementedException($"Unknown Route Response Type: {ResponseType}"),
                 ClusterId = ClusterId,
                 ClusterConfigRevision = revision,
-                RedirectLocation = RedirectLocation,
-                HttpStatusCode = HttpStatusCode,
-                StaticResponseBody = StaticResponseBody,
-                StaticResponseHeaders = StaticResponseHeaders,
+                StaticResponse = StaticResponse?.Realize(),
                 Methods = Methods?.ToList(),
                 Hosts = Hosts?.ToList(),
                 MatchCriteria = MatchCriteria.Select(_ => _.Realize(revision)).ToList(),
@@ -414,6 +428,9 @@
                 PreserveResponseHeaders = PreserveResponseHeaders,
                 AllowedResponseHeaders = AllowedResponseHeaders?.ToList(),
                 ResponseTransforms = ResponseTransforms.Select(_ => _.Realize(revision)).ToList(),
+                IpRestrictionMode = IpRestrictionMode == null ? null : (Models.IpRestrictionMode.FromString(IpRestrictionMode) ?? throw new NotSupportedException($"Unknown IP restriction mode: {IpRestrictionMode}")),
+                IpRestrictionEntries = IpRestrictionEntries?.ToList(),
+                IpDenyResponse = IpDenyResponse?.Realize(),
             };
         }
     }
@@ -445,6 +462,30 @@
             public RouteResponseTypeConverter() : base(
                 routeResponseType => routeResponseType == null ? null : routeResponseType.Type,
                     value => FromString(value)) { }
+        }
+    }
+
+    public record IpRestrictionMode(string Mode) {
+        public static class Constants {
+            public const string AllowList = "AllowList";
+            public const string BlockList = "BlockList";
+        }
+
+        public static readonly IpRestrictionMode AllowList = new(Constants.AllowList);
+        public static readonly IpRestrictionMode BlockList = new(Constants.BlockList);
+
+        public static ImmutableArray<IpRestrictionMode> Modes = [AllowList, BlockList];
+
+        public static IpRestrictionMode? FromString(string? value) => value switch {
+            Constants.AllowList => AllowList,
+            Constants.BlockList => BlockList,
+            _ => null
+        };
+
+        public class IpRestrictionModeConverter : ValueConverter<IpRestrictionMode?, string?> {
+            public IpRestrictionModeConverter() : base(
+                ipRestrictionMode => ipRestrictionMode == null ? null : ipRestrictionMode.Mode,
+                value => FromString(value)) { }
         }
     }
 }

@@ -21,8 +21,7 @@
         public List<ProxyCluster> Clusters { get; set; }
         public List<ProxySniMap> SniMaps { get; set; }
         public long? MaxRequestBodySize { get; set; }
-        public int UnmatchedStatus { get; set; }
-        public bool Tarpit { get; set; }
+        public StaticResponse UnmatchedResponse { get; set; }
 
         public ProxyConfig() {
             Revision = 1;
@@ -64,41 +63,14 @@
 
                 switch (route.ResponseType.Type) {
                     case RouteResponseType.Constants.Redirect:
-                        if (route.HttpStatusCode == null || route.RedirectLocation == null) {
-                            errors.Add($"Route {route.Name} ejected. Missing required properties for a redirect route.");
-                            error = true;
-                        } else {
-                            nonClusterRoutes.Add(route.Id.ToString(), new RedirectRoute {
-                                RedirectStatus = route.HttpStatusCode.Value,
-                                RedirectLocation = route.RedirectLocation 
-                            });
-                        }
-                        break;
                     case RouteResponseType.Constants.Static:
                     case RouteResponseType.Constants.Tarpit:
-                        if (route.HttpStatusCode == null) {
-                            errors.Add($"Route {route.Name} ejected. Missing required properties for a static or tarpit response route.");
+                        if (route.StaticResponse?.HttpStatusCode == null || route.StaticResponse.HttpStatusCode == 0) {
+                            errors.Add($"Route {route.Name} ejected. Missing required properties for a redirect, static or tarpit response route.");
                             error = true;
                         } else {
-                            Dictionary<string, string>? staticResponseHeaders = null;
-                            if (route.StaticResponseHeaders != null) {
-                                staticResponseHeaders = new(StringComparer.OrdinalIgnoreCase);
-                                foreach (var header in route.StaticResponseHeaders) {
-                                    if (
-                                        string.Equals(header.Key, "Content-Length", StringComparison.OrdinalIgnoreCase) ||
-                                        string.Equals(header.Key, "Transfer-Encoding", StringComparison.OrdinalIgnoreCase)
-                                    ) {
-                                        warnings.Add($"Ignoring server-managed response header: {header.Key}");
-                                        continue;
-                                    }
-                                    staticResponseHeaders[header.Key] = header.Value;
-                                }
-                            }
                             nonClusterRoutes.Add(route.Id.ToString(), new StaticResponseRoute {
-                                HttpStatusCode = route.HttpStatusCode.Value,
-                                UseTarpit = route.ResponseType == RouteResponseType.Tarpit,
-                                ResponseBody = route.StaticResponseBody == null ? null : Encoding.UTF8.GetBytes(route.StaticResponseBody),
-                                ResponseHeaders = staticResponseHeaders
+                                Response = route.StaticResponse.AsRunning(warnings.Add)
                             });
                         }
                         break;
@@ -116,19 +88,52 @@
                 httpPorts.Remove(port);
             }
 
-            int unmatchedStatus;
-            if (!Enum.IsDefined(typeof(HttpStatusCode), UnmatchedStatus)) {
-                if (Tarpit) {
-                    unmatchedStatus = 500;
-                } else {
-                    unmatchedStatus = 404;
+            var routeIpRestrictions = new Dictionary<string, RunningIpRestriction>();
+            foreach (var route in validRoutes.ToList()) {
+                if (route.IpRestrictionMode == null) continue;
+
+                try {
+                    if (
+                        route.IpRestrictionMode != IpRestrictionMode.AllowList
+                        && route.IpRestrictionMode != IpRestrictionMode.BlockList
+                    ) {
+                        throw new FormatException($"Unknown IP restriction mode: {route.IpRestrictionMode.Mode}");
+                    }
+
+                    StaticResponse denyResponse;
+                    if (route.IpDenyResponse == null || route.IpDenyResponse.HttpStatusCode == 0) {
+                        warnings.Add($"Route {route.Name} has no valid IP denial response. Using an empty 403 response.");
+                        denyResponse = StaticResponse.CreateDefault(403);
+                    } else {
+                        denyResponse = route.IpDenyResponse;
+                    }
+
+                    var ranges = (route.IpRestrictionEntries ?? new List<string>())
+                        .Select(RunningIpRange.Parse)
+                        .ToImmutableArray();
+
+                    if (ranges.IsEmpty) {
+                        warnings.Add(route.IpRestrictionMode == IpRestrictionMode.AllowList
+                            ? $"Route {route.Name} has an empty IP allow list. All clients will be denied."
+                            : $"Route {route.Name} has an empty IP block list. No clients will be blocked.");
+                    }
+
+                    routeIpRestrictions.Add(route.Id.ToString(), new RunningIpRestriction {
+                        IsAllowList = route.IpRestrictionMode == IpRestrictionMode.AllowList,
+                        Ranges = ranges,
+                        DenyResponse = denyResponse.AsRunning(warnings.Add)
+                    });
+                } catch (FormatException ex) {
+                    errors.Add($"Route {route.Name} ejected. {ex.Message}");
+                    validRoutes.Remove(route);
+                    nonClusterRoutes.Remove(route.Id.ToString());
                 }
-            } else {
-                unmatchedStatus = UnmatchedStatus;
             }
 
             var clusters = Clusters.Select(_ => _.ToYarp()).ToList();
             clusters.Add(ProxyCluster.NullCluster);
+
+            var unmatchedResponse = UnmatchedResponse.AsRunning(warnings.Add);
 
             return new RunningConfig {
                 Revision = Revision,
@@ -140,8 +145,7 @@
                 AdminPort = AdminPort,
                 AdminCert = AdminCertId,
                 MaxRequestBodySize = MaxRequestBodySize,
-                Tarpit = Tarpit,
-                UnmatchedStatus = unmatchedStatus,
+                UnmatchedResponse = unmatchedResponse,
                 HttpPorts = httpPorts.ToImmutableHashSet(),
                 HttpsPorts = httpsPorts.ToImmutableHashSet(),
                 ProxyPorts = httpPorts.Union(httpsPorts).ToImmutableHashSet(),
@@ -153,6 +157,7 @@
                     .ToImmutableDictionary(
                         _ => _.Id.ToString(),
                         _ => new PortBinding(_.HttpPort, _.HttpsPort, _.HttpsPort == null ? true : _.SuppressHttpsRedirect)),
+                RouteIpRestrictions = routeIpRestrictions.ToImmutableDictionary(),
                 NonClusterRoutes = nonClusterRoutes.ToImmutableDictionary()
             };
         }
@@ -175,8 +180,7 @@
                 SniMaps = SniMaps.Select(_ => _.Clone(newRevision)).ToList(),
                 FallbackCertId = FallbackCertId,
                 MaxRequestBodySize = MaxRequestBodySize,
-                UnmatchedStatus = UnmatchedStatus,
-                Tarpit = Tarpit
+                UnmatchedResponse = UnmatchedResponse.Clone(),
             };
         }
 
@@ -187,8 +191,7 @@
                 AdminCertId = includeCertificates ? AdminCertId : null,
                 FallbackCertId = includeCertificates ? FallbackCertId : null,
                 MaxRequestBodySize = MaxRequestBodySize,
-                UnmatchedStatus = UnmatchedStatus,
-                Tarpit = Tarpit
+                UnmatchedResponse = UnmatchedResponse.ToExport()
             };
         }
 
@@ -247,7 +250,6 @@
         public Guid? AdminCertId { get; set; }
         public Guid? FallbackCertId { get; set; }
         public long? MaxRequestBodySize { get; set; }
-        public int UnmatchedStatus { get; set; }
-        public bool Tarpit { get; set; }
+        public StaticResponseExport UnmatchedResponse { get; set; }
     }
 }

@@ -70,6 +70,10 @@ form {
     margin-top: 6px;
 }
 
+textarea {
+    margin-top: 6px;
+}
+
 input[type=text], input[type=password], textarea {
     flex: 1;
     background-color: var(--bg-color);

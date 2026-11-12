@@ -1,36 +1,38 @@
 ﻿namespace ByProxy.Services {
-    using ProxyExportVLatest = ImportExportService.ProxyExportV1_24;
-    using SystemSettingsExportVLatest = ImportExportService.SystemSettingsExportV1_24;
-    using RouteExportVLatest = ImportExportService.RouteExportV1_24;
-    using RequestTransformExportVLatest = ImportExportService.RequestTransformExportV1_24;
-    using RequestPathTransformExportVLatest = ImportExportService.RequestPathTransformExportV1_24;
-    using RequestMethodTransformExportVLatest = ImportExportService.RequestMethodTransformExportV1_24;
-    using RequestHeaderTransformExportVLatest = ImportExportService.RequestHeaderTransformExportV1_24;
-    using RequestQueryTransformExportVLatest = ImportExportService.RequestQueryTransformExportV1_24;
-    using RouteMatchExportVLatest = ImportExportService.RouteMatchExportV1_24;
-    using RouteHeaderMatchExportVLatest = ImportExportService.RouteHeaderMatchExportV1_24;
-    using RouteQueryMatchExportVLatest = ImportExportService.RouteQueryMatchExportV1_24;
-    using ClusterExportVLatest = ImportExportService.ClusterExportV1_24;
-    using DestinationExportVLatest = ImportExportService.DestinationExportV1_24;
-    using SniMapExportVLatest = ImportExportService.SniMapExportV1_24;
-    using AcmeAccountExportVLatest = ImportExportService.AcmeAccountExportV1_24;
-    using AcmeDnsProviderExportVLatest = ImportExportService.AcmeDnsProviderExportV1_24;
-    using CertificateAuthorityExportVLatest = ImportExportService.CertificateAuthorityExportV1_24;
-    using ServerCertExportVLatest = ImportExportService.ServerCertExportV1_24;
-    using IssuedCertExportVLatest = ImportExportService.IssuedCertExportV1_24;
-    using AcmeCertExportVLatest = ImportExportService.AcmeCertExportV1_24;
-    using ImportedCertExportVLatest = ImportExportService.ImportedCertExportV1_24;
-    using AcmeCertHostExportVLatest = ImportExportService.AcmeCertHostExportV1_24;
-    using AcmeHttpCertHostExportVLatest = ImportExportService.AcmeHttpCertHostExportV1_24;
-    using AcmeDnsCertHostExportVLatest = ImportExportService.AcmeDnsCertHostExportV1_24;
-    using EncryptionParametersVLatest = ImportExportService.EncryptionParametersV1_24;
-    using EncryptionHeaderVLatest = ImportExportService.EncryptionHeaderV1_24;
-    using ResponseTransformExportVLatest = ImportExportService.ResponseTransformExportV1_24;
-    using ResponseHeaderTransformExportVLatest = ImportExportService.ResponseHeaderTransformExportV1_24;
+    using ProxyExportVLatest = ImportExportService.ProxyExportV1_25;
+    using SystemSettingsExportVLatest = ImportExportService.SystemSettingsExportV1_25;
+    using RouteExportVLatest = ImportExportService.RouteExportV1_25;
+    using RequestTransformExportVLatest = ImportExportService.RequestTransformExportV1_25;
+    using RequestPathTransformExportVLatest = ImportExportService.RequestPathTransformExportV1_25;
+    using RequestMethodTransformExportVLatest = ImportExportService.RequestMethodTransformExportV1_25;
+    using RequestHeaderTransformExportVLatest = ImportExportService.RequestHeaderTransformExportV1_25;
+    using RequestQueryTransformExportVLatest = ImportExportService.RequestQueryTransformExportV1_25;
+    using RouteMatchExportVLatest = ImportExportService.RouteMatchExportV1_25;
+    using RouteHeaderMatchExportVLatest = ImportExportService.RouteHeaderMatchExportV1_25;
+    using RouteQueryMatchExportVLatest = ImportExportService.RouteQueryMatchExportV1_25;
+    using ClusterExportVLatest = ImportExportService.ClusterExportV1_25;
+    using DestinationExportVLatest = ImportExportService.DestinationExportV1_25;
+    using SniMapExportVLatest = ImportExportService.SniMapExportV1_25;
+    using AcmeAccountExportVLatest = ImportExportService.AcmeAccountExportV1_25;
+    using AcmeDnsProviderExportVLatest = ImportExportService.AcmeDnsProviderExportV1_25;
+    using CertificateAuthorityExportVLatest = ImportExportService.CertificateAuthorityExportV1_25;
+    using ServerCertExportVLatest = ImportExportService.ServerCertExportV1_25;
+    using IssuedCertExportVLatest = ImportExportService.IssuedCertExportV1_25;
+    using AcmeCertExportVLatest = ImportExportService.AcmeCertExportV1_25;
+    using ImportedCertExportVLatest = ImportExportService.ImportedCertExportV1_25;
+    using AcmeCertHostExportVLatest = ImportExportService.AcmeCertHostExportV1_25;
+    using AcmeHttpCertHostExportVLatest = ImportExportService.AcmeHttpCertHostExportV1_25;
+    using AcmeDnsCertHostExportVLatest = ImportExportService.AcmeDnsCertHostExportV1_25;
+    using EncryptionParametersVLatest = ImportExportService.EncryptionParametersV1_25;
+    using EncryptionHeaderVLatest = ImportExportService.EncryptionHeaderV1_25;
+    using ResponseTransformExportVLatest = ImportExportService.ResponseTransformExportV1_25;
+    using ResponseHeaderTransformExportVLatest = ImportExportService.ResponseHeaderTransformExportV1_25;
+    using StaticResponseExportVLatest = ImportExportService.StaticResponseExportV1_25;
 
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$version")]
     [JsonDerivedType(typeof(ImportExportService.ProxyExportV1_20), "1.20")]
     [JsonDerivedType(typeof(ImportExportService.ProxyExportV1_24), "1.24")]
+    [JsonDerivedType(typeof(ImportExportService.ProxyExportV1_25), "1.25")]
     public abstract class ProxyExport {
         public abstract ProxyExport ToNext();
     }
@@ -270,19 +272,19 @@
             };
 
             if (export.SystemSettings != null && includedAreas.HasFlag(ExportOptions.IncludeSystemSettings)) {
+                var systemSettings = export.SystemSettings.ToCurrent();
                 if (mergeOptions.HasFlag(ImportMergeOptions.SkipAdminPortAndListen)) {
                     config.AdminListenAny = currentConfig.AdminListenAny;
                     config.AdminPort = currentConfig.AdminPort;
                 } else {
-                    config.AdminListenAny = export.SystemSettings.AdminListenAny;
-                    config.AdminPort = export.SystemSettings.AdminPort;
+                    config.AdminListenAny = systemSettings.AdminListenAny;
+                    config.AdminPort = systemSettings.AdminPort;
                 }
-                config.MaxRequestBodySize = export.SystemSettings.MaxRequestBodySize;
-                config.UnmatchedStatus = export.SystemSettings.UnmatchedStatus;
-                config.Tarpit = export.SystemSettings.Tarpit;
-                if (export.SystemSettings.AdminCertId != null && includedAreas.HasFlag(ExportOptions.IncludeSystemCertificates)) {
-                    config.AdminCertId = export.SystemSettings.AdminCertId.Value;
-                    config.FallbackCertId = export.SystemSettings.FallbackCertId;
+                config.MaxRequestBodySize = systemSettings.MaxRequestBodySize;
+                config.UnmatchedResponse = systemSettings.UnmatchedResponse.Realize();
+                if (systemSettings.AdminCertId != null && includedAreas.HasFlag(ExportOptions.IncludeSystemCertificates)) {
+                    config.AdminCertId = systemSettings.AdminCertId.Value;
+                    config.FallbackCertId = systemSettings.FallbackCertId;
                 } else {
                     config.AdminCertId = currentConfig.AdminCertId;
                     config.FallbackCertId = currentConfig.FallbackCertId;
@@ -291,8 +293,7 @@
                 config.AdminListenAny = currentConfig.AdminListenAny;
                 config.AdminPort = currentConfig.AdminPort;
                 config.MaxRequestBodySize = currentConfig.MaxRequestBodySize;
-                config.UnmatchedStatus = currentConfig.UnmatchedStatus;
-                config.Tarpit = currentConfig.Tarpit;
+                config.UnmatchedResponse = currentConfig.UnmatchedResponse.Clone();
                 config.AdminCertId = currentConfig.AdminCertId;
                 config.FallbackCertId = currentConfig.FallbackCertId;
             }
@@ -564,6 +565,7 @@
             string? version = headerDoc.RootElement.GetProperty("Version").GetString();
 
             ProxyExport export = version switch {
+                "1.25" => DecryptExportV1_25(headerBytes.Span, payload, password),
                 "1.24" => DecryptExportV1_24(headerBytes.Span, payload, password),
                 "1.20" => DecryptExportV1_20(headerBytes.Span, payload, password),
                 _ => throw new NotSupportedException($"Unsupported encryption version: {version}")
@@ -631,8 +633,7 @@
                 AdminCertId = systemExport.AdminCertId,
                 FallbackCertId = systemExport.FallbackCertId,
                 MaxRequestBodySize = systemExport.MaxRequestBodySize,
-                UnmatchedStatus = systemExport.UnmatchedStatus,
-                Tarpit = systemExport.Tarpit
+                UnmatchedResponse = systemExport.UnmatchedResponse.FromCurrent()
             };
         }
 
@@ -645,8 +646,7 @@
                 Order = routeExport.Order,
                 ResponseType = routeExport.ResponseType,
                 ClusterId = routeExport.ClusterId,
-                RedirectLocation = routeExport.RedirectLocation,
-                HttpStatusCode = routeExport.HttpStatusCode,
+                StaticResponse = routeExport.StaticResponse?.FromCurrent(),
                 Methods = routeExport.Methods?.ToList(),
                 Hosts = routeExport.Hosts?.ToList(),
                 MatchCriteria = routeExport.MatchCriteria.Select(_ => _.FromCurrent()).ToList(),
@@ -665,11 +665,12 @@
                 SuppressHttpsRedirect = routeExport.SuppressHttpsRedirect,
                 MaxRequestBodySize = routeExport.MaxRequestBodySize,
                 RequestTransforms = routeExport.RequestTransforms.Select(_ => _.FromCurrent()).ToList(),
-                StaticResponseBody = routeExport.StaticResponseBody,
-                StaticResponseHeaders = routeExport.StaticResponseHeaders?.ToDictionary(),
                 PreserveResponseHeaders = routeExport.PreserveResponseHeaders,
                 AllowedResponseHeaders = routeExport.AllowedResponseHeaders?.ToList(),
-                ResponseTransforms = routeExport.ResponseTransforms.Select(_ => _.FromCurrent()).ToList()
+                ResponseTransforms = routeExport.ResponseTransforms.Select(_ => _.FromCurrent()).ToList(),
+                IpRestrictionMode = routeExport.IpRestrictionMode,
+                IpRestrictionEntries = routeExport.IpRestrictionEntries?.ToList(),
+                IpDenyResponse = routeExport.IpDenyResponse?.FromCurrent(),
             };
         }
 
@@ -737,6 +738,15 @@
                     Mode = queryMatch.Mode
                 },
                 _ => throw new NotSupportedException($"No export mapping for {matchExport.GetType().Name}")
+            };
+        }
+
+        public static StaticResponseExportVLatest FromCurrent(this StaticResponseExport responseExport) {
+            return new StaticResponseExportVLatest {
+                HttpStatusCode = responseExport.HttpStatusCode,
+                UseTarpit = responseExport.UseTarpit,
+                Body = responseExport.Body,
+                Headers = responseExport.Headers?.ToDictionary()
             };
         }
 

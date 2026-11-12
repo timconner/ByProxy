@@ -2492,4 +2492,71 @@ Overwrite?</value>
   <data name="Sticky Sessions" xml:space="preserve">
     <value>Sticky Sessions</value>
   </data>
+  <data name="IP Restrictions" xml:space="preserve">
+    <value>IP Restrictions</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="IpRestrictionMode_AllowList" xml:space="preserve">
+    <value>Allow List</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="IpRestrictionMode_BlockList" xml:space="preserve">
+    <value>Block List</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_IpRestrictions" xml:space="preserve">
+    <value>Restrict access to this route by client IP address. Allow lists deny unlisted addresses; block lists deny listed addresses.</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Allowed IPs" xml:space="preserve">
+    <value>Allowed IPs</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Blocked IPs" xml:space="preserve">
+    <value>Blocked IPs</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="IP Address Entries" xml:space="preserve">
+    <value>IP Address Entries</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Help_IpRestrictionEntries" xml:space="preserve">
+    <value>One entry per line. Accepts both IPv4 and IPv6. Valid entries include:
+Single IP addresses (e.g. 192.168.1.10)
+CIDR ranges (e.g. 192.168.2.0/24)
+Inclusive start-end range (e.g. 192.168.2.10-192.168.2.20)</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="WARN_IpRestrictionEntriesEmpty" xml:space="preserve">
+    <value>No IP addresses, networks, or ranges have been configured.</value>
+  </data>
+  <data name="IP Denial Response" xml:space="preserve">
+    <value>IP Denial Response</value>
+    <comment>Used in RouteEditor</comment>
+  </data>
+  <data name="Line" xml:space="preserve">
+    <value>Line</value>
+    <comment>As in line number in block of text</comment>
+  </data>
+  <data name="ERR_IpRestrictionInvalidAddress" xml:space="preserve">
+    <value>Invalid IP address.</value>
+  </data>
+  <data name="ERR_IpRestrictionInvalidCidr" xml:space="preserve">
+    <value>Invalid CIDR. Use an IP address followed by /prefix-length, such as 192.168.2.0/24 or 2001:db8::/32.</value>
+  </data>
+  <data name="ERR_IpRestrictionInvalidPrefix" xml:space="preserve">
+    <value>Prefix length must be between 0 and 32 for IPv4, or 0 and 128 for IPv6.</value>
+  </data>
+  <data name="ERR_IpRestrictionInvalidRange" xml:space="preserve">
+    <value>Invalid IP range. Separate the start and end addresses with a hyphen, such as 192.168.2.10-192.168.2.20.</value>
+  </data>
+  <data name="ERR_IpRestrictionRangeFamilyMismatch" xml:space="preserve">
+    <value>Range endpoints must both be IPv4 or both be IPv6. IPv4-mapped IPv6 addresses are treated as IPv4.</value>
+  </data>
+  <data name="ERR_IpRestrictionRangeOrder" xml:space="preserve">
+    <value>The range start address must be less than or equal to the end address.</value>
+  </data>
+  <data name="Disabled" xml:space="preserve">
+    <value>Disabled</value>
+  </data>
 </root>

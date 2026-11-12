@@ -1,4 +1,4 @@
-﻿namespace ByProxy.Infrastructure {
+﻿namespace ByProxy.Infrastructure.Proxy {
     public static class TlsHandshake {
         public static TlsHandshakeCallbackOptions CreateCallbackOptions(Func<ConnectionContext?, string?, SslStreamCertificateContext?> certificateSelector) {
             return new TlsHandshakeCallbackOptions {

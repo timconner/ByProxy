@@ -3,7 +3,8 @@ public partial class SystemSettingsIndex : IDisposable {
     private ProxyDb _db = default!;
     private ProxyConfig? _proxyConfig;
 
-    private static readonly string _version = Utility.Functions.GetAppVersion();
+    private bool _prevUseTarpit;
+    private static readonly string _version = Functions.GetAppVersion();
 
     protected override async Task OnInitializedAsync() {
         _db = _dbFactory.CreateDbContext();
@@ -15,13 +16,23 @@ public partial class SystemSettingsIndex : IDisposable {
             .Where(_ => _.Revision == _proxyState.CandidateConfigRevision)
             .FirstAsync();
 
+        _prevUseTarpit = _proxyConfig.UnmatchedResponse.UseTarpit;
     }
 
     private async Task SaveChanges() {
-        await _modal.PerformSave(async () => {
+        if (_proxyConfig == null) return;
+                
+        var success = await _modal.PerformSave(async () => {
             await _db.SaveChangesAsync();
         });
+        if (!success) return;
+
         _ = _configService.UpdateHasChangesPending();
+
+        if (!_prevUseTarpit && _proxyConfig.UnmatchedResponse.UseTarpit) {
+            await _modal.OkOnly(_strings["Tarpit"], _strings["WARN_EnabledTarpit"]);
+        }
+        _prevUseTarpit = _proxyConfig.UnmatchedResponse.UseTarpit;
     }
 
     private async Task ToggleRequestBodySizeLimit() {
@@ -40,27 +51,13 @@ public partial class SystemSettingsIndex : IDisposable {
         await SaveChanges();
     }
 
-    private async Task TarpitToggled(bool tarpitEnabled) {
-        if (_proxyConfig == null) return;
-        if (tarpitEnabled) {
-            _proxyConfig.Tarpit = true;
-            _proxyConfig.UnmatchedStatus = 500;
-            await SaveChanges();
-            await _modal.OkOnly("Tarpit", _strings["WARN_EnabledTarpit"]);
-        } else {
-            _proxyConfig.Tarpit = false;
-            _proxyConfig.UnmatchedStatus = 404;
-            await SaveChanges();
-        }
-    }
-
     private async Task FallbackCertToggled(bool useFallbackCert) {
         if (_proxyConfig == null) return;
         if (useFallbackCert) {
                 _proxyConfig.FallbackCertId = _proxyConfig.AdminCertId;
                 _proxyConfig.FallbackCert = _proxyConfig.AdminCert;
         } else {
-            if (_proxyConfig.Tarpit) {
+            if (_proxyConfig.UnmatchedResponse.UseTarpit) {
                 var result = await _modal.OkCancel("Tarpit", _strings["WARN_RefusingConnectionsTarpit"]);
                 if (result != DialogResult.OK) return;
             }
