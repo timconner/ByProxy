@@ -1627,6 +1627,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to IPv4-mapped IPv6 CIDRs require a prefix length between 96 and 128..
+        /// </summary>
+        public static string ERR_IpRestrictionMappedPrefix {
+            get {
+                return ResourceManager.GetString("ERR_IpRestrictionMappedPrefix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Range endpoints must both be IPv4 or both be IPv6. IPv4-mapped IPv6 addresses are treated as IPv4..
         /// </summary>
         public static string ERR_IpRestrictionRangeFamilyMismatch {
@@ -1884,6 +1893,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Fingerprints {
             get {
                 return ResourceManager.GetString("Fingerprints", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Forwarded Client IP.
+        /// </summary>
+        public static string Forwarded_Client_IP {
+            get {
+                return ResourceManager.GetString("Forwarded Client IP", resourceCulture);
             }
         }
         
@@ -2344,6 +2362,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Resolve client IP addresses from X-Forwarded-For headers sent by trusted upstream proxies..
+        /// </summary>
+        public static string Help_ForwardedClientIp {
+            get {
+                return ResourceManager.GetString("Help_ForwardedClientIp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The commit button will appear in the navigation menu after a change is made..
         /// </summary>
         public static string Help_GS_CommitConfig {
@@ -2602,9 +2629,9 @@ namespace ByProxy.AdminApp.Languages {
         ///CIDR ranges (e.g. 192.168.2.0/24)
         ///Inclusive start-end range (e.g. 192.168.2.10-192.168.2.20).
         /// </summary>
-        public static string Help_IpRestrictionEntries {
+        public static string Help_IpRangeEntries {
             get {
-                return ResourceManager.GetString("Help_IpRestrictionEntries", resourceCulture);
+                return ResourceManager.GetString("Help_IpRangeEntries", resourceCulture);
             }
         }
         
@@ -3139,6 +3166,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Help_TarpitStatus {
             get {
                 return ResourceManager.GetString("Help_TarpitStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum number of forwarded addresses to process, starting with the nearest proxy. Each forwarding proxy must be trusted..
+        /// </summary>
+        public static string Help_TrustedProxyChainLimit {
+            get {
+                return ResourceManager.GetString("Help_TrustedProxyChainLimit", resourceCulture);
             }
         }
         
@@ -4537,6 +4573,15 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Proxy Chain Limit.
+        /// </summary>
+        public static string Proxy_Chain_Limit {
+            get {
+                return ResourceManager.GetString("Proxy Chain Limit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Purging.
         /// </summary>
         public static string Purging {
@@ -4839,6 +4884,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Reset_Password {
             get {
                 return ResourceManager.GetString("Reset Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resolve Forwarded Client IP.
+        /// </summary>
+        public static string Resolve_Forwarded_Client_IP {
+            get {
+                return ResourceManager.GetString("Resolve Forwarded Client IP", resourceCulture);
             }
         }
         
@@ -5455,6 +5509,24 @@ namespace ByProxy.AdminApp.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Trusted Proxies.
+        /// </summary>
+        public static string Trusted_Proxies {
+            get {
+                return ResourceManager.GetString("Trusted Proxies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trusted Proxy Addresses.
+        /// </summary>
+        public static string Trusted_Proxy_Addresses {
+            get {
+                return ResourceManager.GetString("Trusted Proxy Addresses", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Unencrypted.
         /// </summary>
         public static string Unencrypted {
@@ -5873,6 +5945,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string WARN_ShutdownProxy {
             get {
                 return ResourceManager.GetString("WARN_ShutdownProxy", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No upstream proxies are configured. Forwarded client IP headers will not be processed..
+        /// </summary>
+        public static string WARN_TrustedProxyEntriesEmpty {
+            get {
+                return ResourceManager.GetString("WARN_TrustedProxyEntriesEmpty", resourceCulture);
             }
         }
         

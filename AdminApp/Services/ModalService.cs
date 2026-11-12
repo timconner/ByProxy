@@ -208,5 +208,46 @@
             AssertComponentRegistered();
             return _modal.CertificatePicker(title, certIdToExclude);
         }
+
+        public async Task<ModalResult<List<string>>> IpRangeEntry(string title, List<string>? current) {
+            var draft = string.Join("\n", current ?? new List<string>());
+
+            while (true) {
+                var result = await LargeText(
+                    title: title,
+                    prompt: _strings["Help_IpRangeEntries"],
+                    value: draft,
+                    readOnly: false,
+                    closeOnly: false,
+                    monoSpace: true
+                );
+
+                if (result.DialogResult != DialogResult.OK) return new ModalResult<List<string>>(DialogResult.Cancel, new());
+
+                draft = result.Value ?? string.Empty;
+
+                var lines = draft.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
+                var entries = new List<string>();
+                var errors = new List<string>();
+
+                for (var i = 0; i < lines.Length; i++) {
+                    var entry = lines[i].Trim();
+                    if (string.IsNullOrWhiteSpace(entry)) continue;
+
+                    try {
+                        RunningIpRange.Parse(entry);
+                        entries.Add(entry);
+                    } catch (IpRangeParseException ex) {
+                        errors.Add($"{_strings["Line"]} {i + 1}: {_strings[ex.ErrorKey]}\n{entry}");
+                    }
+                }
+
+                if (errors.Count == 0) {
+                    return new ModalResult<List<string>>(DialogResult.OK, entries);
+                }
+
+                await OkOnly(_strings["Validation Errors"], string.Join("\n\n", errors));
+            }
+        }
     }
 }

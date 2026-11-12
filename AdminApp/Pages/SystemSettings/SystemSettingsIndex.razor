@@ -102,6 +102,71 @@
         </CollapsedContent>
     </PageCollapsibleSection>
 
+    <PageCollapsibleSection Label="@_strings["Trusted Proxies"]">
+        <Content>
+            <fieldset>
+                <legend>@_strings["Forwarded Client IP"]</legend>
+
+                <div>
+                    <Toggle FieldLabel="@_strings["Resolve Forwarded Client IP"]"
+                            OffLabel="@_strings["Disable"]"
+                            OnLabel="@_strings["Enable"]"
+                            IsOn="_proxyConfig.TrustedProxyChainLimit > 0"
+                            ToggleHandler="TrustedProxiesToggled"
+                            DisableToggleStateManagement />
+                    <div class="help-text">@_strings["Help_ForwardedClientIp"]</div>
+                </div>
+
+                @if (_proxyConfig.TrustedProxyChainLimit > 0) {
+                    <div>
+                        <label>
+                            @_strings["Proxy Chain Limit"]:
+                            <input type="number" min="1"
+                                   @bind:get="_proxyConfig.TrustedProxyChainLimit"
+                                   @bind:set="UpdateTrustedProxyChainLimit" />
+                        </label>
+                        <div class="help-text">@_strings["Help_TrustedProxyChainLimit"]</div>
+                    </div>
+
+                    <div>
+                        <div class="trusted-proxy-actions">
+                            <span>@_strings["Trusted Proxy Addresses"]:</span>
+                            <button type="button" @onclick="EditTrustedProxies">
+                                @_strings["Edit"]
+                            </button>
+                        </div>
+
+                        @if (_proxyConfig.TrustedProxies.Count == 0) {
+                            <div>@_strings["WARN_TrustedProxyEntriesEmpty"]</div>
+                        } else {
+                            <ul class="monospace">
+                                @foreach (var entry in _proxyConfig.TrustedProxies) {
+                                    <li>@entry</li>
+                                }
+                            </ul>
+                        }
+                    </div>
+                }
+            </fieldset>
+        </Content>
+        <CollapsedContent>
+            <div class="collapsed-content">
+                @if (_proxyConfig.TrustedProxyChainLimit > 0) {
+                    <div>@_strings["Proxy Chain Limit"]: @_proxyConfig.TrustedProxyChainLimit</div>
+                    @if (_proxyConfig.TrustedProxies.Count == 0) {
+                        <div>@_strings["WARN_TrustedProxyEntriesEmpty"]</div>
+                    } else {
+                        @foreach (var entry in _proxyConfig.TrustedProxies) {
+                            <div class="monospace">@entry</div>
+                        }
+                    }
+                } else {
+                    @_strings["Disabled"]
+                }
+            </div>
+        </CollapsedContent>
+    </PageCollapsibleSection>
+
     <PageDivider Label="@_strings["Danger Zone"]" MarginTop="24px" />
     <div class="danger-zone">
         <div class="services">

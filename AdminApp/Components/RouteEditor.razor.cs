@@ -111,45 +111,9 @@ public partial class RouteEditor {
     }
 
     private async Task EditIpRestrictionEntries() {
-        var draft = string.Join("\n", Route.IpRestrictionEntries ?? new List<string>());
-
-        while (true) {
-            var result = await _modal.LargeText(
-                title: _strings["IP Address Entries"],
-                prompt: _strings["Help_IpRestrictionEntries"],
-                value: draft,
-                readOnly: false,
-                closeOnly: false,
-                monoSpace: true
-            );
-
-            if (result.DialogResult != DialogResult.OK) return;
-
-            draft = result.Value ?? string.Empty;
-
-            var lines = draft.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None);
-            var entries = new List<string>();
-            var errors = new List<string>();
-
-            for (var i = 0; i < lines.Length; i++) {
-                var entry = lines[i].Trim();
-                if (string.IsNullOrWhiteSpace(entry)) continue;
-
-                try {
-                    RunningIpRange.Parse(entry);
-                    entries.Add(entry);
-                } catch (IpRangeParseException ex) {
-                    errors.Add($"{_strings["Line"]} {i + 1}: {_strings[ex.ErrorKey]}\n{entry}");
-                }
-            }
-
-            if (errors.Count == 0) {
-                Route.IpRestrictionEntries = entries;
-                return;
-            }
-
-            await _modal.OkOnly(_strings["Validation Errors"], string.Join("\n\n", errors));
-        }
+        var result = await _modal.IpRangeEntry(_strings["IP Address Entries"], Route.IpRestrictionEntries);
+        if (result.DialogResult != DialogResult.OK || result.Value == null) return;
+        Route.IpRestrictionEntries = result.Value;
     }
 
     private void ChangeRouteResponseType(string? responseType) {

@@ -52,7 +52,7 @@
                         : 404,
                 UseTarpit = UseTarpit,
                 Body = Body == null ? null : Encoding.UTF8.GetBytes(Body),
-                Headers = Headers
+                Headers = headers?.ToImmutableDictionary(StringComparer.OrdinalIgnoreCase)
             };
         }
 

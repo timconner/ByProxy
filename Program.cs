@@ -126,7 +126,8 @@ namespace ByProxy {
                     AdminPort = adminPort,
                     AdminCertId = adminCertId,
                     UnmatchedResponse = StaticResponse.CreateDefault(404),
-                    MaxRequestBodySize = 30_000_000
+                    MaxRequestBodySize = 30_000_000,
+                    TrustedProxies = new()
                 };
                 proxyConfig.Committed = true;
                 proxyConfig.Confirmed = true;
@@ -188,6 +189,7 @@ namespace ByProxy {
             builder.Services.AddSingleton<AcmeChallengeIntercept>();
 
             builder.Services.AddSingleton<RequestLogger>();
+            builder.Services.AddSingleton<ClientIpForwarding>();
             builder.Services.AddSingleton<ClientIpRestrictions>();
             builder.Services.AddSingleton<ConditionalHttpsRedirect>();
             builder.Services.AddSingleton<NonClusterRouteHandler>();
@@ -278,6 +280,7 @@ namespace ByProxy {
             var app = builder.Build();
 
             app.MapWhen(context => runningConfig.ProxyPorts.Contains(context.Connection.LocalPort), proxy => {
+                proxy.UseMiddleware<ClientIpForwarding>();
                 proxy.UseMiddleware<RequestLogger>();
 
                 proxy.UseRouting();

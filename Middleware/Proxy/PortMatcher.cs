@@ -22,7 +22,10 @@
                 var routeModel = candidates[i].Endpoint.Metadata.GetMetadata<RouteModel>();
                 if (routeModel == null) continue;
 
-                if (!_proxyState.RunningConfig.RoutePorts.TryGetValue(routeModel.Config.RouteId, out var ports)) continue;
+                if (!_proxyState.RunningConfig.RoutePorts.TryGetValue(routeModel.Config.RouteId, out var ports)) {
+                    candidates.SetValidity(i, false);
+                    continue;
+                }
 
                 if (localPort != ports.HttpsPort && localPort != ports.HttpPort) {
                     candidates.SetValidity(i, false);

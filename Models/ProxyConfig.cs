@@ -23,6 +23,9 @@
         public long? MaxRequestBodySize { get; set; }
         public StaticResponse UnmatchedResponse { get; set; }
 
+        public List<string> TrustedProxies { get; set; }
+        public int TrustedProxyChainLimit { get; set; }
+
         public ProxyConfig() {
             Revision = 1;
             Routes = new List<ProxyRoute>();
@@ -133,6 +136,35 @@
             var clusters = Clusters.Select(_ => _.ToYarp()).ToList();
             clusters.Add(ProxyCluster.NullCluster);
 
+            var trustedProxies = new List<System.Net.IPNetwork>();
+            var trustedProxyChainLimit = TrustedProxyChainLimit;
+            if (trustedProxyChainLimit < 0) {
+                warnings.Add("Trusted proxy chain limit cannot be negative. Forwarded client IP processing disabled.");
+                trustedProxyChainLimit = 0;
+            } else if (trustedProxyChainLimit > 0) {
+                if (TrustedProxies.Count == 0) {
+                    warnings.Add("No trusted proxies are configured. Forwarded client IP processing disabled.");
+                    trustedProxyChainLimit = 0;
+                } else {
+                    var invalidEntries = false;
+
+                    foreach (var entry in TrustedProxies) {
+                        try {
+                            trustedProxies.AddRange(RunningIpRange.Parse(entry).ToNetworks());
+                        } catch (IpRangeParseException ex) {
+                            errors.Add($"Invalid trusted proxy entry '{entry}'. {ex.Message}");
+                            invalidEntries = true;
+                        }
+                    }
+
+                    if (invalidEntries) {
+                        errors.Add("Forwarded client IP processing disabled because the trusted proxy configuration contains invalid entries.");
+                        trustedProxies.Clear();
+                        trustedProxyChainLimit = 0;
+                    }
+                }
+            }
+
             var unmatchedResponse = UnmatchedResponse.AsRunning(warnings.Add);
 
             return new RunningConfig {
@@ -158,7 +190,9 @@
                         _ => _.Id.ToString(),
                         _ => new PortBinding(_.HttpPort, _.HttpsPort, _.HttpsPort == null ? true : _.SuppressHttpsRedirect)),
                 RouteIpRestrictions = routeIpRestrictions.ToImmutableDictionary(),
-                NonClusterRoutes = nonClusterRoutes.ToImmutableDictionary()
+                NonClusterRoutes = nonClusterRoutes.ToImmutableDictionary(),
+                TrustedProxies = trustedProxies.Distinct().ToImmutableArray(),
+                TrustedProxyChainLimit = trustedProxyChainLimit
             };
         }
 
@@ -181,6 +215,8 @@
                 FallbackCertId = FallbackCertId,
                 MaxRequestBodySize = MaxRequestBodySize,
                 UnmatchedResponse = UnmatchedResponse.Clone(),
+                TrustedProxies = TrustedProxies.ToList(),
+                TrustedProxyChainLimit = TrustedProxyChainLimit,
             };
         }
 
@@ -191,7 +227,9 @@
                 AdminCertId = includeCertificates ? AdminCertId : null,
                 FallbackCertId = includeCertificates ? FallbackCertId : null,
                 MaxRequestBodySize = MaxRequestBodySize,
-                UnmatchedResponse = UnmatchedResponse.ToExport()
+                UnmatchedResponse = UnmatchedResponse.ToExport(),
+                TrustedProxies = TrustedProxyChainLimit > 0 ? TrustedProxies.Order(StringComparer.Ordinal).ToList() : null,
+                TrustedProxyChainLimit = TrustedProxyChainLimit > 0 ? TrustedProxyChainLimit : null,
             };
         }
 
@@ -205,6 +243,7 @@
                     .Select(_ => _.ToExport())
                     .ToList(),
                 Clusters = Clusters
+                    .OrderBy(_ => _.Id)
                     .Select(_ => _.ToExport(sortByOrder))
                     .ToList(),
                 SniMaps = SniMaps
@@ -251,5 +290,7 @@
         public Guid? FallbackCertId { get; set; }
         public long? MaxRequestBodySize { get; set; }
         public StaticResponseExport UnmatchedResponse { get; set; }
+        public List<string>? TrustedProxies { get; set; }
+        public int? TrustedProxyChainLimit { get; set; }
     }
 }

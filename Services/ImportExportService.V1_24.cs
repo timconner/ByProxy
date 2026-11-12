@@ -70,7 +70,9 @@
                         UnmatchedResponse = new StaticResponseExportV1_25 {
                             HttpStatusCode = SystemSettings.UnmatchedStatus,
                             UseTarpit = SystemSettings.Tarpit
-                        }
+                        },
+                        TrustedProxies = null,
+                        TrustedProxyChainLimit = null
                     },
 
                     Routes = Routes?.Select(route => {

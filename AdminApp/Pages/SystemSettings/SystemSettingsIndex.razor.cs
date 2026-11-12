@@ -101,6 +101,30 @@ public partial class SystemSettingsIndex : IDisposable {
         await SaveChanges();
     }
 
+    private async Task TrustedProxiesToggled(bool enabled) {
+        if (_proxyConfig == null) return;
+
+        _proxyConfig.TrustedProxyChainLimit = enabled ? 1 : 0;
+        await SaveChanges();
+    }
+
+    private async Task UpdateTrustedProxyChainLimit(int limit) {
+        if (_proxyConfig == null) return;
+
+        _proxyConfig.TrustedProxyChainLimit = Math.Max(1, limit);
+        await SaveChanges();
+    }
+
+    private async Task EditTrustedProxies() {
+        if (_proxyConfig == null) return;
+
+        var result = await _modal.IpRangeEntry(_strings["Trusted Proxy Addresses"], _proxyConfig.TrustedProxies);
+        if (result.DialogResult != DialogResult.OK || result.Value == null) return;
+
+        _proxyConfig.TrustedProxies = result.Value;
+        await SaveChanges();
+    }
+
     private async Task RestartProxy() {
         var result = await _modal.YesNo(_strings["Restart Proxy Server"], _strings["WARN_RestartProxy"]);
         if (result != DialogResult.Yes) return;

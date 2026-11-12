@@ -2520,12 +2520,11 @@ Overwrite?</value>
     <value>IP Address Entries</value>
     <comment>Used in RouteEditor</comment>
   </data>
-  <data name="Help_IpRestrictionEntries" xml:space="preserve">
+  <data name="Help_IpRangeEntries" xml:space="preserve">
     <value>One entry per line. Accepts both IPv4 and IPv6. Valid entries include:
 Single IP addresses (e.g. 192.168.1.10)
 CIDR ranges (e.g. 192.168.2.0/24)
 Inclusive start-end range (e.g. 192.168.2.10-192.168.2.20)</value>
-    <comment>Used in RouteEditor</comment>
   </data>
   <data name="WARN_IpRestrictionEntriesEmpty" xml:space="preserve">
     <value>No IP addresses, networks, or ranges have been configured.</value>
@@ -2558,5 +2557,39 @@ Inclusive start-end range (e.g. 192.168.2.10-192.168.2.20)</value>
   </data>
   <data name="Disabled" xml:space="preserve">
     <value>Disabled</value>
+  </data>
+  <data name="Forwarded Client IP" xml:space="preserve">
+    <value>Forwarded Client IP</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Trusted Proxies" xml:space="preserve">
+    <value>Trusted Proxies</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Resolve Forwarded Client IP" xml:space="preserve">
+    <value>Resolve Forwarded Client IP</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Help_ForwardedClientIp" xml:space="preserve">
+    <value>Resolve client IP addresses from X-Forwarded-For headers sent by trusted upstream proxies.</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Proxy Chain Limit" xml:space="preserve">
+    <value>Proxy Chain Limit</value>
+  </data>
+  <data name="Help_TrustedProxyChainLimit" xml:space="preserve">
+    <value>Maximum number of forwarded addresses to process, starting with the nearest proxy. Each forwarding proxy must be trusted.</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="Trusted Proxy Addresses" xml:space="preserve">
+    <value>Trusted Proxy Addresses</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="WARN_TrustedProxyEntriesEmpty" xml:space="preserve">
+    <value>No upstream proxies are configured. Forwarded client IP headers will not be processed.</value>
+    <comment>Used in SystemSettingsIndex</comment>
+  </data>
+  <data name="ERR_IpRestrictionMappedPrefix" xml:space="preserve">
+    <value>IPv4-mapped IPv6 CIDRs require a prefix length between 96 and 128.</value>
   </data>
 </root>

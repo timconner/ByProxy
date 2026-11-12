@@ -268,7 +268,7 @@
                 Reverted = false,
                 ReversionReason = null,
                 CommittedAt = null,
-                ConfirmSeconds = 0,
+                ConfirmSeconds = 0
             };
 
             if (export.SystemSettings != null && includedAreas.HasFlag(ExportOptions.IncludeSystemSettings)) {
@@ -289,6 +289,8 @@
                     config.AdminCertId = currentConfig.AdminCertId;
                     config.FallbackCertId = currentConfig.FallbackCertId;
                 }
+                config.TrustedProxies = systemSettings.TrustedProxies?.ToList() ??  new();
+                config.TrustedProxyChainLimit = systemSettings.TrustedProxyChainLimit ?? 0;
             } else {
                 config.AdminListenAny = currentConfig.AdminListenAny;
                 config.AdminPort = currentConfig.AdminPort;
@@ -296,6 +298,8 @@
                 config.UnmatchedResponse = currentConfig.UnmatchedResponse.Clone();
                 config.AdminCertId = currentConfig.AdminCertId;
                 config.FallbackCertId = currentConfig.FallbackCertId;
+                config.TrustedProxies = currentConfig.TrustedProxies.ToList();
+                config.TrustedProxyChainLimit = currentConfig.TrustedProxyChainLimit;
             }
 
             if (export.Routes != null && includedAreas.HasFlag(ExportOptions.IncludeRoutesAndClusters)) {
@@ -633,7 +637,9 @@
                 AdminCertId = systemExport.AdminCertId,
                 FallbackCertId = systemExport.FallbackCertId,
                 MaxRequestBodySize = systemExport.MaxRequestBodySize,
-                UnmatchedResponse = systemExport.UnmatchedResponse.FromCurrent()
+                UnmatchedResponse = systemExport.UnmatchedResponse.FromCurrent(),
+                TrustedProxies = systemExport.TrustedProxies?.ToList(),
+                TrustedProxyChainLimit = systemExport.TrustedProxyChainLimit,
             };
         }
 

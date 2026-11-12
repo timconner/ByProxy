@@ -36,5 +36,8 @@
 
         public required Guid? FallbackCert { get; init; }
         public required HostTrie SniMaps { get; init; }
+
+        public required ImmutableArray<System.Net.IPNetwork> TrustedProxies { get; init; }
+        public required int TrustedProxyChainLimit { get; init; }
     }
 }

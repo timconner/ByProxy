@@ -69,6 +69,8 @@
             public Guid? FallbackCertId { get; set; }
             public long? MaxRequestBodySize { get; set; }
             public required StaticResponseExportV1_25 UnmatchedResponse { get; set; }
+            public List<string>? TrustedProxies { get; set; }
+            public int? TrustedProxyChainLimit { get; set; }
 
             public SystemSettingsExport ToCurrent() {
                 return new SystemSettingsExport {
@@ -77,7 +79,9 @@
                     AdminCertId = AdminCertId,
                     FallbackCertId = FallbackCertId,
                     MaxRequestBodySize = MaxRequestBodySize,
-                    UnmatchedResponse = UnmatchedResponse.ToCurrent()
+                    UnmatchedResponse = UnmatchedResponse.ToCurrent(),
+                    TrustedProxies = TrustedProxies?.ToList(),
+                    TrustedProxyChainLimit = TrustedProxyChainLimit,
                 };
             }
         }

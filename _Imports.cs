@@ -14,6 +14,7 @@ global using System.Net;
 global using System.Net.Http.Headers;
 global using System.Net.Security;
 global using System.Net.Sockets;
+global using System.Numerics;
 global using System.Reflection;
 global using System.Security.Authentication;
 global using System.Security.Claims;
