@@ -77,7 +77,7 @@
             if (string.IsNullOrWhiteSpace(Name)) errors.Add("ERR_NameEmpty");
 
             if (IpRestrictionMode != null && IpRestrictionEntries != null) {
-                foreach (var entry in IpRestrictionEntries) {
+                foreach (var entry in IpRestrictionEntries.WithoutBlankAndCommentLines()) {
                     try {
                         RunningIpRange.Parse(entry);
                     } catch (IpRangeParseException ex) {

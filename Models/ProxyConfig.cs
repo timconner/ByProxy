@@ -112,6 +112,7 @@
                     }
 
                     var ranges = (route.IpRestrictionEntries ?? new List<string>())
+                        .WithoutBlankAndCommentLines()
                         .Select(RunningIpRange.Parse)
                         .ToImmutableArray();
 
@@ -148,7 +149,7 @@
                 } else {
                     var invalidEntries = false;
 
-                    foreach (var entry in TrustedProxies) {
+                    foreach (var entry in TrustedProxies.WithoutBlankAndCommentLines()) {
                         try {
                             trustedProxies.AddRange(RunningIpRange.Parse(entry).ToNetworks());
                         } catch (IpRangeParseException ex) {
@@ -228,7 +229,7 @@
                 FallbackCertId = includeCertificates ? FallbackCertId : null,
                 MaxRequestBodySize = MaxRequestBodySize,
                 UnmatchedResponse = UnmatchedResponse.ToExport(),
-                TrustedProxies = TrustedProxyChainLimit > 0 ? TrustedProxies.Order(StringComparer.Ordinal).ToList() : null,
+                TrustedProxies = TrustedProxyChainLimit > 0 ? TrustedProxies.ToList() : null, // No Sort / Keep Order Intact
                 TrustedProxyChainLimit = TrustedProxyChainLimit > 0 ? TrustedProxyChainLimit : null,
             };
         }

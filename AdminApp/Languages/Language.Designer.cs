@@ -2625,6 +2625,7 @@ namespace ByProxy.AdminApp.Languages {
         
         /// <summary>
         ///   Looks up a localized string similar to One entry per line. Accepts both IPv4 and IPv6. Valid entries include:
+        ///Comment lines using # or blank lines (e.g. # This is a comment.)
         ///Single IP addresses (e.g. 192.168.1.10)
         ///CIDR ranges (e.g. 192.168.2.0/24)
         ///Inclusive start-end range (e.g. 192.168.2.10-192.168.2.20).
@@ -3967,6 +3968,15 @@ namespace ByProxy.AdminApp.Languages {
         public static string Merge {
             get {
                 return ResourceManager.GetString("Merge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to More.
+        /// </summary>
+        public static string More {
+            get {
+                return ResourceManager.GetString("More", resourceCulture);
             }
         }
         

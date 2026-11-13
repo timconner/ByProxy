@@ -109,9 +109,16 @@
                     @_strings["WARN_IpRestrictionEntriesEmpty"]
                 </div>
             } else {
+
                 <ul class="ip-entries monospace">
-                    @foreach (var entry in Route.IpRestrictionEntries) {
+                    @{
+                        List<string> ipListPreview = Route.IpRestrictionEntries.WithoutBlankAndCommentLines().ToList();
+                    }
+                    @foreach (var entry in ipListPreview.Take(5)) {
                         <li>@entry</li>
+                    }
+                    @if (ipListPreview.Count > 5) {
+                        <li>+ @(ipListPreview.Count - 5) @_strings["More"] ...</li>
                     }
                 </ul>
             }

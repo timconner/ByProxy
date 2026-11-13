@@ -29,6 +29,19 @@ fieldset {
     gap: 8px;
 }
 
+ul {
+    margin: 0;
+    padding-left: 20px;
+    margin-top: 8px;
+    margin-bottom: 2px;
+}
+
+li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 .danger-zone {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;

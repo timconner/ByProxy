@@ -76,7 +76,8 @@
                             OffLabel="@_strings["Refuse Connection"]"
                             IsOn="_proxyConfig.FallbackCert != null"
                             OnLabel="@_strings["Use Fallback Certificate"]"
-                            ToggleHandler="FallbackCertToggled" />
+                            ToggleHandler="FallbackCertToggled"
+                            DisableToggleStateManagement />
                     @if (_proxyConfig.FallbackCert != null) {
                         <div class="cert-select">
                             <span>@_strings["Fallback Certificate"]:</span>
@@ -140,7 +141,7 @@
                             <div>@_strings["WARN_TrustedProxyEntriesEmpty"]</div>
                         } else {
                             <ul class="monospace">
-                                @foreach (var entry in _proxyConfig.TrustedProxies) {
+                                @foreach (var entry in _proxyConfig.TrustedProxies.WithoutBlankAndCommentLines()) {
                                     <li>@entry</li>
                                 }
                             </ul>
@@ -156,9 +157,7 @@
                     @if (_proxyConfig.TrustedProxies.Count == 0) {
                         <div>@_strings["WARN_TrustedProxyEntriesEmpty"]</div>
                     } else {
-                        @foreach (var entry in _proxyConfig.TrustedProxies) {
-                            <div class="monospace">@entry</div>
-                        }
+                        <div>@_strings["Trusted Proxies"]: @_proxyConfig.TrustedProxies.WithoutBlankAndCommentLines().Count()</div>
                     }
                 } else {
                     @_strings["Disabled"]

@@ -232,13 +232,15 @@
 
                 for (var i = 0; i < lines.Length; i++) {
                     var entry = lines[i].Trim();
-                    if (string.IsNullOrWhiteSpace(entry)) continue;
-
-                    try {
-                        RunningIpRange.Parse(entry);
-                        entries.Add(entry);
-                    } catch (IpRangeParseException ex) {
-                        errors.Add($"{_strings["Line"]} {i + 1}: {_strings[ex.ErrorKey]}\n{entry}");
+                    if (string.IsNullOrWhiteSpace(entry) || entry.StartsWith('#')) {
+                        entries.Add(entry); // Keep Blank or Comment Lines
+                    } else {
+                        try {
+                            RunningIpRange.Parse(entry);
+                            entries.Add(entry);
+                        } catch (IpRangeParseException ex) {
+                            errors.Add($"{_strings["Line"]} {i + 1}: {_strings[ex.ErrorKey]}\n{entry}");
+                        }
                     }
                 }
 

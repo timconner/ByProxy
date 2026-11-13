@@ -2522,6 +2522,7 @@ Overwrite?</value>
   </data>
   <data name="Help_IpRangeEntries" xml:space="preserve">
     <value>One entry per line. Accepts both IPv4 and IPv6. Valid entries include:
+Comment lines using # or blank lines (e.g. # This is a comment.)
 Single IP addresses (e.g. 192.168.1.10)
 CIDR ranges (e.g. 192.168.2.0/24)
 Inclusive start-end range (e.g. 192.168.2.10-192.168.2.20)</value>
@@ -2599,5 +2600,8 @@ Inclusive start-end range (e.g. 192.168.2.10-192.168.2.20)</value>
   <data name="If Client IP Not Blocked" xml:space="preserve">
     <value>If Client IP Not Blocked</value>
     <comment>Used in RoutesIndex</comment>
+  </data>
+  <data name="More" xml:space="preserve">
+    <value>More</value>
   </data>
 </root>

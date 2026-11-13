@@ -7,6 +7,16 @@
         }
     }
 
+    public static class IpRangeExtensions {
+        public static IEnumerable<string> WithoutBlankAndCommentLines(this IEnumerable<string> source) {
+            foreach(var entry in source) {
+                if (string.IsNullOrWhiteSpace(entry)) continue;
+                if (entry.TrimStart().StartsWith('#')) continue;
+                yield return entry;
+            }
+        }
+    }
+
     public sealed class RunningIpRange {
         public required ReadOnlyMemory<byte> Start { get; init; }
         public required ReadOnlyMemory<byte> End { get; init; }
